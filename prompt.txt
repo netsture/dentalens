@@ -1,0 +1,19 @@
+aa folder ma frontend create karvanu che
+D:\wamp64\www\DentaLens\dentsaas aa folder mathi
+following page na levana
+/appointment/book
+patient/billing
+/settings
+
+D:\wamp64\www\kaabar_erp\frontend
+aa folder ni same design theme layout levanu
+
+Sidebar na following Menu
+
+Dashboard
+Appointment
+Patient
+Billing
+Documents
+Report
+Setting
