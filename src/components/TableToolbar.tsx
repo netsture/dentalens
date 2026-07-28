@@ -1,5 +1,5 @@
 import { useEffect, useId, useState, type ReactNode } from "react";
-import { Filter, RefreshCw, Search } from "lucide-react";
+import { Download, Filter, RefreshCw, Search } from "lucide-react";
 import {
   closeFilterToolbar,
   getOpenFilterToolbarId,
@@ -13,11 +13,16 @@ export type TableToolbarProps = {
   searchPlaceholder?: string;
   onRefresh?: () => void;
   refreshing?: boolean;
+  /** Shown right after Filter; exports current table data */
+  onExport?: () => void;
+  exportLabel?: string;
   filterContent?: ReactNode;
   actions?: ReactNode;
   className?: string;
   /** Notified when this toolbar's filter panel opens/closes */
   onFiltersOpenChange?: (open: boolean) => void;
+  /** When false, Filter only toggles column filters (no toolbar panel). Default true. */
+  showFilterPanel?: boolean;
 };
 
 /**
@@ -30,10 +35,13 @@ export function TableToolbar({
   searchPlaceholder = "Search...",
   onRefresh,
   refreshing = false,
+  onExport,
+  exportLabel = "Export",
   filterContent,
   actions,
   className = "",
   onFiltersOpenChange,
+  showFilterPanel = true,
 }: TableToolbarProps) {
   const toolbarId = useId();
   const [showFilters, setShowFilters] = useState(false);
@@ -127,11 +135,17 @@ export function TableToolbar({
             <Filter className="w-3 h-3" />
             <span>Filter</span>
           </button>
+          {onExport ? (
+            <button type="button" className="btn" onClick={onExport} title="Export to Excel">
+              <Download className="w-3 h-3" />
+              <span>{exportLabel}</span>
+            </button>
+          ) : null}
           {actions}
         </div>
       </div>
 
-      {showFilters && (
+      {showFilters && showFilterPanel && (
         <div className="flex flex-wrap items-end gap-3 pt-2 border-t border-border w-full">
           <div className="flex flex-wrap items-end gap-3 flex-1 min-w-0">
             {filterContent ?? (

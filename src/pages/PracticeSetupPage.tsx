@@ -14,6 +14,8 @@ import {
   Store,
   Users,
 } from "lucide-react";
+import { AddCorporationForm } from "@/components/AddCorporationForm";
+import { ManageCorporationPanel } from "@/components/ManageCorporationPanel";
 
 type MenuKey =
   | "corporation"
@@ -42,9 +44,8 @@ const menus: MenuItem[] = [
     label: "Corporation",
     icon: Building2,
     items: [
-      { key: "corp-profile", label: "Corporation Profile" },
-      { key: "corp-locations", label: "Locations Overview" },
-      { key: "corp-settings", label: "Corporate Settings" },
+      { key: "corp-add", label: "Add Corporation" },
+      { key: "corp-manage", label: "Manage Corporation" },
     ],
   },
   {
@@ -287,8 +288,59 @@ function AddProviderForm() {
   );
 }
 
-function SectionContent({ sub }: { sub: string }) {
+function SectionContent({
+  sub,
+  onNavigate,
+}: {
+  sub: string;
+  onNavigate: (key: SubKey, menuKey: MenuKey) => void;
+}) {
   const meta = findMenu(sub);
+
+  if (sub === "corp-add") {
+    return (
+      <PanelShell
+        title="Add New Corporation"
+        description="Create a corporation profile for practice setup and billing."
+        actions={
+          <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+            <button
+              type="button"
+              className="hover:text-primary bg-transparent border-none p-0 cursor-pointer"
+              onClick={() => onNavigate("corp-manage", "corporation")}
+            >
+              Back
+            </button>
+            <span>|</span>
+            <button
+              type="button"
+              className="hover:text-primary bg-transparent border-none p-0 cursor-pointer"
+              onClick={() => onNavigate("corp-manage", "corporation")}
+            >
+              Back To Practice Setup
+            </button>
+            <span>|</span>
+            <Link to="/dashboard" className="hover:text-primary">
+              Back To Dashboard
+            </Link>
+          </div>
+        }
+      >
+        <AddCorporationForm onCancel={() => onNavigate("corp-manage", "corporation")} />
+      </PanelShell>
+    );
+  }
+
+  if (sub === "corp-manage") {
+    return (
+      <PanelShell
+        title="Manage Corporation"
+        description="All corporations with search, filter and column sorting."
+      >
+        <ManageCorporationPanel onAdd={() => onNavigate("corp-add", "corporation")} />
+      </PanelShell>
+    );
+  }
 
   if (sub === "provider-add") {
     return (
@@ -522,7 +574,7 @@ export default function PracticeSetupPage() {
               </select>
             </div>
           </div>
-          <SectionContent sub={activeSub} />
+          <SectionContent sub={activeSub} onNavigate={selectSub} />
         </main>
       </div>
     </div>

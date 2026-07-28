@@ -1,0 +1,44 @@
+---
+description: Default toolbar and column sorting for every data table
+alwaysApply: true
+---
+
+# Data Table Defaults
+
+Whenever a page or panel **displays table data**, include this toolbar and sorting by default. Do not ship a bare table without them.
+
+## Required toolbar (left → right)
+
+Use `TableToolbar` from `@/components/TableToolbar`:
+
+1. **Search input** — filters rows across relevant columns (live or on Enter)
+2. **Refresh** — reloads / re-applies current view (`onRefresh`)
+3. **Filter** — toggles **inline per-column filter inputs** under table headers (`onFiltersOpenChange` + `showFilterPanel={false}`). Prefer column filters over a duplicate toolbar filter panel.
+4. **Export** — exports the **currently filtered/sorted** rows to Excel via `exportToExcel` from `@/lib/exportToExcel` (`onExport`)
+
+Optional primary actions (e.g. Add …) go in `actions` **after** Export.
+
+```tsx
+<TableToolbar
+  search={q}
+  onSearchChange={setQ}
+  searchPlaceholder="Search …"
+  onRefresh={handleRefresh}
+  refreshing={refreshing}
+  onFiltersOpenChange={setFiltersOpen}
+  showFilterPanel={false}
+  onExport={handleExport}
+  exportLabel="Export"
+  actions={/* Add / other primary actions */}
+/>
+```
+
+## Required column sorting
+
+- Every data column header is clickable to sort asc/desc
+- Show sort affordance (`ArrowUpDown` / `ArrowUp` / `ArrowDown` from lucide-react)
+- Sorting applies to the filtered dataset (search + column filters first, then sort)
+
+## Reference implementation
+
+Follow `ManageCorporationPanel` (`src/components/ManageCorporationPanel.tsx`) and reuse `ReportDataTable` patterns where they fit. Keep styling consistent with `.data-table`, `.btn`, and existing toolbar layout (search left; Refresh / Filter / Export right).
