@@ -32,12 +32,12 @@ export function DashboardLayout({ children }: { children: ReactNode }) {
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
 
   return (
-    <div className="h-screen w-screen flex flex-col overflow-hidden bg-background text-foreground select-none">
+    <div className="h-screen w-screen flex flex-col overflow-hidden bg-background text-foreground">
       <Topbar
         sidebarExpanded={sidebarExpanded}
         onToggleSidebar={() => setSidebarExpanded((v) => !v)}
       />
-      <div className="h-[30px] bg-primary text-primary-foreground flex items-center px-2 gap-0.5 shrink-0 overflow-x-auto border-b border-primary-hover">
+      <div className="h-[30px] bg-primary text-primary-foreground flex items-center justify-end px-2 gap-0.5 shrink-0 overflow-x-auto border-b border-primary-hover">
         {quickActions.map((action) => {
           const Icon = action.icon;
           const className = "h-6 px-2 flex items-center gap-1.5 text-[10px] font-semibold rounded-[2px] hover:bg-white/15 whitespace-nowrap border-none bg-transparent text-primary-foreground cursor-pointer";

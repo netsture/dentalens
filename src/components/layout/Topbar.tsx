@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import {
   Bell,
   Building,
-  Calendar,
+  Check,
   Mail,
   MapPin,
   Maximize2,
@@ -13,6 +13,12 @@ import {
   User,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
+import { applyTheme, getStoredTheme, THEMES, type AppTheme } from "@/lib/theme";
+import {
+  loadWorkspaceContext,
+  SwitchWorkspaceModal,
+  type WorkspaceContext,
+} from "@/components/SwitchWorkspaceModal";
 
 export function Topbar({
   onToggleSidebar,
@@ -24,9 +30,12 @@ export function Topbar({
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [showProfile, setShowProfile] = useState(false);
+  const [showWorkspace, setShowWorkspace] = useState(false);
+  const [workspace, setWorkspace] = useState<WorkspaceContext>(() => loadWorkspaceContext());
   const [density, setDensity] = useState(
     () => localStorage.getItem("dl-density") || "compact"
   );
+  const [theme, setTheme] = useState<AppTheme>(() => getStoredTheme());
   const profileRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -48,6 +57,11 @@ export function Topbar({
       "density-comfortable"
     );
     document.documentElement.classList.add(`density-${d}`);
+  };
+
+  const selectTheme = (next: AppTheme) => {
+    setTheme(next);
+    applyTheme(next);
   };
 
   const initials =
@@ -86,7 +100,7 @@ export function Topbar({
               DL
             </div>
             <span className="font-bold text-[13px] tracking-tight text-foreground truncate">
-              DENTA<span className="font-medium text-muted-foreground">LENS</span>
+              DentaLens<span className="font-medium text-primary">.ai</span>
             </span>
           </a>
         )}
@@ -94,30 +108,32 @@ export function Topbar({
 
       <div className="flex-1 flex items-center justify-between pr-3 h-full min-w-0">
         <div className="flex items-stretch h-full">
-          <div className="flex flex-col justify-center px-4 h-full border-r border-border bg-secondary/40 min-w-0">
+          <button
+            type="button"
+            onClick={() => setShowWorkspace(true)}
+            className="flex flex-col justify-center px-4 h-full border-r border-border bg-secondary/40 min-w-0 border-l-0 border-t-0 border-b-0 cursor-pointer hover:bg-secondary text-left"
+            title="Switch clinic"
+          >
             <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground leading-none mb-0.5 flex items-center gap-1">
               <Building className="w-2.5 h-2.5" /> Clinic
             </span>
             <span className="text-[12px] font-semibold text-foreground truncate max-w-[160px]">
-              DentaLens Clinic
+              {workspace.clinic}
             </span>
-          </div>
-          <div className="hidden md:flex flex-col justify-center px-4 h-full border-r border-border bg-secondary/40">
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowWorkspace(true)}
+            className="hidden md:flex flex-col justify-center px-4 h-full border-r border-border bg-secondary/40 border-l-0 border-t-0 border-b-0 cursor-pointer hover:bg-secondary text-left"
+            title="Switch branch"
+          >
             <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground leading-none mb-0.5 flex items-center gap-1">
               <MapPin className="w-2.5 h-2.5" /> Branch
             </span>
             <span className="text-[12px] text-muted-foreground truncate max-w-[140px]">
-              5TH STREET-GD-MS
+              {workspace.branch}
             </span>
-          </div>
-          <div className="hidden md:flex flex-col justify-center px-4 h-full border-r border-border bg-secondary/40">
-            <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground leading-none mb-0.5 flex items-center gap-1">
-              <Calendar className="w-2.5 h-2.5" /> Period
-            </span>
-            <span className="text-[12px] font-medium text-amber-600 whitespace-nowrap">
-              FY 2025–26
-            </span>
-          </div>
+          </button>
         </div>
 
         <div className="flex items-center gap-1.5">
@@ -196,6 +212,34 @@ export function Topbar({
                     ))}
                   </div>
                 </div>
+                <div className="flex flex-col gap-1.5">
+                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                    Theme
+                  </span>
+                  <div className="flex items-center gap-2 px-0.5">
+                    {THEMES.map((t) => {
+                      const selected = theme === t.id;
+                      return (
+                        <button
+                          key={t.id}
+                          type="button"
+                          title={t.label}
+                          aria-label={`${t.label} theme`}
+                          aria-pressed={selected}
+                          onClick={() => selectTheme(t.id)}
+                          className={`relative w-6 h-6 rounded-full border-none cursor-pointer shrink-0 transition-transform hover:scale-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring ${
+                            selected ? "ring-2 ring-offset-1 ring-foreground/40 scale-105" : "ring-1 ring-border"
+                          }`}
+                          style={{ backgroundColor: t.swatch }}
+                        >
+                          {selected ? (
+                            <Check className="w-3 h-3 text-white absolute inset-0 m-auto drop-shadow-sm" strokeWidth={3} />
+                          ) : null}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
                 <hr className="-mx-2 border-none h-px bg-border" />
                 <button
                   onClick={() => {
@@ -221,7 +265,7 @@ export function Topbar({
                 <button
                   onClick={() => {
                     logout();
-                    navigate("/login");
+                    navigate("/");
                   }}
                   className="w-full h-6 text-[12px] font-semibold text-white bg-destructive hover:opacity-90 rounded-[3px] cursor-pointer border-none"
                 >
@@ -232,6 +276,13 @@ export function Topbar({
           </div>
         </div>
       </div>
+
+      <SwitchWorkspaceModal
+        open={showWorkspace}
+        initial={workspace}
+        onClose={() => setShowWorkspace(false)}
+        onSave={setWorkspace}
+      />
     </header>
   );
 }

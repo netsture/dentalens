@@ -4,14 +4,18 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DentaLens</title>
+    <title>DentaLens.ai — Dental Practice Management Service</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
     <script>
       (function () {
-        const density = localStorage.getItem("dl-density") || "compact";
+        var density = localStorage.getItem("dl-density") || "compact";
         document.documentElement.classList.add("density-" + density);
+        var themes = ["blue", "green", "orange", "teal", "slate"];
+        var theme = localStorage.getItem("dl-theme") || "blue";
+        if (themes.indexOf(theme) === -1) theme = "blue";
+        document.documentElement.setAttribute("data-theme", theme);
       })();
     </script>
   </head>

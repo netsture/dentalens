@@ -587,7 +587,7 @@ export default function ReportPage() {
   const activeParent = parentOf(activeSection);
 
   return (
-    <div className="flex-grow flex flex-col overflow-hidden h-full select-none text-[11px] text-foreground">
+    <div className="flex-grow flex flex-col overflow-hidden h-full text-[11px] text-foreground">
       {activeSection !== "home" && (
         <header className="flex flex-col gap-2 shrink-0 pb-2">
           <div className="flex justify-between items-start gap-3 flex-wrap">
