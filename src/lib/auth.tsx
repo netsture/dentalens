@@ -12,11 +12,11 @@ type AuthContextValue = {
   logout: () => void;
 };
 
-const STORAGE_KEY = "dentalens_demo_user";
+const STORAGE_KEY = "dentsaas_demo_user";
 
 const DEMO_ACCOUNTS = [
-  { email: "admin@dentalens.com", password: "demo123", name: "Samir Admin", role: "Administrator" },
-  { email: "doctor@dentalens.com", password: "demo123", name: "Dr. Rollins", role: "Doctor" },
+  { email: "admin@dentsaas.com", password: "demo123", name: "Samir Admin", role: "Administrator" },
+  { email: "doctor@dentsaas.com", password: "demo123", name: "Dr. Rollins", role: "Doctor" },
 ];
 
 const AuthContext = createContext<AuthContextValue | null>(null);

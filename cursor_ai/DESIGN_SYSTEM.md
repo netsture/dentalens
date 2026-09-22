@@ -1,8 +1,8 @@
-# DentaLens Design System
+# dentsaas Design System
 
 ## Theme-first design rule (mandatory)
 
-**Default:** Always implement UI with the DentaLens theme only:
+**Default:** Always implement UI with the dentsaas theme only:
 
 - Use existing classes: `panel`, `panel-header`, `panel-title`, `btn`, `btn-primary`, `btn-ghost`, `field`, `data-table`, `badge`, `sidebar-item`, design tokens from `globals.css`.
 - Match spacing, typography, radius (`3px`), and colors already used on Dashboard / Patient / Settings.
@@ -12,7 +12,7 @@
 
 - Attaching a screenshot alone is **not** permission to restyle the app.
 - Only change the visual design to match a reference image when the user **explicitly asks** to redesign / match that image.
-- If the user asks to implement a feature and attaches a reference only for structure/fields, keep DentaLens theme styling and adapt field content/layout into theme components.
+- If the user asks to implement a feature and attaches a reference only for structure/fields, keep dentsaas theme styling and adapt field content/layout into theme components.
 - After an explicit redesign request, still prefer reusing theme tokens where possible unless the user requires a pixel-faithful alternate look.
 
 **Forms / modals:**

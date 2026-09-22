@@ -1,4 +1,4 @@
-# DentaLens Change Requests
+# dentsaas Change Requests
 
 આ file તમે future changes માટે edit કરી શકો છો. Cursor AI `MASTER_PROMPT.md` run કરતી વખતે અહીં લખેલી active requirementsને priority આપશે.
 
@@ -55,4 +55,4 @@
 - Keep existing working routes and interactions.
 - Keep the dense ERP design.
 - Keep TypeScript and the documented stack.
-- Keep DentaLens theme styling by default. Only match an attached reference image when this change request (or the user message) explicitly asks for that redesign.
+- Keep dentsaas theme styling by default. Only match an attached reference image when this change request (or the user message) explicitly asks for that redesign.

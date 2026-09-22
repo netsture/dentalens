@@ -269,7 +269,7 @@ function AddProviderForm() {
       </div>
       <div className="field md:col-span-2">
         <label>Email</label>
-        <input type="email" defaultValue="ahart@dentalens.com" />
+        <input type="email" defaultValue="ahart@dentsaas.com" />
       </div>
       <div className="md:col-span-2 flex justify-end gap-2 pt-1">
         <button type="button" className="btn">Cancel</button>

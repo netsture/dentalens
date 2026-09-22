@@ -183,6 +183,21 @@ export default function AppointmentBookPage() {
 
       <div className="flex-1 min-h-0 grid grid-cols-1 xl:grid-cols-12 gap-2">
         <div className="panel xl:col-span-9 flex flex-col min-h-0 overflow-hidden">
+          <div className="px-2 py-1.5 border-b border-border bg-secondary/30 flex items-center gap-2 flex-wrap shrink-0">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mr-1">
+              Legend
+            </span>
+            {[
+              ["Confirmed", "slot-confirmed"],
+              ["Allocated", "slot-allocated"],
+              ["Message", "slot-message"],
+              ["Blocked", "slot-blocked"],
+            ].map(([label, cls]) => (
+              <div key={label} className={`px-2 py-1 rounded-[2px] text-[10px] font-semibold ${cls}`}>
+                {label}
+              </div>
+            ))}
+          </div>
           {view === "grid" ? (
             <div className="overflow-auto flex-1">
               <table className="data-table min-w-[900px]">
@@ -316,22 +331,6 @@ export default function AppointmentBookPage() {
                 Select an appointment slot to view details.
               </p>
             )}
-          </div>
-
-          <div className="panel-header border-t mt-auto">
-            <div className="panel-title">Legend</div>
-          </div>
-          <div className="p-3 grid grid-cols-2 gap-1.5 text-[10px]">
-            {[
-              ["Confirmed", "slot-confirmed"],
-              ["Allocated", "slot-allocated"],
-              ["Message", "slot-message"],
-              ["Blocked", "slot-blocked"],
-            ].map(([label, cls]) => (
-              <div key={label} className={`px-2 py-1 rounded-[2px] font-semibold ${cls}`}>
-                {label}
-              </div>
-            ))}
           </div>
         </div>
       </div>

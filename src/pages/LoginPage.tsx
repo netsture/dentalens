@@ -28,7 +28,7 @@ export default function LoginPage() {
   const [remember, setRemember] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [form, setForm] = useState({ email: "admin@dentalens.com", password: "demo123" });
+  const [form, setForm] = useState({ email: "admin@gmail.com", password: "demo123" });
 
   useEffect(() => {
     const prev = { overflow: document.body.style.overflow, height: document.body.style.height };
@@ -71,7 +71,7 @@ export default function LoginPage() {
                 DL
               </div>
               <span className="text-white font-bold text-2xl tracking-tight">
-                DentaLens<span className="font-light opacity-80">.ai</span>
+              DentSaas<span className="font-light opacity-80">.ai</span>
               </span>
             </Link>
           </div>
@@ -137,7 +137,7 @@ export default function LoginPage() {
                 DL
               </div>
               <span className="font-bold text-xl text-slate-900">
-                DentaLens<span className="text-primary">.ai</span>
+              DentSaas<span className="text-primary">.ai</span>
               </span>
             </Link>
           </div>
@@ -168,7 +168,7 @@ export default function LoginPage() {
                     value={form.email}
                     onChange={(e) => setForm({ ...form, email: e.target.value })}
                     className="w-full h-10 px-3.5 text-[12.5px] rounded-xl text-slate-900 auth-input"
-                    placeholder="admin@dentalens.com"
+                    placeholder="admin@dentsaas.com"
                   />
                 </div>
 
@@ -233,7 +233,7 @@ export default function LoginPage() {
                   ))}
                 </div>
                 <p className="text-[10px] text-slate-400 mt-2">
-                  admin@dentalens.com / demo123
+                  admin@dentsaas.com / demo123
                 </p>
               </div>
             </div>
@@ -248,7 +248,7 @@ export default function LoginPage() {
           </div>
 
           <p className="mt-6 text-center text-[10.5px] text-slate-400">
-            © {new Date().getFullYear()} DentaLens.ai · Version 1.0.0
+            © {new Date().getFullYear()} DentSaas · Version 1.0.0
           </p>
           <div className="mt-2 flex justify-center gap-3 text-[10.5px] text-slate-400">
             <a href="#" className="hover:text-primary">Privacy Policy</a>

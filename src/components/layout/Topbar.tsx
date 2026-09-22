@@ -100,7 +100,7 @@ export function Topbar({
               DL
             </div>
             <span className="font-bold text-[13px] tracking-tight text-foreground truncate">
-              DentaLens<span className="font-medium text-primary">.ai</span>
+              DentSaas<span className="font-medium text-primary">.ai</span>
             </span>
           </a>
         )}

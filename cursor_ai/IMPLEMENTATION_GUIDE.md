@@ -1,4 +1,4 @@
-# DentaLens Implementation Guide
+# dentsaas Implementation Guide
 
 ## Required stack
 

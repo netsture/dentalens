@@ -155,7 +155,7 @@ function Logo({ light = false }: { light?: boolean }) {
         DL
       </div>
       <span className={`font-bold text-[17px] tracking-tight ${light ? "text-white" : "text-slate-900"}`}>
-        DentaLens<span className={light ? "text-white/70" : "text-blue-600"}>.ai</span>
+      DentSaas<span className={light ? "text-white/70" : "text-blue-600"}></span>
       </span>
     </Link>
   );
@@ -213,7 +213,7 @@ export default function HomePage() {
               <span className="text-blue-700">claim, and chart</span>
             </h1>
             <p className="mt-4 text-[15px] text-slate-600 leading-relaxed max-w-lg">
-              DentaLens.ai helps dental teams schedule patients, document care, bill accurately, and
+              DentSaas helps dental teams schedule patients, document care, bill accurately, and
               follow insurance — from the front desk to the back office in one place.
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
@@ -248,7 +248,7 @@ export default function HomePage() {
                 <span className="w-2.5 h-2.5 rounded-full bg-white/40" />
                 <span className="w-2.5 h-2.5 rounded-full bg-white/60" />
                 <span className="w-2.5 h-2.5 rounded-full bg-white" />
-                <span className="ml-2 text-[10px] font-semibold text-white/90">Today at DentaLens.ai</span>
+                <span className="ml-2 text-[10px] font-semibold text-white/90">Today at DentSaas</span>
               </div>
               <div className="p-4 grid grid-cols-2 gap-3">
                 {[
@@ -463,7 +463,7 @@ Authorization: Bearer dl_live_***
       <section id="pricing" className="py-16 md:py-20 bg-gradient-to-br from-blue-600 via-blue-700 to-sky-600 text-white">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-[28px] md:text-[34px] font-black tracking-tight">
-            See DentaLens.ai with your own workflow
+            See DentSaas with your own workflow
           </h2>
           <p className="mt-3 text-[14px] text-blue-100">
             Open the live demo, walk through patients and the appointment book, then decide if it fits your practice.
@@ -490,7 +490,7 @@ Authorization: Bearer dl_live_***
           <div className="lg:col-span-1">
             <Logo />
             <p className="mt-3 text-[12.5px] text-slate-600 leading-relaxed">
-              DentaLens.ai is a dental practice management service for clinics that want scheduling,
+              DentSaas is a dental practice management service for clinics that want scheduling,
               charting, and billing in one clear console.
             </p>
           </div>
@@ -514,7 +514,7 @@ Authorization: Bearer dl_live_***
           ))}
         </div>
         <div className="max-w-6xl mx-auto px-4 mt-10 pt-6 border-t border-blue-100 flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] text-slate-500">
-          <span>© {new Date().getFullYear()} DentaLens.ai · Dental Practice Management Service</span>
+          <span>© {new Date().getFullYear()} DentSaas · Dental Practice Management Service</span>
           <div className="flex gap-4">
             <a href="#" className="hover:text-blue-700">Privacy Policy</a>
             <a href="#" className="hover:text-blue-700">Terms</a>

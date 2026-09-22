@@ -1,8 +1,8 @@
-# DentaLens Product Specification
+# dentsaas Product Specification
 
 ## Product
 
-DentaLens is a frontend-only dental practice management demo inspired by dense CareStack/Dentrix workflows. It combines scheduling, patient records, clinical charting, treatment planning, billing, documents, reporting, and practice settings.
+dentsaas is a frontend-only dental practice management demo inspired by dense CareStack/Dentrix workflows. It combines scheduling, patient records, clinical charting, treatment planning, billing, documents, reporting, and practice settings.
 
 All records are realistic fixtures. Authentication and density preferences may use `localStorage`; no server is required.
 
@@ -11,7 +11,7 @@ All records are realistic fixtures. Authentication and density preferences may u
 ### Top bar
 
 - Height: 44px.
-- Left: sidebar toggle and DentaLens `DL` logo.
+- Left: sidebar toggle and DentSaas `DL` logo.
 - Context blocks: clinic, branch, fiscal period.
 - Right: quick search, notification count, message count, fullscreen and user avatar.
 - Profile popup: user details, role, density selector, Settings, My Profile and Logout.
@@ -85,7 +85,7 @@ Provide a polished split login screen and demo account quick-fill.
 
 Demo credentials:
 
-- Administrator: `admin@dentalens.com` / `demo123`
+- Administrator: `admin@gmail.com` / `demo123`
 - Doctor account may also be offered.
 
 Unauthenticated protected routes redirect to login. Successful login redirects to the requested page or dashboard.

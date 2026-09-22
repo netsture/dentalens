@@ -1,6 +1,6 @@
-# DentaLens Frontend Clone Pack
+# DentSaas Frontend Clone Pack
 
-આ folder બીજા PC પર Cursor AI દ્વારા DentaLens frontend ફરીથી બનાવવા માટેનો portable blueprint છે.
+આ folder બીજા PC પર Cursor AI દ્વારા DentSaas frontend ફરીથી બનાવવા માટેનો portable blueprint છે.
 
 ## કેવી રીતે ઉપયોગ કરવો
 
@@ -37,7 +37,7 @@ AI માત્ર description પરથી દરેક pixel હંમેશ�
 
 ### Theme-first design rule
 
-- Default: હંમેશા DentaLens theme layout (`panel`, `field`, `btn`, tokens) વાપરો.
+- Default: હંમેશા DentSaas theme layout (`panel`, `field`, `btn`, tokens) વાપરો.
 - Reference image attach કરવું માત્ર = બીજું design ન લાગુ કરો.
 - જ્યારે તમે સ્પષ્ટ કહો કે reference image પ્રમાણે redesign કરો, ત્યારે જ visual design બદલો.
 - અન્યથા fields/structure referenceમાંથી લો, styling theme માં રાખો.

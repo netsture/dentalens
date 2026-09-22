@@ -2,13 +2,13 @@ import { useEffect, useState } from "react";
 import { Building2, X } from "lucide-react";
 
 const CLINICS = [
-  "DentaLens Clinic",
+  "dentsaas Clinic",
   "Bright Smiles Dental Group",
   "City Center Oral Health",
 ];
 
 const BRANCHES: Record<string, string[]> = {
-  "DentaLens Clinic": ["5TH STREET-GD-MS", "SOUTH - Bright Smiles", "MAIN - City Center"],
+  "dentsaas Clinic": ["5TH STREET-GD-MS", "SOUTH - Bright Smiles", "MAIN - City Center"],
   "Bright Smiles Dental Group": ["SOUTH", "WEST"],
   "City Center Oral Health": ["CENT", "EAST"],
 };

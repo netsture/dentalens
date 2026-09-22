@@ -114,13 +114,13 @@ export default function SettingsPage() {
             <div className="space-y-4 max-w-4xl">
               <h3 className="text-[13px] font-bold">Practice Information</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <Field label="Practice Name"><input defaultValue="DentaLens Clinic" /></Field>
-                <Field label="Legal Entity Name"><input defaultValue="DentaLens LLC" /></Field>
+                <Field label="Practice Name"><input defaultValue="DentSaas Clinic" /></Field>
+                <Field label="Legal Entity Name"><input defaultValue="DentSaas LLC" /></Field>
                 <Field label="Tax ID / EIN"><input defaultValue="00-0000000" /></Field>
                 <Field label="NPI Number"><input defaultValue="1234567890" /></Field>
                 <Field label="Phone"><input defaultValue="215-224-4343" /></Field>
-                <Field label="Email"><input type="email" defaultValue="info@dentalens.com" /></Field>
-                <Field label="Website"><input defaultValue="https://dentalens.com" /></Field>
+                <Field label="Email"><input type="email" defaultValue="info@gmail.com" /></Field>
+                <Field label="Website"><input defaultValue="https://dentsaas.com" /></Field>
                 <Field label="Timezone">
                   <select defaultValue="est">
                     <option value="est">Eastern (EST)</option>
@@ -160,7 +160,7 @@ export default function SettingsPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-w-4xl">
               <Field label="First Name"><input defaultValue="Samir" /></Field>
               <Field label="Last Name"><input defaultValue="Admin" /></Field>
-              <Field label="Email"><input type="email" defaultValue="admin@dentalens.com" /></Field>
+              <Field label="Email"><input type="email" defaultValue="admin@gmail.com" /></Field>
               <Field label="Phone"><input defaultValue="+1 215 000 0000" /></Field>
               <Field label="Role">
                 <select defaultValue="admin">
@@ -224,7 +224,7 @@ export default function SettingsPage() {
                 </select>
               </Field>
               <Field label="Tax Rate (%)"><input type="number" defaultValue={6} /></Field>
-              <Field label="Billing Email" full><input type="email" defaultValue="billing@dentalens.com" /></Field>
+              <Field label="Billing Email" full><input type="email" defaultValue="billing@gmail.com" /></Field>
             </div>
           )}
 
@@ -292,7 +292,7 @@ export default function SettingsPage() {
               <ToggleRow label="QuickBooks" description="Export accounting data." />
               <div className="field mt-3">
                 <label>API Webhook URL</label>
-                <input placeholder="https://your-app.com/webhooks/dentalens" />
+                <input placeholder="https://your-app.com/webhooks/dentsaas" />
               </div>
             </div>
           )}

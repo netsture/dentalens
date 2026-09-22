@@ -1,5 +1,5 @@
 aa folder ma frontend create karvanu che
-D:\wamp64\www\DentaLens\dentsaas aa folder mathi
+D:\wamp64\www\dentsaas\dentsaas aa folder mathi
 following page na levana
 /appointment/book
 patient/billing

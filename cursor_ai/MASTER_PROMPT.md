@@ -4,7 +4,7 @@ Copy everything below this line into Cursor Agent mode:
 
 ---
 
-Build a complete frontend-only clone of the DentaLens dental practice application described in the `cursor_ai` folder.
+Build a complete frontend-only clone of the dentsaas dental practice application described in the `cursor_ai` folder.
 
 Before changing or creating code, read these files completely:
 
@@ -29,7 +29,7 @@ Create the same dense desktop dental ERP frontend, navigation hierarchy, routes,
 - Buttons that imply a visible UI action must work: navigation, tabs, filters, search, expansion, modals, date stepping, view switching, selection, toggles, and temporary save feedback.
 - Do not add a backend, database, external API, or paid service.
 - Do not replace the dense ERP design with a generic dashboard template.
-- **Theme-first rule:** Always use the DentaLens theme (`panel`, `field`, `btn`, tokens). Do not implement outside themes. Only restyle to match a reference image when the user explicitly asks for that redesign; otherwise keep theme layout even if a screenshot is attached.
+- **Theme-first rule:** Always use the dentsaas theme (`panel`, `field`, `btn`, tokens). Do not implement outside themes. Only restyle to match a reference image when the user explicitly asks for that redesign; otherwise keep theme layout even if a screenshot is attached.
 - Do not omit screens because they use mock data.
 - Use reusable components for the shell, tables, toolbars, patient workspace, fields, badges, modals, and navigation.
 - Preserve compatibility routes listed in `PRODUCT_SPEC.md`.

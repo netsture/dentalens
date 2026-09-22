@@ -1,6 +1,6 @@
-# DentaLens Frontend (Demo)
+# DentSaas Frontend (Demo)
 
-KaabarERP-style console layout + DentaLens pages (appointment book, billing, settings).
+ERP-style console layout + DentSaas pages (appointment book, billing, settings).
 
 ## Run
 
@@ -16,8 +16,8 @@ Open http://localhost:5174
 
 | Role | Email | Password |
 |------|-------|----------|
-| Administrator | `admin@dentalens.com` | `demo123` |
-| Doctor | `doctor@dentalens.com` | `demo123` |
+| Administrator | `admin@dentsaas.com` | `demo123` |
+| Doctor | `doctor@dentsaas.com` | `demo123` |
 
 ## Routes
 
