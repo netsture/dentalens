@@ -5,6 +5,8 @@ import {
   ChevronDown,
   ChevronRight,
   Home,
+  LayoutDashboard,
+  MapPin,
   MessageSquare,
   Plus,
   Search,
@@ -51,7 +53,7 @@ const menus: MenuItem[] = [
   {
     key: "office",
     label: "Office",
-    icon: Building2,
+    icon: MapPin,
     items: [
       { key: "office-add", label: "Add New Office" },
       { key: "office-manage", label: "Manage Offices" },
@@ -166,6 +168,63 @@ const adaCodes = [
   { code: "D6240", description: "Pontic - porcelain fused to high noble metal", category: "Prosthodontics", fee: "$1,118.00" },
 ];
 
+const dashboardCards: {
+  menuKey: MenuKey;
+  title: string;
+  count: number;
+  unit: string;
+  description: string;
+  icon: ComponentType<{ className?: string }>;
+  manageKey: SubKey;
+  addKey: SubKey;
+  addLabel: string;
+}[] = [
+  {
+    menuKey: "corporation",
+    title: "Corporation",
+    count: 5,
+    unit: "entities",
+    description: "Legal entities, NPI, and billing profiles for the practice.",
+    icon: Building2,
+    manageKey: "corp-manage",
+    addKey: "corp-add",
+    addLabel: "Add Corporation",
+  },
+  {
+    menuKey: "office",
+    title: "Office",
+    count: offices.length,
+    unit: "locations",
+    description: "Practice locations, phones, timezones, and working hours.",
+    icon: MapPin,
+    manageKey: "office-manage",
+    addKey: "office-add",
+    addLabel: "Add Office",
+  },
+  {
+    menuKey: "provider",
+    title: "Provider",
+    count: providers.length,
+    unit: "clinicians",
+    description: "Doctors and specialists used for scheduling and billing.",
+    icon: Stethoscope,
+    manageKey: "provider-manage",
+    addKey: "provider-add",
+    addLabel: "Add Provider",
+  },
+  {
+    menuKey: "insurance",
+    title: "Insurance",
+    count: carriers.length,
+    unit: "carriers",
+    description: "Payers, plans, and fee schedules used at checkout.",
+    icon: Shield,
+    manageKey: "ins-carriers",
+    addKey: "ins-plans",
+    addLabel: "View Plans",
+  },
+];
+
 function findMenu(sub: string): { menu: MenuItem; item: { key: string; label: string } } | null {
   for (const menu of menus) {
     const item = menu.items.find((i) => i.key === sub);
@@ -196,6 +255,70 @@ function PanelShell({
       </div>
       <div className="p-3 overflow-auto flex-1">{children}</div>
     </div>
+  );
+}
+
+function SetupDashboard({
+  onNavigate,
+}: {
+  onNavigate: (key: SubKey, menuKey: MenuKey) => void;
+}) {
+  return (
+    <PanelShell
+      title="Setup Dashboard"
+      description="Overview of corporation, offices, providers and insurance."
+    >
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-2">
+        {dashboardCards.map((card) => {
+          const Icon = card.icon;
+          return (
+            <div
+              key={card.menuKey}
+              className="border border-border rounded-[3px] bg-background p-3 flex flex-col gap-2 min-h-[148px] hover:border-primary/40"
+            >
+              <button
+                type="button"
+                onClick={() => onNavigate(card.manageKey, card.menuKey)}
+                className="flex items-start gap-2.5 text-left bg-transparent border-none p-0 cursor-pointer"
+              >
+                <div className="w-8 h-8 rounded-[3px] bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                  <Icon className="w-4 h-4" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                    {card.title}
+                  </div>
+                  <div className="text-[18px] font-bold text-foreground leading-tight mt-0.5">
+                    {card.count}
+                    <span className="text-[10px] font-semibold text-muted-foreground ml-1.5 uppercase tracking-wide">
+                      {card.unit}
+                    </span>
+                  </div>
+                </div>
+                <ChevronRight className="w-3.5 h-3.5 text-muted-foreground shrink-0 mt-1" />
+              </button>
+              <p className="text-[11px] text-muted-foreground leading-snug flex-1">{card.description}</p>
+              <div className="flex items-center gap-1.5 pt-1">
+                <button
+                  type="button"
+                  className="btn flex-1"
+                  onClick={() => onNavigate(card.addKey, card.menuKey)}
+                >
+                  {card.addLabel}
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-primary flex-1"
+                  onClick={() => onNavigate(card.manageKey, card.menuKey)}
+                >
+                  Manage
+                </button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </PanelShell>
   );
 }
 
@@ -291,9 +414,11 @@ function AddProviderForm() {
 function SectionContent({
   sub,
   onNavigate,
+  onDashboard,
 }: {
   sub: string;
   onNavigate: (key: SubKey, menuKey: MenuKey) => void;
+  onDashboard: () => void;
 }) {
   const meta = findMenu(sub);
 
@@ -315,7 +440,7 @@ function SectionContent({
             <button
               type="button"
               className="hover:text-primary bg-transparent border-none p-0 cursor-pointer"
-              onClick={() => onNavigate("corp-manage", "corporation")}
+              onClick={onDashboard}
             >
               Back To Practice Setup
             </button>
@@ -405,7 +530,7 @@ function SectionContent({
 
   const icons: Record<string, typeof Building2> = {
     corporation: Building2,
-    office: Building2,
+    office: MapPin,
     provider: Stethoscope,
     insurance: Shield,
     ada: Settings2,
@@ -459,9 +584,10 @@ function SectionContent({
 
 export default function PracticeSetupPage() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const activeSub = searchParams.get("section") || "provider-manage";
-  const activeMeta = findMenu(activeSub);
-  const activeMenu = activeMeta?.menu.key || "provider";
+  const activeSub = searchParams.get("section") || "";
+  const isDashboard = !activeSub;
+  const activeMeta = isDashboard ? null : findMenu(activeSub);
+  const activeMenu = activeMeta?.menu.key ?? null;
 
   const [expanded, setExpanded] = useState<MenuKey | null>(() => activeMenu);
 
@@ -472,6 +598,11 @@ export default function PracticeSetupPage() {
   const selectSub = (key: SubKey, menuKey: MenuKey) => {
     setSearchParams({ section: key }, { replace: false });
     setExpanded(menuKey);
+  };
+
+  const selectDashboard = () => {
+    setSearchParams({}, { replace: false });
+    setExpanded(null);
   };
 
   const toggleGroup = (key: MenuKey) => {
@@ -487,12 +618,17 @@ export default function PracticeSetupPage() {
         </Link>
         <span>/</span>
         <span className="text-foreground font-semibold">Practice Setup</span>
-        {activeMeta && (
+        {isDashboard ? (
+          <>
+            <span>/</span>
+            <span className="text-primary font-semibold">Setup Dashboard</span>
+          </>
+        ) : activeMeta ? (
           <>
             <span>/</span>
             <span className="text-primary font-semibold">{activeMeta.item.label}</span>
           </>
-        )}
+        ) : null}
       </div>
 
       <div className="panel px-3 py-2 flex items-center justify-between gap-2 flex-wrap">
@@ -505,6 +641,16 @@ export default function PracticeSetupPage() {
       <div className="flex gap-2 flex-1 min-h-0">
         <aside className="panel w-[230px] shrink-0 p-2 overflow-auto hidden md:flex md:flex-col">
           <div className="menu-group-title">Setup Menu</div>
+          <button
+            type="button"
+            onClick={selectDashboard}
+            className={`sidebar-item w-full text-left border-none cursor-pointer mb-0.5 ${
+              isDashboard ? "active" : "bg-transparent text-foreground hover:bg-secondary-hover"
+            }`}
+          >
+            <LayoutDashboard className={`w-3.5 h-3.5 shrink-0 ${isDashboard ? "" : "text-muted-foreground"}`} />
+            <span className="truncate flex-1 text-left">Dashboard</span>
+          </button>
           {menus.map((menu) => {
             const Icon = menu.icon;
             const open = expanded === menu.key;
@@ -560,10 +706,15 @@ export default function PracticeSetupPage() {
                 value={activeSub}
                 onChange={(e) => {
                   const key = e.target.value;
+                  if (!key) {
+                    selectDashboard();
+                    return;
+                  }
                   const meta = findMenu(key);
                   if (meta) selectSub(key, meta.menu.key);
                 }}
               >
+                <option value="">Dashboard</option>
                 {menus.map((menu) => (
                   <optgroup key={menu.key} label={menu.label}>
                     {menu.items.map((item) => (
@@ -574,7 +725,11 @@ export default function PracticeSetupPage() {
               </select>
             </div>
           </div>
-          <SectionContent sub={activeSub} onNavigate={selectSub} />
+          {isDashboard ? (
+            <SetupDashboard onNavigate={selectSub} />
+          ) : (
+            <SectionContent sub={activeSub} onNavigate={selectSub} onDashboard={selectDashboard} />
+          )}
         </main>
       </div>
     </div>
