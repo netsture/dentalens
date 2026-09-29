@@ -431,7 +431,7 @@
 }
 
 .auth-bg-gradient {
-  background: linear-gradient(145deg, #0b1628 0%, #0f2d52 55%, #132040 100%);
+  background: linear-gradient(145deg, #0b1628 0%, #0f2d52 55%, #0d3b4f 100%);
 }
 
 .auth-pattern-grid {
@@ -440,7 +440,7 @@
 }
 
 .auth-text-gradient {
-  background: linear-gradient(90deg, #60a5fa 0%, #34d399 100%);
+  background: linear-gradient(90deg, #2dd4bf 0%, #38bdf8 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -457,13 +457,13 @@
 }
 
 .auth-input:focus {
-  border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
+  border-color: #14a89e;
+  box-shadow: 0 0 0 3px rgba(20, 168, 158, 0.12);
 }
 
 .auth-btn-submit {
-  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-  box-shadow: 0 4px 18px rgba(37, 99, 235, 0.35);
+  background: linear-gradient(90deg, #14a89e 0%, #1c6db2 100%);
+  box-shadow: 0 4px 18px rgba(20, 150, 170, 0.35);
 }
 
 .auth-btn-submit:disabled {

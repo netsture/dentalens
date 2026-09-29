@@ -61,90 +61,24 @@ export default function LoginPage() {
 
   return (
     <div className="w-full flex flex-col lg:flex-row font-sans min-h-screen">
-      <div className="hidden lg:flex flex-col lg:w-[58%] xl:w-[65%] relative sticky top-0 h-screen overflow-y-auto shrink-0 auth-bg-gradient">
-        <div className="absolute inset-0 pointer-events-none auth-pattern-grid" />
-        <div className="absolute -top-20 left-10 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="relative z-10 flex flex-col h-full px-10 xl:px-14 py-8 xl:py-10">
-          <div className="flex items-center gap-3 shrink-0">
-            <Link to="/" className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-white/95 flex items-center justify-center text-primary font-black text-lg">
-                DL
-              </div>
-              <span className="text-white font-bold text-2xl tracking-tight">
-              DentSaas<span className="font-light opacity-80">.ai</span>
-              </span>
-            </Link>
-          </div>
+      
 
-          <div className="mt-8 shrink-0">
-            <h1 className="text-white font-black leading-[1.15] text-[32px] xl:text-[36px]">
-              Dental Practice
-              <br />
-              <span className="auth-text-gradient">Management Service</span>
-            </h1>
-            <p className="text-slate-400 mt-2.5 text-[12.5px] leading-relaxed max-w-[480px]">
-              Scheduling, clinical charting, insurance claims, billing and RCM — modern clinic
-              operations in one console.
-            </p>
-          </div>
-
-          <div className="mt-8 flex-1 flex flex-col justify-center min-h-0">
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-5 text-white">
-              <div className="text-[11px] text-slate-400 mb-3 uppercase tracking-wider font-bold">
-                Today at a glance
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                {[
-                  ["Confirmed", "28"],
-                  ["Waiting", "6"],
-                  ["No-shows", "2"],
-                  ["Collections", "$4,820"],
-                ].map(([l, v]) => (
-                  <div key={l} className="rounded-lg bg-white/5 border border-white/10 px-3 py-2.5">
-                    <div className="text-[10px] text-slate-400">{l}</div>
-                    <div className="text-[18px] font-bold mt-0.5">{v}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-4 gap-2 mt-6 shrink-0">
-            {stats.map((st) => (
-              <div key={st.label} className="rounded-xl py-2.5 px-2 text-center bg-white/5 border border-white/10">
-                <div className="text-white font-black text-[17px] leading-none">{st.value}</div>
-                <div className="text-slate-500 text-[9px] mt-1">{st.label}</div>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-4 hidden xl:flex flex-wrap gap-x-4 gap-y-1.5 shrink-0">
-            {features.map((f) => (
-              <div key={f} className="flex items-center gap-1.5 text-[10.5px] text-slate-400">
-                <CheckCircle2 className="w-3 h-3 text-emerald-400 shrink-0" />
-                {f}
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <div className="flex-1 flex flex-col items-center bg-slate-50 px-4 sm:px-6 py-8 sm:py-10 sticky top-0 h-screen overflow-y-auto">
+      <div className="flex-1 flex flex-col items-center bg-[#f3f9fa] px-4 sm:px-6 py-8 sm:py-10 sticky top-0 h-screen overflow-y-auto">
         <div className="w-full max-w-[420px] flex flex-col my-auto py-4">
           <div className="lg:hidden flex items-center gap-2 mb-8">
             <Link to="/" className="flex items-center gap-2">
-              <div className="w-10 h-10 rounded-lg bg-primary text-primary-foreground font-black flex items-center justify-center">
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#14a89e] to-[#1c6db2] text-white font-black flex items-center justify-center">
                 DL
               </div>
-              <span className="font-bold text-xl text-slate-900">
-              DentSaas<span className="text-primary">.ai</span>
+              <span className="font-bold text-xl text-[#0f2d52]">
+              DentSaas<span className="text-teal-600">.ai</span>
               </span>
             </Link>
           </div>
 
           <div className="w-full bg-white rounded-xl sm:rounded-2xl border border-slate-100 overflow-hidden auth-card">
             <div className="px-5 sm:px-8 pt-6 pb-4 border-b border-slate-100">
-              <h2 className="text-[22px] font-black text-slate-900 leading-none">Welcome Back</h2>
+              <h2 className="text-[22px] font-black text-[#0f2d52] leading-none">Welcome Back</h2>
               <p className="text-[12.5px] text-slate-500 mt-1.5">
                 Sign in to access your Dental Practice Management Service.
               </p>
@@ -167,7 +101,7 @@ export default function LoginPage() {
                     type="email"
                     value={form.email}
                     onChange={(e) => setForm({ ...form, email: e.target.value })}
-                    className="w-full h-10 px-3.5 text-[12.5px] rounded-xl text-slate-900 auth-input"
+                    className="w-full h-10 px-3.5 text-[12.5px] rounded-xl text-[#0f2d52] auth-input"
                     placeholder="admin@dentsaas.com"
                   />
                 </div>
@@ -181,7 +115,7 @@ export default function LoginPage() {
                       type={showPw ? "text" : "password"}
                       value={form.password}
                       onChange={(e) => setForm({ ...form, password: e.target.value })}
-                      className="w-full h-10 pl-3.5 pr-10 text-[12.5px] rounded-xl text-slate-900 auth-input"
+                      className="w-full h-10 pl-3.5 pr-10 text-[12.5px] rounded-xl text-[#0f2d52] auth-input"
                       placeholder="demo123"
                     />
                     <button
@@ -199,7 +133,7 @@ export default function LoginPage() {
                     type="checkbox"
                     checked={remember}
                     onChange={() => setRemember((v) => !v)}
-                    className="w-4 h-4 accent-blue-600"
+                    className="w-4 h-4 accent-teal-600"
                   />
                   <span className="text-[12px] text-slate-600">Remember Me</span>
                 </label>
@@ -226,7 +160,7 @@ export default function LoginPage() {
                         setForm({ email: c.email, password: c.password });
                         setError(null);
                       }}
-                      className="flex-1 py-1.5 px-2 bg-blue-50 hover:bg-blue-100 text-[#2563EB] rounded-lg text-[11px] font-semibold border border-blue-100 cursor-pointer"
+                      className="flex-1 py-1.5 px-2 bg-teal-50 hover:bg-teal-100 text-teal-700 rounded-lg text-[11px] font-semibold border border-teal-100 cursor-pointer"
                     >
                       {c.role}
                     </button>
@@ -238,8 +172,8 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <div className="mx-5 sm:mx-8 mb-5 flex items-start gap-2.5 px-3.5 py-2.5 rounded-xl bg-blue-50 border border-blue-100">
-              <Lock className="w-3.5 h-3.5 text-blue-600 shrink-0 mt-0.5" />
+            <div className="mx-5 sm:mx-8 mb-5 flex items-start gap-2.5 px-3.5 py-2.5 rounded-xl bg-teal-50 border border-teal-100">
+              <Lock className="w-3.5 h-3.5 text-teal-600 shrink-0 mt-0.5" />
               <p className="text-[10.5px] text-slate-600 leading-snug">
                 Protected by Enterprise Security with <strong>MFA</strong>, <strong>RBAC</strong> and{" "}
                 <strong>Audit Logging</strong>.
@@ -251,9 +185,9 @@ export default function LoginPage() {
             © {new Date().getFullYear()} DentSaas · Version 1.0.0
           </p>
           <div className="mt-2 flex justify-center gap-3 text-[10.5px] text-slate-400">
-            <a href="#" className="hover:text-primary">Privacy Policy</a>
-            <a href="#" className="hover:text-primary">Terms of Service</a>
-            <a href="#" className="hover:text-primary">Support</a>
+            <a href="#" className="hover:text-teal-600">Privacy Policy</a>
+            <a href="#" className="hover:text-teal-600">Terms of Service</a>
+            <a href="#" className="hover:text-teal-600">Support</a>
           </div>
         </div>
       </div>
