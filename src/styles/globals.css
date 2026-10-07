@@ -427,7 +427,42 @@
   padding: 1px 6px;
   border-radius: 3px;
   font-size: 10px;
-  font-weight: 700;
+  line-height: 1.45;
+  white-space: nowrap;
+}
+
+.badge-status {
+  border: 1px solid;
+}
+
+.badge-status-green {
+  background: hsl(152, 52%, 93%);
+  border-color: hsl(152, 42%, 58%);
+  color: hsl(152, 58%, 22%);
+}
+
+.badge-status-blue {
+  background: hsl(215, 80%, 95%);
+  border-color: hsl(215, 68%, 66%);
+  color: hsl(215, 68%, 28%);
+}
+
+.badge-status-red {
+  background: hsl(0, 78%, 96%);
+  border-color: hsl(0, 68%, 70%);
+  color: hsl(0, 70%, 34%);
+}
+
+.badge-status-amber {
+  background: hsl(38, 88%, 93%);
+  border-color: hsl(36, 72%, 58%);
+  color: hsl(28, 68%, 28%);
+}
+
+.badge-status-slate {
+  background: hsl(220, 14%, 95%);
+  border-color: hsl(220, 12%, 76%);
+  color: hsl(220, 16%, 32%);
 }
 
 .auth-bg-gradient {

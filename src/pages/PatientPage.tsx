@@ -14,6 +14,7 @@ import { TableToolbar } from "@/components/TableToolbar";
 import { AddPatientModal } from "@/components/AddPatientModal";
 import { AddInsuranceModal } from "@/components/AddInsuranceModal";
 import { exportToExcel } from "@/lib/exportToExcel";
+import { StatusBadge } from "@/components/StatusBadge";
 
 const seedPatients = [
   { id: "16665", name: "Denise Wingard", phone: "215-555-0142", dob: "03-12-1984", balance: "$948.80", lastVisit: "Dec 10, 2020", status: "Active" },
@@ -23,7 +24,7 @@ const seedPatients = [
   { id: "17004", name: "CURRY NEVAEH", phone: "484-554-6555", dob: "02-15-2005", balance: "$0.00", lastVisit: "Yesterday", status: "New" },
   { id: "17005", name: "DELGADO GENESIS", phone: "862-247-7212", dob: "03-03-2010", balance: "$210.00", lastVisit: "Today", status: "Active" },
   { id: "17006", name: "BALSECA SAMUEL", phone: "201-552-0729", dob: "05-12-2009", balance: "$0.00", lastVisit: "Today", status: "New" },
-  { id: "17007", name: "ESCOBAR TEJADA DARA", phone: "484-375-5283", dob: "02-01-2013", balance: "$75.00", lastVisit: "Today", status: "Active" },
+  { id: "17007", name: "ESCOBAR TEJADA DARA", phone: "484-375-5283", dob: "02-01-2013", balance: "$75.00", lastVisit: "Today", status: "Inactive" },
 ];
 
 type PatientRow = (typeof seedPatients)[number];
@@ -273,7 +274,7 @@ export default function PatientPage() {
                       {p.balance}
                     </td>
                     <td>
-                      <span className="badge bg-accent text-accent-foreground">{p.status}</span>
+                      <StatusBadge status={p.status} />
                     </td>
                     <td>
                       <div className="flex gap-1 justify-end">

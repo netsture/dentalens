@@ -13,6 +13,7 @@ import {
   Stethoscope,
   Building2,
   Search,
+  UserRound,
   X,
 } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -20,6 +21,7 @@ import { useMemo, useState } from "react";
 const menuItems = [
   { group: "Practice", name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
   { group: "Practice", name: "Practice Setup", path: "/practice-setup", icon: Building2 },
+  { group: "Provider", name: "Doctor Screen", path: "/provider", icon: UserRound },
   { group: "Scheduling", name: "Appointment Book", path: "/appointment/book", icon: CalendarDays },
   { group: "Patients", name: "Patient Search", path: "/patient", icon: Users },
   { group: "Patients", name: "Patient Overview", path: "/patient/overview", icon: LayoutDashboard },
@@ -47,6 +49,7 @@ export function Sidebar({ expanded }: { expanded: boolean }) {
     if (path === "/dashboard") return location.pathname === "/dashboard" || location.pathname === "/";
     if (path === "/patient") return location.pathname === "/patient";
     if (path === "/practice-setup") return location.pathname.startsWith("/practice-setup");
+    if (path === "/provider") return location.pathname === "/provider" || location.pathname.startsWith("/provider/");
     return location.pathname === path || location.pathname.startsWith(path + "/");
   };
 

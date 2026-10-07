@@ -11,6 +11,7 @@ import {
   Send,
   UserCheck,
 } from "lucide-react";
+import { StatusBadge } from "@/components/StatusBadge";
 
 type ToolKey = "find-slot" | "online" | "short-call" | "unscheduled" | "recalls";
 
@@ -89,9 +90,7 @@ function DataGrid({ headers, rows }: { headers: string[]; rows: string[][] }) {
             <tr key={row.join("-")}>
               {row.map((cell, index) => (
                 <td key={index} className={index === 0 ? "font-semibold" : ""}>
-                  {index === row.length - 1 ? (
-                    <span className="badge bg-accent text-accent-foreground">{cell}</span>
-                  ) : cell}
+                  {headers[index] === "Status" ? <StatusBadge status={cell} /> : cell}
                 </td>
               ))}
               <td>

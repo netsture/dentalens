@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { AddCorporationForm } from "@/components/AddCorporationForm";
 import { ManageCorporationPanel } from "@/components/ManageCorporationPanel";
+import { StatusBadge } from "@/components/StatusBadge";
 
 type MenuKey =
   | "corporation"
@@ -338,7 +339,7 @@ function DataTable({ headers, rows }: { headers: string[]; rows: string[][] }) {
             <tr key={row.join("-")}>
               {row.map((cell, i) => (
                 <td key={i} className={i === 0 ? "font-semibold" : ""}>
-                  {cell}
+                  {headers[i] === "Status" ? <StatusBadge status={cell} /> : cell}
                 </td>
               ))}
             </tr>

@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import type { ComponentType } from "react";
 import { ReportDataTable, type ReportColumn } from "@/components/ReportDataTable";
+import { StatusBadge } from "@/components/StatusBadge";
 
 type Section =
   | "home"
@@ -145,7 +146,7 @@ const patientRows = [
   { name: "BRAKE ZOIEY", id: "17002", visits: 5, balance: 120, status: "Active" },
   { name: "MCNUTT PHEONIX", id: "17003", visits: 6, balance: 45, status: "Active" },
   { name: "CURRY NEVAEH", id: "17004", visits: 1, balance: 0, status: "New" },
-  { name: "DELGADO GENESIS", id: "17005", visits: 4, balance: 210, status: "Active" },
+  { name: "DELGADO GENESIS", id: "17005", visits: 4, balance: 210, status: "Inactive" },
 ];
 
 const newPatientRows = [
@@ -247,7 +248,7 @@ const patientOverviewCols: ReportColumn<(typeof patientRows)[0]>[] = [
       </span>
     ),
   },
-  { key: "status", label: "Status", filter: "select", options: ["Active", "New"], render: (r) => <span className="badge bg-accent text-accent-foreground">{r.status}</span> },
+  { key: "status", label: "Status", filter: "select", options: ["Active", "New", "Inactive"], render: (r) => <StatusBadge status={r.status} /> },
 ];
 
 const newPatientCols: ReportColumn<(typeof newPatientRows)[0]>[] = [
@@ -299,7 +300,7 @@ const noshowCols: ReportColumn<(typeof noshowRows)[0]>[] = [
     label: "Type",
     filter: "select",
     options: ["No-Show", "Cancelled"],
-    render: (r) => <span className="badge bg-secondary text-secondary-foreground">{r.type}</span>,
+    render: (r) => <StatusBadge status={r.type} />,
   },
 ];
 
@@ -329,7 +330,7 @@ const claimCols: ReportColumn<(typeof claimRows)[0]>[] = [
     label: "Status",
     filter: "select",
     options: ["Submitted", "Paid", "Pending", "Denied"],
-    render: (r) => <span className="badge bg-accent text-accent-foreground">{r.status}</span>,
+    render: (r) => <StatusBadge status={r.status} />,
   },
   {
     key: "amount",

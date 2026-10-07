@@ -13,6 +13,7 @@ import {
   UserPlus,
 } from "lucide-react";
 import { TableToolbar } from "@/components/TableToolbar";
+import { StatusBadge } from "@/components/StatusBadge";
 
 type Appointment = {
   id: string;
@@ -277,7 +278,7 @@ export default function AppointmentBookPage() {
                         <td>{a.patient}</td>
                         <td>{a.type}</td>
                         <td>
-                          <span className="badge bg-accent text-accent-foreground capitalize">{a.status}</span>
+                          <StatusBadge status={a.status} />
                         </td>
                         <td>{a.phone || "—"}</td>
                       </tr>
@@ -315,7 +316,7 @@ export default function AppointmentBookPage() {
                 </div>
                 <div className="field">
                   <label>Status</label>
-                  <div className="capitalize">{selected.status}</div>
+                  <StatusBadge status={selected.status} />
                 </div>
                 <div className="field">
                   <label>Phone</label>

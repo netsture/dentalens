@@ -13,6 +13,8 @@ import SettingsPage from "@/pages/SettingsPage";
 import SchedulerToolsPage from "@/pages/SchedulerToolsPage";
 import PatientWorkspacePage from "@/pages/PatientWorkspacePage";
 import PracticeSetupPage from "@/pages/PracticeSetupPage";
+import ProviderListPage from "@/pages/ProviderListPage";
+import DoctorScreenPage from "@/pages/DoctorScreenPage";
 
 export default function App() {
   return (
@@ -23,6 +25,8 @@ export default function App() {
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/practice-setup" element={<PracticeSetupPage />} />
+          <Route path="/provider" element={<ProviderListPage />} />
+          <Route path="/provider/:providerId" element={<DoctorScreenPage />} />
           <Route path="/appointment/book" element={<AppointmentBookPage />} />
           <Route path="/appointment/find-slot" element={<SchedulerToolsPage />} />
           <Route path="/appointment/online" element={<SchedulerToolsPage />} />

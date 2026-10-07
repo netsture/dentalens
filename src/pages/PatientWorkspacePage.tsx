@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { AddInsuranceModal } from "@/components/AddInsuranceModal";
 import { AddPatientModal } from "@/components/AddPatientModal";
+import { StatusBadge } from "@/components/StatusBadge";
 
 type SectionKey = "overview" | "insurance" | "clinical" | "treatment" | "recalls" | "authorizations";
 
@@ -121,7 +122,7 @@ function Overview() {
           <Detail label="Insurance balance">$0.00</Detail>
           <Detail label="Last visit">September 15, 2026</Detail>
           <Detail label="Next appointment">September 29, 2026 · 9:20 AM</Detail>
-          <Detail label="Recall status"><span className="badge bg-amber-100 text-amber-800">Due soon</span></Detail>
+          <Detail label="Recall status"><StatusBadge status="Due soon" /></Detail>
         </div>
       </div>
       <div className="panel">
@@ -153,7 +154,7 @@ function Insurance({ onAdd }: { onAdd: () => void }) {
         <Detail label="Plan name">Cigna Silver Plan</Detail>
         <Detail label="Member ID">J3405197101</Detail>
         <Detail label="Effective date">June 1, 2026</Detail>
-        <Detail label="Status"><span className="badge bg-emerald-100 text-emerald-800">Active</span></Detail>
+        <Detail label="Status"><StatusBadge status="Active" /></Detail>
         <Detail label="Subscriber">Melissa Que</Detail>
         <Detail label="Relationship">Self</Detail>
         <Detail label="Eligibility checked">July 21, 2026</Detail>
@@ -184,10 +185,19 @@ function TreatmentPlanner() {
           <tbody>
             {treatments.map((row) => (
               <tr key={row.join("-")}>
-                {row.map((cell, index) => <td key={index} className={index === 0 ? "font-semibold text-primary" : ""}>{cell}</td>)}
+                {row.map((cell, index) => (
+                  <td key={index} className={index === 0 ? "font-semibold text-primary" : ""}>
+                    {index === row.length - 1 ? <StatusBadge status={cell} /> : cell}
+                  </td>
+                ))}
               </tr>
             ))}
-            <tr className="bg-secondary font-bold"><td colSpan={3}>Total</td><td>$2,236.00</td><td>$0.00</td><td>Proposed</td></tr>
+            <tr className="bg-secondary font-bold">
+              <td colSpan={3}>Total</td>
+              <td>$2,236.00</td>
+              <td>$0.00</td>
+              <td><StatusBadge status="Proposed" /></td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -228,7 +238,17 @@ function SimpleTable({ section }: { section: "recalls" | "authorizations" }) {
       </div>
       <table className="data-table">
         <thead><tr>{headers.map((header) => <th key={header}>{header}</th>)}</tr></thead>
-        <tbody>{rows.map((row) => <tr key={row.join("-")}>{row.map((cell, index) => <td key={index} className={index === 0 ? "font-semibold" : ""}>{cell}</td>)}</tr>)}</tbody>
+        <tbody>
+          {rows.map((row) => (
+            <tr key={row.join("-")}>
+              {row.map((cell, index) => (
+                <td key={index} className={index === 0 ? "font-semibold" : ""}>
+                  {headers[index] === "Status" ? <StatusBadge status={cell} /> : cell}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
       </table>
     </div>
   );
@@ -251,7 +271,11 @@ export default function PatientWorkspacePage() {
           </div>
           <div>
             <h1 className="font-bold text-[14px]">Melissa Que <span className="text-muted-foreground font-medium">(#1494)</span></h1>
-            <p className="text-[10px] text-muted-foreground">36 yrs · Female · Active patient · Dr. Hart</p>
+            <p className="text-[10px] text-muted-foreground flex items-center gap-1.5 flex-wrap">
+              <span>36 yrs · Female</span>
+              <StatusBadge status="Active" />
+              <span>· Dr. Hart</span>
+            </p>
           </div>
           <span className="badge bg-red-100 text-red-700">Penicillin allergy</span>
         </div>

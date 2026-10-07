@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { ArrowDown, ArrowUp, ArrowUpDown, FilterX, Pencil } from "lucide-react";
 import { TableToolbar } from "@/components/TableToolbar";
 import { exportToExcel } from "@/lib/exportToExcel";
+import { StatusBadge } from "@/components/StatusBadge";
 
 export type CorporationRow = {
   id: string;
@@ -324,17 +325,7 @@ export function ManageCorporationPanel({ onAdd }: { onAdd?: () => void }) {
                   <td>{c.phone}</td>
                   <td>{formatDate(c.effectiveDate)}</td>
                   <td>
-                    <span
-                      className={`badge ${
-                        c.status === "Active"
-                          ? "bg-accent text-accent-foreground"
-                          : c.status === "Draft"
-                            ? "bg-secondary text-foreground"
-                            : "bg-muted text-muted-foreground"
-                      }`}
-                    >
-                      {c.status}
-                    </span>
+                    <StatusBadge status={c.status} />
                   </td>
                   <td>
                     <button type="button" className="btn h-6 px-2" title="Edit">

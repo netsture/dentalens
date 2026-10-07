@@ -10,6 +10,8 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { TableToolbar } from "@/components/TableToolbar";
+import { TodayScheduleOverview } from "@/components/TodayScheduleOverview";
+import { StatusBadge } from "@/components/StatusBadge";
 
 const stats = [
   { label: "Total Patients", value: "2,847", change: "+12%", icon: Users },
@@ -104,7 +106,7 @@ export default function DashboardPage() {
         <div className="panel xl:col-span-2 flex flex-col min-h-0 gap-2 p-2">
           <div className="panel-header !border-0 !bg-transparent !px-0 !py-0">
             <div className="panel-title flex items-center gap-1.5">
-              <Clock className="w-3.5 h-3.5 text-primary" /> Today's Schedule
+              <Clock className="w-3.5 h-3.5 text-primary" /> Today's Appointments
             </div>
             <Link to="/appointment/book" className="btn btn-ghost text-primary">
               Open book →
@@ -155,7 +157,7 @@ export default function DashboardPage() {
                       </span>
                     </td>
                     <td>
-                      <span className="badge bg-accent text-accent-foreground">{a.status}</span>
+                      <StatusBadge status={a.status} />
                     </td>
                   </tr>
                 ))}
@@ -164,20 +166,24 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div className="panel flex flex-col">
-          <div className="panel-header">
-            <div className="panel-title">Recent Activity</div>
-          </div>
-          <div className="p-2 flex flex-col gap-1.5 overflow-auto">
-            {recentActivity.map((r) => (
-              <div
-                key={r.text}
-                className="px-2 py-2 rounded-[3px] hover:bg-secondary border border-transparent hover:border-border"
-              >
-                <div className="text-[12px] text-foreground font-medium leading-snug">{r.text}</div>
-                <div className="text-[10px] text-muted-foreground mt-0.5">{r.time}</div>
-              </div>
-            ))}
+        <div className="flex flex-col gap-3 min-w-0 min-h-0">
+          <TodayScheduleOverview />
+
+          <div className="panel flex flex-col min-h-0">
+            <div className="panel-header">
+              <div className="panel-title">Recent Activity</div>
+            </div>
+            <div className="p-2 flex flex-col gap-1.5 overflow-auto">
+              {recentActivity.map((r) => (
+                <div
+                  key={r.text}
+                  className="px-2 py-2 rounded-[3px] hover:bg-secondary border border-transparent hover:border-border"
+                >
+                  <div className="text-[12px] text-foreground font-medium leading-snug">{r.text}</div>
+                  <div className="text-[10px] text-muted-foreground mt-0.5">{r.time}</div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
