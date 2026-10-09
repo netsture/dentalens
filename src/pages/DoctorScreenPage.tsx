@@ -623,7 +623,7 @@ export default function DoctorScreenPage() {
                               <button
                                 type="button"
                                 title="More actions"
-                                className={`bg-transparent border-none cursor-pointer font-bold text-[14px] tracking-[0.2em] px-1 ${
+                                className={`bg-transparent border-none cursor-pointer px-1 ${
                                   open ? "text-primary" : "text-muted-foreground hover:text-primary"
                                 }`}
                                 onClick={() =>
@@ -634,7 +634,7 @@ export default function DoctorScreenPage() {
                                   )
                                 }
                               >
-                                ••
+                                {open ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
                               </button>
                             </td>
                           );
@@ -658,7 +658,7 @@ export default function DoctorScreenPage() {
                             <button
                               type="button"
                               title="More actions"
-                              className={`bg-transparent border-none cursor-pointer font-bold text-[14px] tracking-[0.2em] px-1 ${
+                              className={`bg-transparent border-none cursor-pointer px-1 ${
                                 open ? "text-primary" : "text-muted-foreground hover:text-primary"
                               }`}
                               onClick={() =>
@@ -669,7 +669,7 @@ export default function DoctorScreenPage() {
                                 )
                               }
                             >
-                              ••
+                              {open ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
                             </button>
                           </td>
                         );
