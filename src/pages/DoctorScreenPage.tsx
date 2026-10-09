@@ -64,7 +64,7 @@ const tableColumns: TableColumn[] = [
   { kind: "action", key: "oralPreauth", label: "Oral Surgery Preauth Note", links: ["Create", "View"] },
   { kind: "action", key: "oralIns", label: "Oral Surgery Ins/Ext Note" },
   { kind: "action", key: "behavior", label: "Behavior Mgmt", links: ["Create", "View"] },
-  { kind: "action", key: "rowAction", label: "Action", links: ["••"] },
+  { kind: "action", key: "rowAction", label: "Other Action", links: ["••"] },
 ];
 
 const dataColumns = tableColumns.filter((col): col is DataColumn => col.kind === "data");
@@ -80,7 +80,7 @@ function columnFilterText(row: DoctorScheduleRow, col: TableColumn): string {
     return `${row[col.key] ?? ""}${extra}`;
   }
   if (col.key === "oralIns") return row.oralSurgeryIns || "NA";
-  if (col.key === "rowAction") return "action more";
+  if (col.key === "rowAction") return "other action more";
   return (col.links ?? []).join(" ");
 }
 

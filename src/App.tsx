@@ -40,6 +40,7 @@ export default function App() {
           <Route path="/patient/treatment" element={<PatientWorkspacePage />} />
           <Route path="/patient/recalls" element={<PatientWorkspacePage />} />
           <Route path="/patient/authorizations" element={<PatientWorkspacePage />} />
+          <Route path="/patient/documents" element={<PatientWorkspacePage />} />
           <Route path="/patient/billing" element={<PatientBillingPage />} />
           <Route path="/documents" element={<DocumentsPage />} />
           <Route path="/report" element={<ReportPage />} />

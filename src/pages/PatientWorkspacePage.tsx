@@ -1,5 +1,5 @@
 import { useState, type ComponentType, type ReactNode } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Activity,
   Bell,
@@ -21,8 +21,9 @@ import {
 import { AddInsuranceModal } from "@/components/AddInsuranceModal";
 import { AddPatientModal } from "@/components/AddPatientModal";
 import { StatusBadge } from "@/components/StatusBadge";
+import { PatientDocumentsPanel } from "@/components/PatientDocumentsPanel";
 
-type SectionKey = "overview" | "insurance" | "clinical" | "treatment" | "recalls" | "authorizations";
+type SectionKey = "overview" | "insurance" | "clinical" | "treatment" | "recalls" | "authorizations" | "documents";
 
 const sections: { key: SectionKey; label: string; icon: ComponentType<{ className?: string }> }[] = [
   { key: "overview", label: "Overview", icon: UserCircle2 },
@@ -31,6 +32,7 @@ const sections: { key: SectionKey; label: string; icon: ComponentType<{ classNam
   { key: "treatment", label: "Treatment Planner", icon: ClipboardList },
   { key: "recalls", label: "Recalls", icon: History },
   { key: "authorizations", label: "Authorizations", icon: FileCheck2 },
+  { key: "documents", label: "Documents", icon: FileText },
 ];
 
 const treatments = [
@@ -256,6 +258,7 @@ function SimpleTable({ section }: { section: "recalls" | "authorizations" }) {
 
 export default function PatientWorkspacePage() {
   const location = useLocation();
+  const navigate = useNavigate();
   const section = (location.pathname.split("/").pop() || "overview") as SectionKey;
   const [showActions, setShowActions] = useState(false);
   const [showAddPatient, setShowAddPatient] = useState(false);
@@ -299,7 +302,6 @@ export default function PatientWorkspacePage() {
           })}
           <div className="menu-group-title">Account</div>
           <Link to="/patient/billing" className="sidebar-item"><Wallet className="w-3.5 h-3.5" /> Billing</Link>
-          <Link to="/documents" className="sidebar-item"><FileText className="w-3.5 h-3.5" /> Documents</Link>
         </aside>
 
         <main className="flex-1 min-w-0 overflow-auto">
@@ -313,6 +315,7 @@ export default function PatientWorkspacePage() {
           {section === "treatment" && <TreatmentPlanner />}
           {section === "recalls" && <SimpleTable section="recalls" />}
           {section === "authorizations" && <SimpleTable section="authorizations" />}
+          {section === "documents" && <PatientDocumentsPanel />}
         </main>
       </div>
 
@@ -342,6 +345,7 @@ export default function PatientWorkspacePage() {
                       setShowActions(false);
                       if (label === "Insurance") setShowAddInsurance(true);
                       if (label === "New patient") setShowAddPatient(true);
+                      if (label === "Document") navigate("/patient/documents");
                     }}
                   >
                     <ActionIcon className="w-4 h-4 text-primary mb-2" />
