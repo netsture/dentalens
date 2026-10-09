@@ -31,6 +31,9 @@ const TONE_BY_STATUS: Record<string, Tone> = {
   allocated: "amber",
   "due soon": "amber",
   draft: "amber",
+  "checking out": "amber",
+  "checkout completed": "green",
+  "check out completed": "green",
 };
 
 function toneFor(status: string): Tone {
