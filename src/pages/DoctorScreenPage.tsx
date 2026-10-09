@@ -8,6 +8,8 @@ import {
   Banknote,
   BookOpen,
   CalendarDays,
+  ChevronDown,
+  ChevronUp,
   ClipboardList,
   Columns3,
   FilterX,
@@ -247,9 +249,17 @@ export default function DoctorScreenPage() {
 
   const [appointmentDate, setAppointmentDate] = useState("2026-10-06");
   const [activeTool, setActiveTool] = useState<string | null>(null);
-  const [openActionRowId, setOpenActionRowId] = useState<string | null>(null);
-  const [hiddenCols, setHiddenCols] = useState<string[]>([]);
+  const [actionTray, setActionTray] = useState<{ id: string; side: "left" | "right" } | null>(null);
+  const [hiddenCols, setHiddenCols] = useState<string[]>([
+    "caries",
+    "referrals",
+    "specialNote",
+    "oralPreauth",
+    "oralIns",
+    "behavior",
+  ]);
   const [columnsOpen, setColumnsOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const columnsMenuRef = useRef<HTMLDivElement>(null);
   const [q, setQ] = useState("");
   const [filters, setFilters] = useState<FilterState>({});
@@ -404,8 +414,19 @@ export default function DoctorScreenPage() {
             </span>
           </div>
         </div>
+
+        <button
+          type="button"
+          className={`btn shrink-0 ${menuOpen ? "btn-primary" : ""}`}
+          onClick={() => setMenuOpen((open) => !open)}
+          title={menuOpen ? "Hide menu sections" : "Show menu sections"}
+        >
+          {menuOpen ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+          {menuOpen ? "Hide menus" : "Show menus"}
+        </button>
       </div>
 
+      {menuOpen ? (
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-2">
         {menuSections.map((section) => {
           const Icon = section.icon;
@@ -441,6 +462,7 @@ export default function DoctorScreenPage() {
           );
         })}
       </div>
+      ) : null}
 
       {activeTool && (
         <div className="panel px-3 py-2 text-[12px] flex items-center justify-between gap-2">
@@ -595,7 +617,7 @@ export default function DoctorScreenPage() {
                     {visibleColumns.map((col) => {
                       if (col.kind === "action") {
                         if (col.key === "rowAction") {
-                          const open = openActionRowId === row.id;
+                          const open = actionTray?.id === row.id && actionTray.side === "right";
                           return (
                             <td key={col.key} className="text-center align-top">
                               <button
@@ -604,7 +626,13 @@ export default function DoctorScreenPage() {
                                 className={`bg-transparent border-none cursor-pointer font-bold text-[14px] tracking-[0.2em] px-1 ${
                                   open ? "text-primary" : "text-muted-foreground hover:text-primary"
                                 }`}
-                                onClick={() => setOpenActionRowId(open ? null : row.id)}
+                                onClick={() =>
+                                  setActionTray((current) =>
+                                    current?.id === row.id && current.side === "right"
+                                      ? null
+                                      : { id: row.id, side: "right" }
+                                  )
+                                }
                               >
                                 ••
                               </button>
@@ -623,7 +651,7 @@ export default function DoctorScreenPage() {
                       }
 
                       if (col.key === "no") {
-                        const open = openActionRowId === row.id;
+                        const open = actionTray?.id === row.id && actionTray.side === "left";
                         return (
                           <td key={col.key} className="font-semibold text-muted-foreground align-top">
                             <div>{row.no}</div>
@@ -633,7 +661,13 @@ export default function DoctorScreenPage() {
                               className={`bg-transparent border-none cursor-pointer font-bold text-[14px] tracking-[0.2em] px-1 ${
                                 open ? "text-primary" : "text-muted-foreground hover:text-primary"
                               }`}
-                              onClick={() => setOpenActionRowId(open ? null : row.id)}
+                              onClick={() =>
+                                setActionTray((current) =>
+                                  current?.id === row.id && current.side === "left"
+                                    ? null
+                                    : { id: row.id, side: "left" }
+                                )
+                              }
                             >
                               ••
                             </button>
@@ -698,10 +732,14 @@ export default function DoctorScreenPage() {
                       );
                     })}
                   </tr>
-                  {openActionRowId === row.id ? (
+                  {actionTray?.id === row.id ? (
                     <tr>
                       <td colSpan={visibleColumns.length} className="bg-secondary/50">
-                        <div className="flex items-center gap-1.5 py-1 pl-1">
+                        <div
+                          className={`flex items-center gap-1.5 py-1 ${
+                            actionTray.side === "right" ? "justify-end pr-1" : "pl-1"
+                          }`}
+                        >
                           {rowActionIcons.map((action) => {
                             const Icon = action.icon;
                             return (
