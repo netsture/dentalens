@@ -15,6 +15,8 @@ import PatientWorkspacePage from "@/pages/PatientWorkspacePage";
 import PracticeSetupPage from "@/pages/PracticeSetupPage";
 import ProviderListPage from "@/pages/ProviderListPage";
 import DoctorScreenPage from "@/pages/DoctorScreenPage";
+import BlankSectionPage from "@/pages/BlankSectionPage";
+import EligibilityPage from "@/pages/EligibilityPage";
 
 export default function App() {
   return (
@@ -44,6 +46,8 @@ export default function App() {
           <Route path="/patient/billing" element={<PatientBillingPage />} />
           <Route path="/documents" element={<DocumentsPage />} />
           <Route path="/report" element={<ReportPage />} />
+          <Route path="/eligibility" element={<EligibilityPage />} />
+          <Route path="/back-office" element={<BlankSectionPage />} />
           <Route path="/settings" element={<SettingsPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />

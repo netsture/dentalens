@@ -1,16 +1,23 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
+  AlertTriangle,
   Ban,
   ChevronLeft,
   ChevronRight,
   Clock,
+  FileText,
   LayoutGrid,
   List as ListIcon,
+  Mail,
+  Phone,
   Plus,
   Printer,
+  Receipt,
   Settings2,
   Stethoscope,
   UserPlus,
+  Wallet,
+  X,
 } from "lucide-react";
 import { TableToolbar } from "@/components/TableToolbar";
 import { StatusBadge } from "@/components/StatusBadge";
@@ -57,6 +64,29 @@ const seed: Appointment[] = [
 
 const times = ["08:00", "08:30", "09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00"];
 
+const patientExtras: Record<string, { id: string; insurance: string; dob: string; balance: string; ephone: string }> = {
+  "JOHNSONN ELLA": { id: "17001", insurance: "Cigna (PPO) [PRIMARY-AS SELF]", dob: "02-27-2012", balance: "$0.00", ephone: "000-000-0000" },
+  "BRAKE ZOIEY": { id: "17002", insurance: "Delta Dental (PPO) [PRIMARY-AS SELF]", dob: "08-28-2012", balance: "$120.00", ephone: "000-000-0000" },
+  "BRAKE ZAKAI": { id: "17008", insurance: "Delta Dental (PPO) [PRIMARY-AS SELF]", dob: "08-28-2012", balance: "$120.00", ephone: "000-000-0000" },
+  "MCNUTT PHEONIX": { id: "17003", insurance: "Aetna Dental [PRIMARY-AS SELF]", dob: "02-19-2012", balance: "$45.00", ephone: "000-000-0000" },
+  "HOLLENBACH OLIVIA": { id: "17009", insurance: "MetLife PDP [PRIMARY-AS SELF]", dob: "04-11-2011", balance: "$0.00", ephone: "000-000-0000" },
+  "CURRY NEVAEH": { id: "17004", insurance: "(CASH)", dob: "02-15-2005", balance: "$0.00", ephone: "000-000-0000" },
+  "DELGADO GENESIS": { id: "17005", insurance: "Cigna (PPO) [PRIMARY-AS SELF]", dob: "03-03-2010", balance: "$210.00", ephone: "000-000-0000" },
+  "BALSECA SAMUEL": { id: "17006", insurance: "(CASH)", dob: "05-12-2009", balance: "$0.00", ephone: "000-000-0000" },
+};
+
+const otherTypes = ["NF Patient", "Exam", "Cleaning", "Consultation", "Emergency", "Recall"];
+
+const yellowActions = [
+  "Cancel by patient & not reschedule",
+  "Cancel not by patient & not reschedule",
+  "Reschedule by patient",
+  "Reschedule not by patient",
+];
+
+const redActions = ["No show / Broken", "Patient termination"];
+const greenActions = ["Confirm appt", "Send email/text", "Left message", "Back to appointment", "Back to front desk"];
+
 function statusClass(status: Appointment["status"]) {
   if (status === "confirmed") return "slot-confirmed";
   if (status === "allocated") return "slot-allocated";
@@ -71,6 +101,11 @@ export default function AppointmentBookPage() {
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<Appointment | null>(null);
   const [showBook, setShowBook] = useState(false);
+  const [showReschedule, setShowReschedule] = useState(false);
+  const [otherType, setOtherType] = useState<string[]>([]);
+  const [remarks, setRemarks] = useState("");
+  const [collect, setCollect] = useState("");
+  const [rescheduleNotice, setRescheduleNotice] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState("all");
   const [refreshing, setRefreshing] = useState(false);
   const [tick, setTick] = useState(0);
@@ -92,6 +127,22 @@ export default function AppointmentBookPage() {
       (a) => a.patient.toLowerCase().includes(q) || a.type.toLowerCase().includes(q)
     );
   }, [search, statusFilter, tick]);
+
+  useEffect(() => {
+    if (!selected && !showBook && !showReschedule) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        if (showReschedule) {
+          setShowReschedule(false);
+          return;
+        }
+        setSelected(null);
+        setShowBook(false);
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [selected, showBook, showReschedule]);
 
   const handleRefresh = () => {
     setRefreshing(true);
@@ -182,8 +233,8 @@ export default function AppointmentBookPage() {
         }
       />
 
-      <div className="flex-1 min-h-0 grid grid-cols-1 xl:grid-cols-12 gap-2">
-        <div className="panel xl:col-span-9 flex flex-col min-h-0 overflow-hidden">
+      <div className="flex-1 min-h-0">
+        <div className="panel flex flex-col min-h-0 h-full overflow-hidden">
           <div className="px-2 py-1.5 border-b border-border bg-secondary/30 flex items-center gap-2 flex-wrap shrink-0">
             <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mr-1">
               Legend
@@ -288,53 +339,271 @@ export default function AppointmentBookPage() {
             </div>
           )}
         </div>
+      </div>
 
-        <div className="panel xl:col-span-3 flex flex-col">
-          <div className="panel-header">
-            <div className="panel-title">Appointment Detail</div>
-          </div>
-          <div className="p-3 flex flex-col gap-2 text-[12px]">
-            {selected ? (
-              <>
+      {selected && (
+        <div className="fixed inset-0 bg-black/50 z-[2000] flex items-center justify-center p-4" onClick={() => setSelected(null)}>
+          <div className="bg-card border border-border rounded-[4px] w-full max-w-md shadow-xl" onClick={(e) => e.stopPropagation()}>
+            <div className="panel-header">
+              <div className="panel-title">Appointment Detail</div>
+              <button type="button" className="btn" onClick={() => setSelected(null)}>
+                <X className="w-3.5 h-3.5" /> Close
+              </button>
+            </div>
+            <div className="p-4 flex flex-col gap-2 text-[12px]">
+              <div className="field">
+                <label>Patient</label>
+                <div className="font-bold text-[13px]">{selected.patient}</div>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
                 <div className="field">
-                  <label>Patient</label>
-                  <div className="font-bold text-[13px]">{selected.patient}</div>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="field">
-                    <label>Start</label>
-                    <div>{selected.start}</div>
-                  </div>
-                  <div className="field">
-                    <label>End</label>
-                    <div>{selected.end}</div>
-                  </div>
+                  <label>Start</label>
+                  <div>{selected.start}</div>
                 </div>
                 <div className="field">
-                  <label>Type</label>
-                  <div>{selected.type}</div>
+                  <label>End</label>
+                  <div>{selected.end}</div>
                 </div>
-                <div className="field">
-                  <label>Status</label>
-                  <StatusBadge status={selected.status} />
-                </div>
-                <div className="field">
-                  <label>Phone</label>
-                  <div>{selected.phone || "—"}</div>
-                </div>
-                <div className="flex gap-1.5 mt-2">
-                  <button className="btn btn-primary flex-1">Check In</button>
-                  <button className="btn flex-1">Reschedule</button>
-                </div>
-              </>
-            ) : (
-              <p className="text-muted-foreground text-[11px]">
-                Select an appointment slot to view details.
-              </p>
-            )}
+              </div>
+              <div className="field">
+                <label>Type</label>
+                <div>{selected.type}</div>
+              </div>
+              <div className="field">
+                <label>Status</label>
+                <StatusBadge status={selected.status} />
+              </div>
+              <div className="field">
+                <label>Phone</label>
+                <div>{selected.phone || "—"}</div>
+              </div>
+              <div className="flex gap-1.5 mt-2">
+                <button type="button" className="btn btn-primary flex-1">Check In</button>
+                <button
+                  type="button"
+                  className="btn flex-1"
+                  onClick={() => {
+                    setOtherType([]);
+                    setRemarks("");
+                    setCollect("");
+                    setRescheduleNotice(null);
+                    setShowReschedule(true);
+                  }}
+                >
+                  Reschedule
+                </button>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      )}
+
+      {showReschedule && selected && (
+        <div
+          className="fixed inset-0 bg-black/50 z-[2100] flex items-center justify-center p-4"
+          onClick={() => setShowReschedule(false)}
+        >
+          <div
+            className="bg-card border border-border rounded-[4px] w-full max-w-5xl max-h-[92vh] overflow-auto shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="panel-header">
+              <div className="panel-title">
+                Appointment Date · {date.toLocaleDateString("en-US", { month: "2-digit", day: "2-digit", year: "numeric" })}
+              </div>
+              <button type="button" className="btn" onClick={() => setShowReschedule(false)}>
+                <X className="w-3.5 h-3.5" /> Close
+              </button>
+            </div>
+
+            <div className="p-3 flex flex-col gap-3">
+              <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
+                {[
+                  ["Patient ID", patientExtras[selected.patient]?.id ?? selected.id.replace("a", "16")],
+                  ["Patient Name", selected.patient],
+                  ["Insurance Company", patientExtras[selected.patient]?.insurance ?? "(CASH)"],
+                  ["Patient Telephone", selected.phone || "—"],
+                  ["DOB", patientExtras[selected.patient]?.dob ?? "—"],
+                  ["Approx Balance", patientExtras[selected.patient]?.balance ?? "N/A"],
+                ].map(([label, value]) => (
+                  <div key={label} className="field">
+                    <label>{label}</label>
+                    <div className="text-[12px] font-semibold leading-snug">{value}</div>
+                    {label === "Patient Telephone" && patientExtras[selected.patient]?.ephone ? (
+                      <div className="text-[10px] text-muted-foreground">E-phone {patientExtras[selected.patient].ephone}</div>
+                    ) : null}
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex flex-wrap items-center gap-1.5">
+                <button type="button" className="btn h-7 px-2" title="Notes"><FileText className="w-3.5 h-3.5" /></button>
+                <button type="button" className="btn h-7 px-2" title="Call"><Phone className="w-3.5 h-3.5" /></button>
+                <button type="button" className="btn h-7 px-2" title="Email"><Mail className="w-3.5 h-3.5" /></button>
+                <button type="button" className="btn h-7 px-2" title="Print"><Printer className="w-3.5 h-3.5" /></button>
+                <button type="button" className="btn h-7 px-2" title="Alert"><AlertTriangle className="w-3.5 h-3.5" /></button>
+                <button type="button" className="btn" onClick={() => setRescheduleNotice("Opened View Ledger / Account")}>
+                  <Wallet className="w-3.5 h-3.5" /> View Ledger / Account
+                </button>
+                <button type="button" className="btn" onClick={() => setRescheduleNotice("Opened View Invoices History")}>
+                  <Receipt className="w-3.5 h-3.5" /> View Invoices History
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div className="field">
+                  <label>Time Start</label>
+                  <input type="time" defaultValue={selected.start} />
+                </div>
+                <div className="field">
+                  <label>Time End / Units</label>
+                  <input type="time" defaultValue={selected.end} />
+                </div>
+                <div className="field">
+                  <label>Doctor</label>
+                  <select defaultValue={sides.find((s) => s.id === selected.sideId)?.doctorId ?? "d1"}>
+                    {doctors.map((d) => (
+                      <option key={d.id} value={d.id}>{d.name}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
+                <div className="flex flex-col gap-3">
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="field">
+                      <label>Unfinished Split Procedure</label>
+                      <div className="text-[12px] text-muted-foreground">—</div>
+                    </div>
+                    <div className="field">
+                      <label>Treatment Plan</label>
+                      <div className="text-[12px] text-muted-foreground">{selected.plan || "—"}</div>
+                    </div>
+                    <div className="field">
+                      <label>Other</label>
+                      <div className="flex flex-col gap-1">
+                        {otherTypes.map((item) => (
+                          <label key={item} className="flex items-center gap-1.5 text-[11px] font-medium cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={otherType.includes(item)}
+                              onChange={() =>
+                                setOtherType((current) =>
+                                  current.includes(item) ? current.filter((v) => v !== item) : [...current, item]
+                                )
+                              }
+                            />
+                            {item}
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="field">
+                      <label>Procedure to be done</label>
+                      <input defaultValue={selected.type} />
+                    </div>
+                    <div className="field">
+                      <label>Remarks</label>
+                      <textarea rows={3} value={remarks} onChange={(e) => setRemarks(e.target.value)} />
+                    </div>
+                    <div className="field">
+                      <label>Collect ($)</label>
+                      <input value={collect} onChange={(e) => setCollect(e.target.value)} placeholder="0.00" />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <div className="grid grid-cols-2 gap-1.5 p-2 rounded-[3px] bg-amber-50 border border-amber-200">
+                    {yellowActions.map((label) => (
+                      <button
+                        key={label}
+                        type="button"
+                        className="btn h-auto min-h-8 py-1.5 text-[10px] bg-violet-100 border-violet-300 text-violet-800 hover:bg-violet-200"
+                        onClick={() => setRescheduleNotice(label)}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                    {redActions.map((label) => (
+                      <button
+                        key={label}
+                        type="button"
+                        className="btn h-auto min-h-8 py-1.5 text-[10px] bg-rose-100 border-rose-300 text-rose-700 hover:bg-rose-200"
+                        onClick={() => setRescheduleNotice(label)}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="grid grid-cols-2 gap-1.5 p-2 rounded-[3px] bg-emerald-50 border border-emerald-200">
+                    {greenActions.map((label) => (
+                      <button
+                        key={label}
+                        type="button"
+                        className="btn h-auto min-h-8 py-1.5 text-[10px] bg-sky-100 border-sky-300 text-sky-800 hover:bg-sky-200"
+                        onClick={() => {
+                          if (label === "Back to appointment" || label === "Back to front desk") {
+                            setShowReschedule(false);
+                            if (label === "Back to front desk") setSelected(null);
+                            return;
+                          }
+                          setRescheduleNotice(label);
+                        }}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                    <button
+                      type="button"
+                      className="btn btn-success h-auto min-h-8 py-1.5 text-[10px] col-span-2"
+                      onClick={() => {
+                        setRescheduleNotice("Saved changes to appointment");
+                        setShowReschedule(false);
+                      }}
+                    >
+                      Save changes to appt
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {rescheduleNotice ? (
+                <div className="panel px-3 py-2 text-[12px] flex items-center justify-between">
+                  <span>{rescheduleNotice}</span>
+                  <button type="button" className="btn" onClick={() => setRescheduleNotice(null)}>Close</button>
+                </div>
+              ) : null}
+
+              <div className="panel overflow-hidden">
+                <div className="panel-header">
+                  <div className="panel-title">List of Proposed Appointments</div>
+                </div>
+                <table className="data-table">
+                  <thead>
+                    <tr>
+                      <th>Office</th>
+                      <th>Doctor / Provider</th>
+                      <th>Proposed Procedure</th>
+                      <th>Remarks</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td colSpan={4} className="text-center text-muted-foreground py-4">
+                        No results found.
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showBook && (
         <div className="fixed inset-0 bg-black/50 z-[2000] flex items-center justify-center p-4" onClick={() => setShowBook(false)}>

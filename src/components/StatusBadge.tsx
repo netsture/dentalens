@@ -34,6 +34,12 @@ const TONE_BY_STATUS: Record<string, Tone> = {
   "checking out": "amber",
   "checkout completed": "green",
   "check out completed": "green",
+  awaited: "amber",
+  checked: "green",
+  "eligibility done": "green",
+  "pending eligibility": "red",
+  eligible: "green",
+  "not eligible": "red",
 };
 
 function toneFor(status: string): Tone {

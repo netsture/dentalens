@@ -14,6 +14,8 @@ import {
   Building2,
   Search,
   UserRound,
+  BadgeCheck,
+  Briefcase,
   X,
 } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -32,6 +34,8 @@ const menuItems = [
   { group: "Financial", name: "Patient Billing", path: "/patient/billing", icon: Wallet },
   { group: "Financial", name: "Documents", path: "/documents", icon: FileText },
   { group: "Financial", name: "Analytics & Reports", path: "/report", icon: BarChart3 },
+  { group: "Eligibility", name: "Eligibility Check", path: "/eligibility", icon: BadgeCheck },
+  { group: "Back Office", name: "Overview", path: "/back-office", icon: Briefcase },
   { group: "Administration", name: "Settings", path: "/settings", icon: Settings },
 ];
 

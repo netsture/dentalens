@@ -22,6 +22,7 @@ import { AddInsuranceModal } from "@/components/AddInsuranceModal";
 import { AddPatientModal } from "@/components/AddPatientModal";
 import { StatusBadge } from "@/components/StatusBadge";
 import { PatientDocumentsPanel } from "@/components/PatientDocumentsPanel";
+import { PatientInsurancePlansTable } from "@/components/PatientInsurancePlansTable";
 
 type SectionKey = "overview" | "insurance" | "clinical" | "treatment" | "recalls" | "authorizations" | "documents";
 
@@ -162,6 +163,7 @@ function Insurance({ onAdd }: { onAdd: () => void }) {
         <Detail label="Eligibility checked">July 21, 2026</Detail>
         <Detail label="Fee schedule">Office UCR</Detail>
       </div>
+      <PatientInsurancePlansTable />
       <div className="panel overflow-hidden">
         <div className="panel-header"><div className="panel-title">Deductibles and Maximums</div></div>
         <table className="data-table">
