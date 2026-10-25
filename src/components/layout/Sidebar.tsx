@@ -16,6 +16,7 @@ import {
   UserRound,
   BadgeCheck,
   Briefcase,
+  Mic,
   X,
 } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -37,6 +38,7 @@ const menuItems = [
   { group: "Eligibility", name: "Eligibility Check", path: "/eligibility", icon: BadgeCheck },
   { group: "Back Office", name: "Overview", path: "/back-office", icon: Briefcase },
   { group: "Administration", name: "Settings", path: "/settings", icon: Settings },
+  { group: "Administration", name: "Voice Command", path: "/voice-command", icon: Mic },
 ];
 
 export function Sidebar({ expanded }: { expanded: boolean }) {

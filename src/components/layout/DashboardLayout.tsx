@@ -15,6 +15,7 @@ import {
 import { Sidebar } from "./Sidebar";
 import { Topbar } from "./Topbar";
 import { Statusbar } from "./Statusbar";
+import { VoiceCommand } from "@/components/VoiceCommand";
 
 const quickActions = [
   { label: "Patient", icon: UserPlus, href: "/patient?add=1" },
@@ -59,6 +60,7 @@ export function DashboardLayout({ children }: { children: ReactNode }) {
         </main>
       </div>
       <Statusbar />
+      <VoiceCommand />
     </div>
   );
 }

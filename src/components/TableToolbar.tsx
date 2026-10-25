@@ -1,4 +1,4 @@
-import { useEffect, useId, useState, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { Download, Filter, RefreshCw, Search } from "lucide-react";
 import {
   closeFilterToolbar,
@@ -6,6 +6,7 @@ import {
   openFilterToolbar,
   subscribeFilterToolbar,
 } from "@/lib/filterPanelStore";
+import { VOICE_EVENT } from "@/lib/voiceCommands";
 
 export type TableToolbarProps = {
   search?: string;
@@ -46,10 +47,40 @@ export function TableToolbar({
   const toolbarId = useId();
   const [showFilters, setShowFilters] = useState(false);
   const [localSearch, setLocalSearch] = useState(search);
+  const searchFn = useRef(onSearchChange);
+  const refreshFn = useRef(onRefresh);
+  const exportFn = useRef(onExport);
+  searchFn.current = onSearchChange;
+  refreshFn.current = onRefresh;
+  exportFn.current = onExport;
 
   useEffect(() => {
     setLocalSearch(search);
   }, [search]);
+
+  useEffect(() => {
+    const onVoice = (event: Event) => {
+      const detail = (event as CustomEvent<{ type: string; query?: string }>).detail;
+      if (!detail) return;
+      if (detail.type === "search") {
+        const query = detail.query ?? "";
+        setLocalSearch(query);
+        searchFn.current?.(query);
+      }
+      if (detail.type === "clear-search") {
+        setLocalSearch("");
+        searchFn.current?.("");
+      }
+      if (detail.type === "refresh") refreshFn.current?.();
+      if (detail.type === "export") exportFn.current?.();
+      if (detail.type === "filter") {
+        if (getOpenFilterToolbarId() === toolbarId) closeFilterToolbar(toolbarId);
+        else openFilterToolbar(toolbarId);
+      }
+    };
+    window.addEventListener(VOICE_EVENT, onVoice);
+    return () => window.removeEventListener(VOICE_EVENT, onVoice);
+  }, []);
 
   // Close this panel if another page/table opens its filter
   useEffect(() => {

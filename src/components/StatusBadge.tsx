@@ -17,6 +17,7 @@ const TONE_BY_STATUS: Record<string, Tone> = {
   message: "blue",
   proposed: "blue",
   recommended: "blue",
+  custom: "blue",
   inactive: "red",
   denied: "red",
   cancelled: "red",

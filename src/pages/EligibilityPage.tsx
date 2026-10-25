@@ -633,7 +633,7 @@ export default function EligibilityPage() {
                       )}
                     </td>
                     <td>
-                      <button type="button" className="btn h-6 px-2" onClick={() => navigate("/patient/insurance")}>
+                      <button type="button" className="btn h-6 px-2" onClick={() => navigate(`/patient/insurance?id=${row.patientId}`)}>
                         View/Add
                       </button>
                     </td>

@@ -17,6 +17,7 @@ import ProviderListPage from "@/pages/ProviderListPage";
 import DoctorScreenPage from "@/pages/DoctorScreenPage";
 import BlankSectionPage from "@/pages/BlankSectionPage";
 import EligibilityPage from "@/pages/EligibilityPage";
+import VoiceCommandPage from "@/pages/VoiceCommandPage";
 
 export default function App() {
   return (
@@ -49,6 +50,7 @@ export default function App() {
           <Route path="/eligibility" element={<EligibilityPage />} />
           <Route path="/back-office" element={<BlankSectionPage />} />
           <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/voice-command" element={<VoiceCommandPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

@@ -150,7 +150,7 @@ function formatScheduleDate(date: Date) {
 }
 
 export function TodayScheduleOverview() {
-  const [openIds, setOpenIds] = useState<string[]>(["loretto-1044"]);
+  const [openIds, setOpenIds] = useState<string[]>([]);
   const total = useMemo(() => offices.reduce((sum, office) => sum + office.count, 0), []);
   const todayLabel = useMemo(() => formatScheduleDate(new Date()), []);
 

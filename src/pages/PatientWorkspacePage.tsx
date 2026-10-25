@@ -1,5 +1,5 @@
 import { useState, type ComponentType, type ReactNode } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import {
   Activity,
   Bell,
@@ -258,14 +258,30 @@ function SimpleTable({ section }: { section: "recalls" | "authorizations" }) {
   );
 }
 
+const workspacePatients: Record<string, { name: string; detail: string }> = {
+  "1494": { name: "Melissa Que", detail: "36 yrs · Female" },
+  "375000": { name: "MORELL ALBERTO", detail: "Eligibility · LORETTO AVE" },
+  "854666": { name: "TEJADA RODRIGUEZ MAURICIO", detail: "Eligibility · LORETTO AVE" },
+  "855107": { name: "VASQUEZ LOUITES", detail: "Eligibility · ALLENTOWN" },
+  "900889": { name: "REESE TERRY", detail: "Eligibility · LORETTO AVE" },
+  "100500": { name: "SMITH ZEFFELI", detail: "Eligibility · OLNEY" },
+  "17001": { name: "JOHNSONN ELLA", detail: "Eligibility · DUNCAN" },
+  "17004": { name: "CURRY NEVAEH", detail: "Eligibility · ORTHO" },
+  "16665": { name: "Denise Wingard", detail: "Eligibility · SAAS" },
+};
+
 export default function PatientWorkspacePage() {
   const location = useLocation();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const section = (location.pathname.split("/").pop() || "overview") as SectionKey;
   const [showActions, setShowActions] = useState(false);
   const [showAddPatient, setShowAddPatient] = useState(false);
   const [showAddInsurance, setShowAddInsurance] = useState(false);
   const active = sections.find((item) => item.key === section) || sections[0];
+  const patientId = searchParams.get("id") || "1494";
+  const patient = workspacePatients[patientId] ?? { name: "Patient", detail: "Opened from eligibility" };
+  const idQuery = searchParams.get("id") ? `?id=${searchParams.get("id")}` : "";
 
   return (
     <div className="flex flex-col h-full min-h-0 gap-2">
@@ -275,9 +291,9 @@ export default function PatientWorkspacePage() {
             <UserCircle2 className="w-7 h-7" />
           </div>
           <div>
-            <h1 className="font-bold text-[14px]">Melissa Que <span className="text-muted-foreground font-medium">(#1494)</span></h1>
+            <h1 className="font-bold text-[14px]">{patient.name} <span className="text-muted-foreground font-medium">(#{patientId})</span></h1>
             <p className="text-[10px] text-muted-foreground flex items-center gap-1.5 flex-wrap">
-              <span>36 yrs · Female</span>
+              <span>{patient.detail}</span>
               <StatusBadge status="Active" />
               <span>· Dr. Hart</span>
             </p>
@@ -297,13 +313,13 @@ export default function PatientWorkspacePage() {
           {sections.map((item) => {
             const Icon = item.icon;
             return (
-              <Link key={item.key} to={`/patient/${item.key}`} className={`sidebar-item ${section === item.key ? "active" : ""}`}>
+              <Link key={item.key} to={`/patient/${item.key}${idQuery}`} className={`sidebar-item ${section === item.key ? "active" : ""}`}>
                 <Icon className="w-3.5 h-3.5" /> {item.label}
               </Link>
             );
           })}
           <div className="menu-group-title">Account</div>
-          <Link to="/patient/billing" className="sidebar-item"><Wallet className="w-3.5 h-3.5" /> Billing</Link>
+          <Link to={`/patient/billing${idQuery}`} className="sidebar-item"><Wallet className="w-3.5 h-3.5" /> Billing</Link>
         </aside>
 
         <main className="flex-1 min-w-0 overflow-auto">
