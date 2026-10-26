@@ -8,12 +8,13 @@ import {
   MapPin,
   Maximize2,
   Menu,
-  Search,
   Settings,
   User,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { applyTheme, getStoredTheme, THEMES, type AppTheme } from "@/lib/theme";
+import { applyDensity, getStoredDensity, type AppDensity } from "@/lib/density";
+import { PatientSearch } from "@/components/PatientSearch";
 import {
   loadWorkspaceContext,
   SwitchWorkspaceModal,
@@ -32,9 +33,7 @@ export function Topbar({
   const [showProfile, setShowProfile] = useState(false);
   const [showWorkspace, setShowWorkspace] = useState(false);
   const [workspace, setWorkspace] = useState<WorkspaceContext>(() => loadWorkspaceContext());
-  const [density, setDensity] = useState(
-    () => localStorage.getItem("dl-density") || "compact"
-  );
+  const [density, setDensity] = useState<AppDensity>(() => getStoredDensity());
   const [theme, setTheme] = useState<AppTheme>(() => getStoredTheme());
   const profileRef = useRef<HTMLDivElement>(null);
 
@@ -48,15 +47,9 @@ export function Topbar({
     return () => document.removeEventListener("mousedown", onOutside);
   }, []);
 
-  const applyDensity = (d: string) => {
-    setDensity(d);
-    localStorage.setItem("dl-density", d);
-    document.documentElement.classList.remove(
-      "density-compact",
-      "density-standard",
-      "density-comfortable"
-    );
-    document.documentElement.classList.add(`density-${d}`);
+  const selectDensity = (next: AppDensity) => {
+    setDensity(next);
+    applyDensity(next);
   };
 
   const selectTheme = (next: AppTheme) => {
@@ -106,8 +99,8 @@ export function Topbar({
         )}
       </div>
 
-      <div className="flex-1 flex items-center justify-between pr-3 h-full min-w-0">
-        <div className="flex items-stretch h-full">
+      <div className="flex-1 grid grid-cols-[1fr_minmax(220px,420px)_1fr] items-center pr-3 h-full min-w-0">
+        <div className="flex items-stretch h-full min-w-0">
           <button
             type="button"
             onClick={() => setShowWorkspace(true)}
@@ -136,16 +129,11 @@ export function Topbar({
           </button>
         </div>
 
-        <div className="flex items-center gap-1.5">
-          <div className="relative hidden sm:flex items-center">
-            <Search className="w-3.5 h-3.5 absolute left-3 text-muted-foreground pointer-events-none" />
-            <input
-              type="text"
-              placeholder="Quick find..."
-              className="w-44 md:w-56 h-[34px] pl-8 pr-3 text-[12px] bg-background border border-border rounded-full outline-none focus:border-primary text-foreground placeholder:text-muted-foreground"
-            />
-          </div>
+        <div className="flex justify-center px-2 min-w-0">
+          <PatientSearch />
+        </div>
 
+        <div className="flex items-center justify-end gap-1.5">
           <div className="w-px h-6 bg-border mx-1 shrink-0" />
 
           <button className="relative w-9 h-9 flex items-center justify-center rounded-full hover:bg-secondary border-none bg-transparent cursor-pointer">
@@ -200,7 +188,7 @@ export function Topbar({
                     {(["compact", "standard", "comfortable"] as const).map((d) => (
                       <button
                         key={d}
-                        onClick={() => applyDensity(d)}
+                        onClick={() => selectDensity(d)}
                         className={`flex-1 h-6 text-[11px] font-semibold capitalize cursor-pointer border-none ${
                           density === d
                             ? "bg-primary text-primary-foreground"

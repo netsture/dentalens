@@ -3,12 +3,11 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import App from "./App";
 import { initTheme } from "./lib/theme";
+import { initDensity } from "./lib/density";
 import "./styles/globals.css";
 
 initTheme();
-
-const density = localStorage.getItem("dl-density") || "compact";
-document.documentElement.classList.add(`density-${density}`);
+initDensity();
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

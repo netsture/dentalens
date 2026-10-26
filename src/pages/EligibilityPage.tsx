@@ -1,5 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { createPortal } from "react-dom";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ArrowDown,
@@ -7,11 +6,9 @@ import {
   ArrowUp,
   ArrowUpDown,
   FilterX,
-  MessageSquare,
   Phone,
-  Send,
-  X,
 } from "lucide-react";
+import { NewMessageInbox } from "@/components/NewMessageInbox";
 import { TableToolbar } from "@/components/TableToolbar";
 import { StatusBadge } from "@/components/StatusBadge";
 import { exportToExcel } from "@/lib/exportToExcel";
@@ -135,59 +132,6 @@ const rowTone = Object.fromEntries(legend.map((item) => [item.id, item.row])) as
 const filterInputClass =
   "w-full h-6 px-1 text-[10px] border border-border rounded-[2px] bg-background text-foreground outline-none focus:border-primary font-medium";
 
-type MessageReply = { from: string; body: string; time: string };
-type EligibilityMessage = {
-  id: string;
-  from: string;
-  patient: string;
-  patientId: string;
-  office: string;
-  subject: string;
-  body: string;
-  time: string;
-  unread: boolean;
-  replies: MessageReply[];
-};
-
-const seedMessages: EligibilityMessage[] = [
-  {
-    id: "m1",
-    from: "Nishita",
-    patient: "MORELL ALBERTO",
-    patientId: "375000",
-    office: "LORETTO AVE GD-OS-1044",
-    subject: "Need eligibility recheck",
-    body: "Aetna Open Access is showing pending. Please recheck and reply with the status.",
-    time: "10-10-2026 10:08 AM",
-    unread: true,
-    replies: [],
-  },
-  {
-    id: "m2",
-    from: "Front Desk",
-    patient: "REESE TERRY",
-    patientId: "900889",
-    office: "LORETTO AVE GD-OS-1044",
-    subject: "Secondary insurance missing",
-    body: "Jefferson secondary is not on file. Can you add it before the 10:20 appointment?",
-    time: "10-10-2026 09:42 AM",
-    unread: true,
-    replies: [],
-  },
-  {
-    id: "m3",
-    from: "Nikita",
-    patient: "SMITH ZEFFELI",
-    patientId: "100500",
-    office: "OLNEY AVENUE-GD",
-    subject: "Eligibility done",
-    body: "Delta Dental PPO verified last night. Ready for check-in.",
-    time: "10-09-2026 09:26 PM",
-    unread: false,
-    replies: [{ from: "You", body: "Noted, marked checked.", time: "10-09-2026 09:40 PM" }],
-  },
-];
-
 export default function EligibilityPage() {
   const navigate = useNavigate();
   const [q, setQ] = useState("");
@@ -207,76 +151,6 @@ export default function EligibilityPage() {
   const [dmoEarly, setDmoEarly] = useState(false);
   const [viewOnlyUc, setViewOnlyUc] = useState(false);
   const [ucCheck, setUcCheck] = useState(false);
-  const [messages, setMessages] = useState(seedMessages);
-  const [inboxOpen, setInboxOpen] = useState(false);
-  const [inboxPos, setInboxPos] = useState({ top: 0, left: 0 });
-  const [replyId, setReplyId] = useState<string | null>(null);
-  const [replyText, setReplyText] = useState("");
-  const inboxBtnRef = useRef<HTMLButtonElement>(null);
-  const inboxPanelRef = useRef<HTMLDivElement>(null);
-  const unreadCount = messages.filter((msg) => msg.unread).length;
-  const replyMessage = messages.find((msg) => msg.id === replyId) ?? null;
-
-  const placeInbox = () => {
-    const el = inboxBtnRef.current;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    const width = 400;
-    const left = Math.min(Math.max(8, rect.left), window.innerWidth - width - 8);
-    setInboxPos({ top: rect.bottom + 8, left });
-  };
-
-  const toggleInbox = () => {
-    setInboxOpen((open) => {
-      if (!open) placeInbox();
-      return !open;
-    });
-  };
-
-  useEffect(() => {
-    if (!inboxOpen) return;
-    placeInbox();
-    const onDocClick = (event: MouseEvent) => {
-      const target = event.target as Node;
-      if (inboxBtnRef.current?.contains(target) || inboxPanelRef.current?.contains(target)) return;
-      setInboxOpen(false);
-    };
-    const onReposition = () => placeInbox();
-    document.addEventListener("mousedown", onDocClick);
-    window.addEventListener("resize", onReposition);
-    window.addEventListener("scroll", onReposition, true);
-    return () => {
-      document.removeEventListener("mousedown", onDocClick);
-      window.removeEventListener("resize", onReposition);
-      window.removeEventListener("scroll", onReposition, true);
-    };
-  }, [inboxOpen]);
-
-  const openReply = (id: string) => {
-    setReplyId(id);
-    setReplyText("");
-    setInboxOpen(false);
-    setMessages((current) => current.map((msg) => (msg.id === id ? { ...msg, unread: false } : msg)));
-  };
-
-  const sendReply = () => {
-    const text = replyText.trim();
-    if (!replyId || !text) return;
-    setMessages((current) =>
-      current.map((msg) =>
-        msg.id === replyId
-          ? {
-              ...msg,
-              unread: false,
-              replies: [...msg.replies, { from: "You", body: text, time: "Just now" }],
-            }
-          : msg
-      )
-    );
-    setReplyText("");
-    setReplyId(null);
-  };
-
   const selectOptions = useMemo(() => {
     const map: Record<string, string[]> = {};
     columns.forEach((col) => {
@@ -387,65 +261,7 @@ export default function EligibilityPage() {
             <label>Appointment Date · {toDisplayDate(aptDate)}</label>
             <input type="date" value={aptDate} onChange={(e) => setAptDate(e.target.value)} />
           </div>
-          <div className="relative">
-            <button
-              type="button"
-              ref={inboxBtnRef}
-              className={`btn ${unreadCount > 0 ? "btn-alert-blink" : ""}`}
-              onClick={toggleInbox}
-            >
-              <MessageSquare className="w-3.5 h-3.5" />
-              New Message
-              {unreadCount > 0 ? (
-                <span className="min-w-4 h-4 px-1 rounded-full bg-red-600 text-white text-[9px] leading-4 text-center">
-                  {unreadCount}
-                </span>
-              ) : null}
-            </button>
-            {inboxOpen
-              ? createPortal(
-                  <div
-                    ref={inboxPanelRef}
-                    className="fixed w-[400px] max-w-[calc(100vw-16px)] bg-card border border-border rounded-[3px] shadow-xl overflow-hidden"
-                    style={{ top: inboxPos.top, left: inboxPos.left, zIndex: 3200 }}
-                  >
-                    <div className="px-2.5 py-1.5 border-b border-border flex items-center justify-between bg-secondary/40">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Messages</span>
-                      <span className="text-[10px] text-muted-foreground">{unreadCount} unread</span>
-                    </div>
-                    <div className="max-h-[320px] overflow-auto">
-                      {messages.length === 0 ? (
-                        <div className="px-3 py-6 text-[11px] text-muted-foreground text-center">No messages.</div>
-                      ) : (
-                        messages.map((msg) => (
-                          <button
-                            key={msg.id}
-                            type="button"
-                            className={`w-full text-left px-2.5 py-2.5 border-b border-border last:border-b-0 cursor-pointer hover:bg-secondary ${
-                              msg.unread ? "bg-rose-50" : "bg-card"
-                            }`}
-                            onClick={() => openReply(msg.id)}
-                          >
-                            <div className="flex items-center justify-between gap-2">
-                              <span className={`text-[12px] ${msg.unread ? "font-bold text-rose-700" : "font-semibold"}`}>
-                                {msg.from}
-                              </span>
-                              <span className="text-[10px] text-muted-foreground shrink-0">{msg.time}</span>
-                            </div>
-                            <div className="text-[12px] font-medium mt-0.5">{msg.subject}</div>
-                            <div className="text-[11px] text-muted-foreground mt-0.5">
-                              {msg.patient} · {msg.patientId} · {msg.office}
-                            </div>
-                            <p className="text-[11px] leading-snug mt-1">{msg.body}</p>
-                          </button>
-                        ))
-                      )}
-                    </div>
-                  </div>,
-                  document.body
-                )
-              : null}
-          </div>
+          <NewMessageInbox replyPlaceholder="Type a reply for this eligibility message..." />
         </div>
         <div className="flex flex-wrap gap-1.5">
           {["ORTHO", "MI", "DUNCAN", "SAAS"].map((item) => (
@@ -645,68 +461,6 @@ export default function EligibilityPage() {
         </div>
       </div>
 
-      {replyMessage ? (
-        <div
-          className="fixed inset-0 bg-black/50 z-[3000] flex items-center justify-center p-4"
-          onClick={() => setReplyId(null)}
-        >
-          <div
-            className="panel bg-card w-full max-w-lg shadow-xl flex flex-col max-h-[calc(100vh-48px)]"
-            onClick={(e) => e.stopPropagation()}
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="eligibility-reply-title"
-          >
-            <div className="panel-header shrink-0">
-              <div id="eligibility-reply-title" className="panel-title flex items-center gap-1.5">
-                <MessageSquare className="w-3.5 h-3.5 text-primary" />
-                Reply to {replyMessage.from}
-              </div>
-              <button type="button" className="btn h-7 px-2" onClick={() => setReplyId(null)} aria-label="Close">
-                <X className="w-3.5 h-3.5" />
-              </button>
-            </div>
-            <div className="p-3 flex flex-col gap-2 overflow-auto">
-              <div className="text-[11px] text-muted-foreground">
-                {replyMessage.patient} · {replyMessage.patientId} · {replyMessage.office}
-              </div>
-              <div className="border border-border rounded-[3px] bg-secondary/40 p-2.5">
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-[12px] font-semibold">{replyMessage.subject}</span>
-                  <span className="text-[10px] text-muted-foreground">{replyMessage.time}</span>
-                </div>
-                <p className="text-[12px] mt-1 leading-snug">{replyMessage.body}</p>
-              </div>
-              {replyMessage.replies.map((reply, index) => (
-                <div key={`${reply.time}-${index}`} className="border border-border rounded-[3px] bg-card p-2.5">
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="text-[11px] font-semibold">{reply.from}</span>
-                    <span className="text-[10px] text-muted-foreground">{reply.time}</span>
-                  </div>
-                  <p className="text-[12px] mt-1 leading-snug">{reply.body}</p>
-                </div>
-              ))}
-              <div className="field">
-                <label>Your reply</label>
-                <textarea
-                  rows={4}
-                  value={replyText}
-                  onChange={(e) => setReplyText(e.target.value)}
-                  placeholder="Type a reply for this eligibility message..."
-                />
-              </div>
-            </div>
-            <div className="px-3 py-2 border-t border-border flex justify-end gap-1.5">
-              <button type="button" className="btn" onClick={() => setReplyId(null)}>
-                Cancel
-              </button>
-              <button type="button" className="btn btn-primary" onClick={sendReply} disabled={!replyText.trim()}>
-                <Send className="w-3.5 h-3.5" /> Send Reply
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : null}
     </div>
   );
 }

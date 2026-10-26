@@ -18,6 +18,8 @@ export type TableToolbarProps = {
   onExport?: () => void;
   exportLabel?: string;
   filterContent?: ReactNode;
+  /** Shown immediately before Refresh */
+  leadingActions?: ReactNode;
   actions?: ReactNode;
   className?: string;
   /** Notified when this toolbar's filter panel opens/closes */
@@ -39,6 +41,7 @@ export function TableToolbar({
   onExport,
   exportLabel = "Export",
   filterContent,
+  leadingActions,
   actions,
   className = "",
   onFiltersOpenChange,
@@ -147,6 +150,7 @@ export function TableToolbar({
         </div>
 
         <div className="flex items-center gap-1.5 flex-wrap ml-auto">
+          {leadingActions}
           <button
             type="button"
             className="btn"

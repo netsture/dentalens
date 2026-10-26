@@ -1,7 +1,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { Navigate, useNavigate, Link } from "react-router-dom";
-import { AlertTriangle, CheckCircle2, Eye, EyeOff, Lock } from "lucide-react";
-import { DEMO_CREDENTIALS, useAuth } from "@/lib/auth";
+import { AlertTriangle, Eye, EyeOff, Lock } from "lucide-react";
+import { useAuth } from "@/lib/auth";
 
 const stats = [
   { value: "2.8K+", label: "Patients" },
@@ -28,7 +28,7 @@ export default function LoginPage() {
   const [remember, setRemember] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [form, setForm] = useState({ email: "admin@gmail.com", password: "demo123" });
+  const [form, setForm] = useState({ email: "", password: "" });
 
   useEffect(() => {
     const prev = { overflow: document.body.style.overflow, height: document.body.style.height };
@@ -102,7 +102,7 @@ export default function LoginPage() {
                     value={form.email}
                     onChange={(e) => setForm({ ...form, email: e.target.value })}
                     className="w-full h-10 px-3.5 text-[12.5px] rounded-xl text-[#0f2d52] auth-input"
-                    placeholder="admin@dentsaas.com"
+                    placeholder="Enter email"
                   />
                 </div>
 
@@ -116,7 +116,7 @@ export default function LoginPage() {
                       value={form.password}
                       onChange={(e) => setForm({ ...form, password: e.target.value })}
                       className="w-full h-10 pl-3.5 pr-10 text-[12.5px] rounded-xl text-[#0f2d52] auth-input"
-                      placeholder="demo123"
+                      placeholder="Enter password"
                     />
                     <button
                       type="button"
@@ -146,30 +146,6 @@ export default function LoginPage() {
                   {loading ? "Authenticating..." : "Sign In →"}
                 </button>
               </form>
-
-              <div className="pt-3 border-t border-slate-100">
-                <p className="text-[10.5px] font-bold text-slate-500 uppercase tracking-wider mb-2">
-                  Quick-Fill Demo Accounts
-                </p>
-                <div className="flex gap-2">
-                  {DEMO_CREDENTIALS.map((c) => (
-                    <button
-                      key={c.email}
-                      type="button"
-                      onClick={() => {
-                        setForm({ email: c.email, password: c.password });
-                        setError(null);
-                      }}
-                      className="flex-1 py-1.5 px-2 bg-teal-50 hover:bg-teal-100 text-teal-700 rounded-lg text-[11px] font-semibold border border-teal-100 cursor-pointer"
-                    >
-                      {c.role}
-                    </button>
-                  ))}
-                </div>
-                <p className="text-[10px] text-slate-400 mt-2">
-                  admin@dentsaas.com / demo123
-                </p>
-              </div>
             </div>
 
             <div className="mx-5 sm:mx-8 mb-5 flex items-start gap-2.5 px-3.5 py-2.5 rounded-xl bg-teal-50 border border-teal-100">

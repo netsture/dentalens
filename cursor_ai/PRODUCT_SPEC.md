@@ -81,12 +81,12 @@ Groups and items:
 
 Route: `/login`
 
-Provide a polished split login screen and demo account quick-fill.
+Provide a polished split login screen.
 
-Demo credentials:
+Credentials:
 
-- Administrator: `admin@gmail.com` / `demo123`
-- Doctor account may also be offered.
+- Administrator: `admin@gmail.com` / `admin@123`
+- Doctor: `doctor@gmail.com` / `doctor@123`
 
 Unauthenticated protected routes redirect to login. Successful login redirects to the requested page or dashboard.
 

@@ -23,6 +23,7 @@ import {
   TriangleAlert,
   UserRound,
 } from "lucide-react";
+import { NewMessageInbox } from "@/components/NewMessageInbox";
 import { TableToolbar } from "@/components/TableToolbar";
 import { StatusBadge } from "@/components/StatusBadge";
 import { exportToExcel } from "@/lib/exportToExcel";
@@ -485,6 +486,7 @@ export default function DoctorScreenPage() {
         search={q}
         onSearchChange={setQ}
         searchPlaceholder="Search today's patients..."
+        leadingActions={<NewMessageInbox replyPlaceholder="Type a reply for this patient message..." />}
         onRefresh={handleRefresh}
         refreshing={refreshing}
         onFiltersOpenChange={setFiltersOpen}

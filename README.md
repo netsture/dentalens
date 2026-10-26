@@ -16,8 +16,8 @@ Open http://localhost:5174
 
 | Role | Email | Password |
 |------|-------|----------|
-| Administrator | `admin@dentsaas.com` | `demo123` |
-| Doctor | `doctor@dentsaas.com` | `demo123` |
+| Administrator | `admin@gmail.com` | `admin@123` |
+| Doctor | `doctor@gmail.com` | `doctor@123` |
 
 ## Routes
 

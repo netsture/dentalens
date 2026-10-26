@@ -15,8 +15,8 @@ type AuthContextValue = {
 const STORAGE_KEY = "dentsaas_demo_user";
 
 const DEMO_ACCOUNTS = [
-  { email: "admin@dentsaas.com", password: "demo123", name: "Samir Admin", role: "Administrator" },
-  { email: "doctor@dentsaas.com", password: "demo123", name: "Dr. Rollins", role: "Doctor" },
+  { email: "admin@gmail.com", password: "admin@123", name: "Samir Admin", role: "Administrator" },
+  { email: "doctor@gmail.com", password: "doctor@123", name: "Dr. Rollins", role: "Doctor" },
 ];
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -41,7 +41,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const match = DEMO_ACCOUNTS.find(
           (a) => a.email.toLowerCase() === email.toLowerCase() && a.password === password
         );
-        if (!match) throw new Error("Invalid email or password. Use demo credentials.");
+        if (!match) throw new Error("Invalid email or password.");
         const next = { email: match.email, name: match.name, role: match.role };
         localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
         setUser(next);
@@ -62,9 +62,3 @@ export function useAuth() {
   if (!ctx) throw new Error("useAuth must be used within AuthProvider");
   return ctx;
 }
-
-export const DEMO_CREDENTIALS = DEMO_ACCOUNTS.map(({ email, password, role }) => ({
-  email,
-  password,
-  role,
-}));
