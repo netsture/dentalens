@@ -15,6 +15,7 @@ type AuthContextValue = {
 const STORAGE_KEY = "dentsaas_demo_user";
 
 const DEMO_ACCOUNTS = [
+  { email: "samir@gmail.com", password: "123456", name: "Samir Parikh", role: "Administrator" },
   { email: "admin@gmail.com", password: "admin@123", name: "Samir Admin", role: "Administrator" },
   { email: "doctor@gmail.com", password: "doctor@123", name: "Dr. Rollins", role: "Doctor" },
 ];

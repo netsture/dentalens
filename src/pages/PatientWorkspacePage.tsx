@@ -11,6 +11,7 @@ import {
   History,
   MessageSquare,
   Plus,
+  Printer,
   ReceiptText,
   ShieldCheck,
   Stethoscope,
@@ -310,13 +311,22 @@ export default function PatientWorkspacePage() {
       <div className="flex gap-2 flex-1 min-h-0">
         <aside className="panel w-[190px] shrink-0 p-1.5 overflow-auto hidden md:block">
           <div className="menu-group-title">Patient</div>
-          {sections.map((item) => {
+          {sections.flatMap((item) => {
             const Icon = item.icon;
-            return (
+            const link = (
               <Link key={item.key} to={`/patient/${item.key}${idQuery}`} className={`sidebar-item ${section === item.key ? "active" : ""}`}>
                 <Icon className="w-3.5 h-3.5" /> {item.label}
               </Link>
             );
+            if (item.key === "documents") {
+              return [
+                <Link key="printform" to={`/patient/printform/${patientId}`} className="sidebar-item">
+                  <Printer className="w-3.5 h-3.5" /> Print Form
+                </Link>,
+                link,
+              ];
+            }
+            return [link];
           })}
           <div className="menu-group-title">Account</div>
           <Link to={`/patient/billing${idQuery}`} className="sidebar-item"><Wallet className="w-3.5 h-3.5" /> Billing</Link>

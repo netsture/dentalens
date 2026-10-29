@@ -26,6 +26,10 @@ export const SEARCH_PATIENTS: SearchPatient[] = [
   { id: "851982", name: "JOHNSON", phone: "215-555-0196", dob: "03-12-1984", status: "Active" },
 ];
 
+export function getPatientById(id: string) {
+  return SEARCH_PATIENTS.find((patient) => patient.id === id);
+}
+
 export function searchPatients(query: string, limit = 8): SearchPatient[] {
   const q = query.trim().toLowerCase();
   if (!q) return [];

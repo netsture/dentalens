@@ -47,12 +47,12 @@
   --radius: 3px;
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   --font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --erp-font-size: 11.5px;
+  --erp-font-size: 12px;
   --erp-grid-gap: 6px;
   --density-zoom: 1;
   --density-pad: 10px;
-  --density-font: 11.5px;
-  --density-font-sm: 10px;
+  --density-font: 12px;
+  --density-font-sm: 11px;
   --density-btn-h: 26px;
   --density-input-h: 28px;
   --density-cell-y: 5px;
@@ -143,12 +143,12 @@
 }
 
 html.density-compact {
-  --erp-font-size: 10.5px;
+  --erp-font-size: 11px;
   --erp-grid-gap: 4px;
   --density-zoom: 1;
   --density-pad: 8px;
-  --density-font: 10.5px;
-  --density-font-sm: 9px;
+  --density-font: 11px;
+  --density-font-sm: 10px;
   --density-btn-h: 24px;
   --density-input-h: 26px;
   --density-cell-y: 4px;
@@ -159,12 +159,12 @@ html.density-compact {
 }
 
 html.density-standard {
-  --erp-font-size: 11.5px;
+  --erp-font-size: 12px;
   --erp-grid-gap: 6px;
   --density-zoom: 1;
   --density-pad: 10px;
-  --density-font: 11.5px;
-  --density-font-sm: 10px;
+  --density-font: 12px;
+  --density-font-sm: 11px;
   --density-btn-h: 26px;
   --density-input-h: 28px;
   --density-cell-y: 5px;
@@ -175,12 +175,12 @@ html.density-standard {
 }
 
 html.density-comfortable {
-  --erp-font-size: 12.5px;
+  --erp-font-size: 14px;
   --erp-grid-gap: 8px;
   --density-zoom: 1;
   --density-pad: 12px;
-  --density-font: 12.5px;
-  --density-font-sm: 11px;
+  --density-font: 14px;
+  --density-font-sm: 12px;
   --density-btn-h: 28px;
   --density-input-h: 30px;
   --density-cell-y: 6px;
@@ -202,7 +202,7 @@ html.density-comfortable {
   body {
     background-color: var(--background);
     color: var(--foreground);
-    font-size: var(--density-font);
+    font-size: 12px;
     height: 100vh;
     overflow: hidden;
     display: flex;
@@ -254,16 +254,24 @@ html.density-comfortable {
   opacity: 0.6;
 }
 
+.app-sidebar,
+.app-sidebar .sidebar-menu,
+.app-sidebar .sidebar-item,
+.app-sidebar .sidebar-item span,
+.app-sidebar input {
+  font-size: 12px;
+}
+
 .sidebar-item {
   display: flex;
   align-items: center;
   gap: 8px;
-  height: var(--density-sidebar-h);
+  height: 28px;
   padding: 0 8px;
   color: var(--foreground);
   text-decoration: none;
   border-radius: 3px;
-  font-size: var(--density-font);
+  font-size: 12px;
   font-weight: 500;
 }
 
@@ -288,7 +296,7 @@ html.density-comfortable {
   overflow: hidden;
   padding: var(--density-pad);
   gap: var(--erp-grid-gap);
-  font-size: var(--erp-font-size);
+  font-size: var(--density-font);
   zoom: var(--density-zoom);
 }
 
@@ -324,10 +332,14 @@ html.density-comfortable {
 }
 
 .panel-title {
-  font-size: var(--density-font);
+  font-size: 12px;
   font-weight: 700;
   color: var(--foreground);
   letter-spacing: 0.01em;
+}
+
+.console-body .panel-title {
+  font-size: var(--density-font);
 }
 
 .btn {
@@ -341,10 +353,14 @@ html.density-comfortable {
   border: 1px solid var(--border);
   background: var(--card);
   color: var(--foreground);
-  font-size: var(--density-font);
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
   transition: background-color 0.15s, border-color 0.15s;
+}
+
+.console-body .btn {
+  font-size: var(--density-font);
 }
 
 .btn:hover {
@@ -379,7 +395,7 @@ html.density-comfortable {
 }
 
 .field label {
-  font-size: var(--density-font-sm);
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -395,8 +411,18 @@ html.density-comfortable {
   border-radius: 3px;
   background: var(--background);
   color: var(--foreground);
-  font-size: var(--density-font);
+  font-size: 12px;
   outline: none;
+}
+
+.console-body .field label {
+  font-size: var(--density-font-sm);
+}
+
+.console-body .field input,
+.console-body .field select,
+.console-body .field textarea {
+  font-size: var(--density-font);
 }
 
 .field input[type="date"] {
@@ -436,7 +462,11 @@ html.density-comfortable {
 .data-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: var(--erp-font-size);
+  font-size: 12px;
+}
+
+.console-body .data-table {
+  font-size: var(--density-font);
 }
 
 .data-table th {
@@ -444,7 +474,7 @@ html.density-comfortable {
   padding: var(--density-th-y) var(--density-cell-x);
   background: var(--secondary);
   border-bottom: 1px solid var(--border);
-  font-size: var(--density-font-sm);
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.03em;
@@ -466,14 +496,22 @@ html.density-comfortable {
   background: var(--secondary);
 }
 
+.console-body .data-table th {
+  font-size: var(--density-font-sm);
+}
+
 .badge {
   display: inline-flex;
   align-items: center;
   padding: 1px 6px;
   border-radius: 3px;
-  font-size: var(--density-font-sm);
+  font-size: 11px;
   line-height: 1.45;
   white-space: nowrap;
+}
+
+.console-body .badge {
+  font-size: var(--density-font-sm);
 }
 
 .badge-status {

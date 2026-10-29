@@ -18,6 +18,7 @@ import DoctorScreenPage from "@/pages/DoctorScreenPage";
 import BlankSectionPage from "@/pages/BlankSectionPage";
 import EligibilityPage from "@/pages/EligibilityPage";
 import VoiceCommandPage from "@/pages/VoiceCommandPage";
+import PatientPrintFormPage from "@/pages/PatientPrintFormPage";
 
 export default function App() {
   return (
@@ -43,6 +44,7 @@ export default function App() {
           <Route path="/patient/treatment" element={<PatientWorkspacePage />} />
           <Route path="/patient/recalls" element={<PatientWorkspacePage />} />
           <Route path="/patient/authorizations" element={<PatientWorkspacePage />} />
+          <Route path="/patient/printform/:patientId" element={<PatientPrintFormPage />} />
           <Route path="/patient/documents" element={<PatientWorkspacePage />} />
           <Route path="/patient/billing" element={<PatientBillingPage />} />
           <Route path="/documents" element={<DocumentsPage />} />

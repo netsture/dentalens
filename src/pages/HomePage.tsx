@@ -20,16 +20,40 @@ import {
 
 const platformFeatures = [
   {
+    title: "Practice Setup",
+    desc: "Configure corporation, offices, providers, and fee lists once — then reuse them across the whole platform.",
+    icon: Shield,
+    tone: "bg-teal-50 text-teal-800",
+  },
+  {
     title: "Patient Scheduling",
     desc: "Book visits by chair and provider, see who is waiting or seated, and keep every location’s dayboard in sync.",
     icon: CalendarDays,
     tone: "bg-teal-100 text-teal-700",
   },
   {
+    title: "Eligibility Checks",
+    desc: "Confirm coverage before the appointment so the team knows benefits, remaining maximums, and patient share.",
+    icon: ClipboardCheck,
+    tone: "bg-cyan-50 text-cyan-700",
+  },
+  {
     title: "Clinical Charting",
     desc: "Record findings tooth by tooth, track perio measurements, and keep the chart ready for the next visit.",
     icon: Smile,
     tone: "bg-teal-50 text-teal-600",
+  },
+  {
+    title: "Treatment Planner",
+    desc: "Group recommended procedures into phases, estimate cost, and share a plan patients can understand.",
+    icon: Stethoscope,
+    tone: "bg-teal-100 text-teal-600",
+  },
+  {
+    title: "Imaging & Docs",
+    desc: "Keep X-rays, consent forms, and clinical files with the patient record for quick review chairside.",
+    icon: Camera,
+    tone: "bg-teal-50 text-teal-700",
   },
   {
     title: "Dental Billing",
@@ -44,34 +68,10 @@ const platformFeatures = [
     tone: "bg-teal-100 text-teal-800",
   },
   {
-    title: "Eligibility Checks",
-    desc: "Confirm coverage before the appointment so the team knows benefits, remaining maximums, and patient share.",
-    icon: ClipboardCheck,
-    tone: "bg-cyan-50 text-cyan-700",
-  },
-  {
-    title: "Imaging & Docs",
-    desc: "Keep X-rays, consent forms, and clinical files with the patient record for quick review chairside.",
-    icon: Camera,
-    tone: "bg-teal-50 text-teal-700",
-  },
-  {
-    title: "Treatment Planner",
-    desc: "Group recommended procedures into phases, estimate cost, and share a plan patients can understand.",
-    icon: Stethoscope,
-    tone: "bg-teal-100 text-teal-600",
-  },
-  {
     title: "Analytics & Reports",
     desc: "Monitor daily production, collections, and chair utilization so owners see what drives growth.",
     icon: FileText,
     tone: "bg-cyan-100 text-cyan-800",
-  },
-  {
-    title: "Practice Setup",
-    desc: "Configure corporation, offices, providers, and fee lists once — then reuse them across the whole platform.",
-    icon: Shield,
-    tone: "bg-teal-50 text-teal-800",
   },
 ];
 

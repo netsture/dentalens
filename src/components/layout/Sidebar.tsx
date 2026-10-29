@@ -61,7 +61,7 @@ export function Sidebar({ expanded }: { expanded: boolean }) {
 
   return (
     <aside
-      className={`bg-secondary border-r border-border flex flex-col shrink-0 overflow-hidden transition-[width] duration-200 h-full ${
+      className={`app-sidebar bg-secondary border-r border-border flex flex-col shrink-0 overflow-hidden transition-[width] duration-200 h-full ${
         expanded ? "w-[240px]" : "w-[52px]"
       }`}
     >
