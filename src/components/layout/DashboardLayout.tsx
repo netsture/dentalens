@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import {
   Bell,
   FilePlus2,
@@ -16,6 +16,7 @@ import { Sidebar } from "./Sidebar";
 import { Topbar } from "./Topbar";
 import { Statusbar } from "./Statusbar";
 import { VoiceCommand } from "@/components/VoiceCommand";
+import { shouldAutoCollapseSidebar, useSidebarCollapseSettings } from "@/lib/sidebarCollapse";
 
 const quickActions = [
   { label: "Patient", icon: UserPlus, href: "/patient?add=1" },
@@ -30,12 +31,30 @@ const quickActions = [
 ];
 
 export function DashboardLayout({ children }: { children: ReactNode }) {
+  const location = useLocation();
+  const [collapseSettings] = useSidebarCollapseSettings();
+  const autoCollapse = shouldAutoCollapseSidebar(location.pathname, collapseSettings);
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
+  const [hoverOpen, setHoverOpen] = useState(false);
+  const previousExpanded = useRef(true);
+
+  useEffect(() => {
+    if (autoCollapse) {
+      previousExpanded.current = sidebarExpanded;
+      setSidebarExpanded(false);
+      setHoverOpen(false);
+      return;
+    }
+    setSidebarExpanded(previousExpanded.current);
+    setHoverOpen(false);
+  }, [autoCollapse]);
+
+  const showSidebar = autoCollapse ? sidebarExpanded || hoverOpen : sidebarExpanded;
 
   return (
     <div className="h-screen w-screen flex flex-col overflow-hidden bg-background text-foreground">
       <Topbar
-        sidebarExpanded={sidebarExpanded}
+        sidebarExpanded={autoCollapse ? false : sidebarExpanded}
         onToggleSidebar={() => setSidebarExpanded((v) => !v)}
       />
       <div className="h-[30px] bg-primary text-primary-foreground flex items-center justify-end px-2 gap-0.5 shrink-0 overflow-x-auto border-b border-primary-hover">
@@ -54,7 +73,17 @@ export function DashboardLayout({ children }: { children: ReactNode }) {
         })}
       </div>
       <div className="flex-1 flex overflow-hidden relative">
-        <Sidebar expanded={sidebarExpanded} />
+        <div
+          className={`h-full shrink-0 z-30 ${autoCollapse ? "relative w-[52px]" : ""}`}
+          onMouseEnter={() => {
+            if (autoCollapse) setHoverOpen(true);
+          }}
+          onMouseLeave={() => {
+            if (autoCollapse) setHoverOpen(false);
+          }}
+        >
+          <Sidebar expanded={showSidebar} flyout={autoCollapse} />
+        </div>
         <main className="console-body flex-1 flex flex-col overflow-hidden min-w-0">
           <div className="flex-1 flex flex-col overflow-auto min-h-0">{children}</div>
         </main>

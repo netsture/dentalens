@@ -4,6 +4,7 @@ import {
   Bell,
   Building,
   Check,
+  CircleHelp,
   Mail,
   MapPin,
   Maximize2,
@@ -15,6 +16,7 @@ import { useAuth } from "@/lib/auth";
 import { applyTheme, getStoredTheme, THEMES, type AppTheme } from "@/lib/theme";
 import { applyDensity, getStoredDensity, type AppDensity } from "@/lib/density";
 import { PatientSearch } from "@/components/PatientSearch";
+import { SupportGuideModal } from "@/components/SupportGuideModal";
 import {
   loadWorkspaceContext,
   SwitchWorkspaceModal,
@@ -31,6 +33,7 @@ export function Topbar({
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [showProfile, setShowProfile] = useState(false);
+  const [showSupport, setShowSupport] = useState(false);
   const [showWorkspace, setShowWorkspace] = useState(false);
   const [workspace, setWorkspace] = useState<WorkspaceContext>(() => loadWorkspaceContext());
   const [density, setDensity] = useState<AppDensity>(() => getStoredDensity());
@@ -135,6 +138,16 @@ export function Topbar({
 
         <div className="flex items-center justify-end gap-1.5">
           <div className="w-px h-6 bg-border mx-1 shrink-0" />
+
+          <button
+            type="button"
+            className="btn"
+            title="Support guide"
+            onClick={() => setShowSupport(true)}
+          >
+            <CircleHelp className="w-3.5 h-3.5" />
+            Support
+          </button>
 
           <button className="relative w-9 h-9 flex items-center justify-center rounded-full hover:bg-secondary border-none bg-transparent cursor-pointer">
             <Bell className="w-[18px] h-[18px] text-foreground" />
@@ -264,6 +277,8 @@ export function Topbar({
           </div>
         </div>
       </div>
+
+      <SupportGuideModal open={showSupport} onClose={() => setShowSupport(false)} />
 
       <SwitchWorkspaceModal
         open={showWorkspace}

@@ -41,7 +41,7 @@ const menuItems = [
   { group: "Administration", name: "Voice Command", path: "/voice-command", icon: Mic },
 ];
 
-export function Sidebar({ expanded }: { expanded: boolean }) {
+export function Sidebar({ expanded, flyout = false }: { expanded: boolean; flyout?: boolean }) {
   const location = useLocation();
   const [query, setQuery] = useState("");
 
@@ -62,7 +62,9 @@ export function Sidebar({ expanded }: { expanded: boolean }) {
   return (
     <aside
       className={`app-sidebar bg-secondary border-r border-border flex flex-col shrink-0 overflow-hidden transition-[width] duration-200 h-full ${
-        expanded ? "w-[240px]" : "w-[52px]"
+        flyout ? "absolute inset-y-0 left-0 z-40" : ""
+      } ${expanded ? "w-[240px]" : "w-[52px]"} ${
+        flyout && expanded ? "shadow-[4px_0_16px_rgba(15,23,42,0.12)]" : ""
       }`}
     >
       {expanded && (

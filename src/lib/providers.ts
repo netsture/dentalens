@@ -160,3 +160,7 @@ export function getProvider(id: string) {
 export function getProviderSchedule(providerId: string) {
   return doctorSchedule.filter((row) => row.providerId === providerId);
 }
+
+export function getSchedulePatient(patientId: string) {
+  return doctorSchedule.find((row) => row.patientId === patientId);
+}

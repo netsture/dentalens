@@ -708,6 +708,26 @@ export default function DoctorScreenPage() {
                         );
                       }
 
+                      if (col.key === "examTx") {
+                        const label = String(row.examTx ?? "");
+                        const isExamPlan = label.toUpperCase().includes("EXAM TXPLAN");
+                        return (
+                          <td key={col.key} className="align-top text-[11px]">
+                            {isExamPlan ? (
+                              <button
+                                type="button"
+                                className="text-primary font-semibold bg-transparent border-none p-0 cursor-pointer hover:underline"
+                                onClick={() => navigate(`/patient/treatementplan/${row.patientId}?provider=${provider.id}`)}
+                              >
+                                {label}
+                              </button>
+                            ) : (
+                              label
+                            )}
+                          </td>
+                        );
+                      }
+
                       if (col.key === "status") {
                         return (
                           <td key={col.key} className="align-top">

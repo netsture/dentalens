@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import {
   Bell,
   Building2,
@@ -10,6 +10,10 @@ import {
   Shield,
   User,
 } from "lucide-react";
+import {
+  SIDEBAR_COLLAPSE_PAGES,
+  useSidebarCollapseSettings,
+} from "@/lib/sidebarCollapse";
 
 const tabs = [
   { id: "practice", label: "Practice", icon: Building2 },
@@ -31,36 +35,150 @@ function Field({ label, children, full }: { label: string; children: ReactNode; 
   );
 }
 
+function ToggleSwitch({ on, onToggle }: { on: boolean; onToggle: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      className={`w-9 h-5 rounded-full relative border-none cursor-pointer transition-colors shrink-0 ${
+        on ? "bg-primary" : "bg-border"
+      }`}
+    >
+      <span
+        className="absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all"
+        style={{ left: on ? "18px" : "2px" }}
+      />
+    </button>
+  );
+}
+
 function ToggleRow({
   label,
   description,
   defaultChecked = false,
+  checked,
+  onCheckedChange,
 }: {
   label: string;
   description?: string;
   defaultChecked?: boolean;
+  checked?: boolean;
+  onCheckedChange?: (next: boolean) => void;
 }) {
   const [on, setOn] = useState(defaultChecked);
+  const value = checked ?? on;
+  const toggle = () => {
+    const next = !value;
+    setOn(next);
+    onCheckedChange?.(next);
+  };
   return (
     <div className="flex items-start justify-between gap-4 py-1.5 md:col-span-2 border-b border-border last:border-0">
       <div>
         <p className="text-[12px] font-semibold text-foreground">{label}</p>
         {description && <p className="text-[10px] text-muted-foreground">{description}</p>}
       </div>
-      <button
-        type="button"
-        onClick={() => setOn((v) => !v)}
-        className={`w-9 h-5 rounded-full relative border-none cursor-pointer transition-colors ${
-          on ? "bg-primary" : "bg-border"
-        }`}
-      >
-        <span
-          className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all ${
-            on ? "left-4.5 right-0.5 left-auto" : "left-0.5"
-          }`}
-          style={{ left: on ? "18px" : "2px" }}
-        />
-      </button>
+      <ToggleSwitch on={value} onToggle={toggle} />
+    </div>
+  );
+}
+
+function SidebarCollapseSettings() {
+  const [settings, update] = useSidebarCollapseSettings();
+  const [query, setQuery] = useState("");
+
+  const groups = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    const pages = SIDEBAR_COLLAPSE_PAGES.filter((page) => {
+      if (!q) return true;
+      return [page.label, page.group, page.path].some((value) => value.toLowerCase().includes(q));
+    });
+    return [...new Set(pages.map((page) => page.group))].map((group) => ({
+      group,
+      pages: pages.filter((page) => page.group === group),
+    }));
+  }, [query]);
+
+  const selectedCount = settings.pages.length;
+  const allVisibleIds = groups.flatMap((group) => group.pages.map((page) => page.id));
+  const allVisibleSelected = allVisibleIds.length > 0 && allVisibleIds.every((id) => settings.pages.includes(id));
+
+  const togglePage = (id: string) => {
+    const pages = settings.pages.includes(id)
+      ? settings.pages.filter((item) => item !== id)
+      : [...settings.pages, id];
+    update({ ...settings, pages });
+  };
+
+  const toggleVisible = () => {
+    if (allVisibleSelected) {
+      update({ ...settings, pages: settings.pages.filter((id) => !allVisibleIds.includes(id)) });
+      return;
+    }
+    update({ ...settings, pages: Array.from(new Set([...settings.pages, ...allVisibleIds])) });
+  };
+
+  return (
+    <div className="md:col-span-2 border border-border rounded-[3px] bg-background">
+      <div className="flex items-start justify-between gap-4 p-3 border-b border-border">
+        <div>
+          <p className="text-[12px] font-semibold text-foreground">Auto collapse sidebar</p>
+          <p className="text-[10px] text-muted-foreground">
+            Collapse the sidebar on selected pages. Hover the icon rail to open it again.
+          </p>
+        </div>
+        <ToggleSwitch on={settings.enabled} onToggle={() => update({ ...settings, enabled: !settings.enabled })} />
+      </div>
+
+      <div className={`p-3 flex flex-col gap-2 ${settings.enabled ? "" : "opacity-50 pointer-events-none"}`}>
+        <div className="flex items-center gap-2 flex-wrap">
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search pages..."
+            className="flex-1 min-w-[180px] h-7 px-2 text-[11px]"
+          />
+          <button type="button" className="btn" onClick={toggleVisible}>
+            {allVisibleSelected ? "Clear visible" : "Select visible"}
+          </button>
+          <span className="text-[10px] text-muted-foreground whitespace-nowrap">
+            {selectedCount} of {SIDEBAR_COLLAPSE_PAGES.length} pages
+          </span>
+        </div>
+
+        <div className="border border-border rounded-[3px] max-h-[360px] overflow-auto">
+          {groups.length === 0 ? (
+            <p className="text-[11px] text-muted-foreground p-3">No pages match the search.</p>
+          ) : (
+            groups.map((group) => (
+              <div key={group.group} className="border-b border-border last:border-0">
+                <div className="px-3 py-1.5 bg-secondary text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                  {group.group}
+                </div>
+                {group.pages.map((page) => {
+                  const checked = settings.pages.includes(page.id);
+                  return (
+                    <label
+                      key={page.id}
+                      className="flex items-center gap-2 px-3 py-1.5 hover:bg-secondary cursor-pointer border-t border-border/70"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={() => togglePage(page.id)}
+                        className="accent-primary"
+                      />
+                      <span className="text-[12px] font-semibold text-foreground flex-1">{page.label}</span>
+                      <span className="text-[10px] text-muted-foreground">{page.path}</span>
+                    </label>
+                  );
+                })}
+              </div>
+            ))
+          )}
+        </div>
+      </div>
     </div>
   );
 }
@@ -278,8 +396,8 @@ export default function SettingsPage() {
                   <option value="24">24-hour</option>
                 </select>
               </Field>
-              <ToggleRow label="Compact Sidebar by Default" />
               <ToggleRow label="Show Onboarding Tips" defaultChecked />
+              <SidebarCollapseSettings />
             </div>
           )}
 

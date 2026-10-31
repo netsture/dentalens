@@ -1088,3 +1088,239 @@ textarea.cs-control {
   0%, 100% { transform: scaleY(0.5); }
   50% { transform: scaleY(1.4); }
 }
+
+.tx-exam {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tx-kv {
+  display: inline-flex;
+  gap: 4px;
+  margin-right: 14px;
+  white-space: nowrap;
+}
+
+.tx-work {
+  display: grid;
+  grid-template-columns: minmax(420px, 640px) minmax(0, 1fr);
+  gap: 8px;
+  align-items: start;
+}
+
+.tx-chart {
+  position: sticky;
+  top: 0;
+}
+
+.tx-mouth-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  margin: 4px 0;
+}
+
+.tx-mouth-area,
+.tx-dentition {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 8px;
+  border: 1px solid var(--border);
+  background: var(--secondary);
+  color: var(--foreground);
+  font-weight: 700;
+  border-radius: 3px;
+}
+
+.tx-mouth-btn {
+  height: 20px;
+  padding: 0 7px;
+  border: 0;
+  border-radius: 3px;
+  color: #fff;
+  font-weight: 700;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.tx-mouth-btn.tone-navy { background: #5174a2; }
+.tx-mouth-btn.tone-green { background: #78cd51; }
+.tx-mouth-btn.tone-red { background: #ff6c60; }
+.tx-mouth-btn.tone-gold { background: #f1c500; color: #1f2937; }
+
+.tx-arch {
+  display: flex;
+  justify-content: center;
+  gap: 1px;
+  margin: 2px 0 6px;
+}
+
+.tx-tooth {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 38px;
+  padding: 1px 0;
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 3px;
+}
+
+.tx-tooth img {
+  width: 36px;
+  height: 56px;
+  object-fit: contain;
+}
+
+.tx-tooth span {
+  font-size: 10px;
+  line-height: 1;
+  color: var(--muted-foreground);
+}
+
+.tx-tooth.is-on {
+  background: rgba(81, 116, 162, 0.18);
+  border-color: #5174a2;
+}
+
+.tx-entry {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tx-fields {
+  display: grid;
+  grid-template-columns: minmax(180px, 280px);
+  gap: 8px;
+}
+
+.tx-hasneed,
+.tx-pending {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.tx-box {
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+  background: var(--card);
+}
+
+.tx-box-h {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 8px;
+  font-weight: 700;
+  color: #111;
+}
+
+.tx-mic {
+  width: 22px;
+  height: 22px;
+  border: 0;
+  border-radius: 99px;
+  background: rgba(0, 0, 0, 0.14);
+  color: #111;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.tx-mic.is-on {
+  background: #dc2626;
+  color: #fff;
+  animation: tx-mic-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes tx-mic-pulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.45); }
+  50% { transform: scale(1.06); box-shadow: 0 0 0 6px rgba(220, 38, 38, 0); }
+}
+
+.tx-box-h.has { background: rgba(90, 216, 128, 0.65); }
+.tx-box-h.need { background: rgba(245, 56, 56, 0.55); }
+
+.tx-box-body { padding: 8px; }
+
+.tx-speech {
+  margin: 0 0 8px;
+  font-weight: 600;
+  color: #111;
+  opacity: 0.75;
+}
+
+.tx-surface-pad {
+  display: grid;
+  grid-template-columns: 28px 28px 28px;
+  gap: 3px;
+  justify-items: center;
+}
+
+.tx-surface-btn {
+  width: 28px;
+  height: 22px;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  background: var(--card);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.tx-surface-btn.is-on {
+  background: #5174a2;
+  border-color: #5174a2;
+  color: #fff;
+}
+
+.tx-chip-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  margin-top: 8px;
+}
+
+.tx-chip-has,
+.tx-chip-need,
+.tx-pill {
+  height: 20px;
+  padding: 0 6px;
+  border: 0;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  color: #111;
+}
+
+.tx-chip-has,
+.tx-pill.has {
+  background: linear-gradient(to bottom, #9ce7b3, #38b75e);
+}
+
+.tx-chip-need,
+.tx-pill.need {
+  background: linear-gradient(to bottom, #f98787, #f74f4f);
+}
+
+.tx-chip-has:hover,
+.tx-pill.has:hover { filter: brightness(0.96); }
+.tx-chip-need:hover,
+.tx-pill.need:hover { filter: brightness(0.96); }
+
+@media (max-width: 1100px) {
+  .tx-work,
+  .tx-hasneed,
+  .tx-pending,
+  .tx-fields {
+    grid-template-columns: 1fr;
+  }
+  .tx-chart { position: static; }
+}
