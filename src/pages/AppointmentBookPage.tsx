@@ -90,6 +90,16 @@ const yellowActions = [
 const redActions = ["No show / Broken", "Patient termination"];
 const greenActions = ["Confirm appt", "Send email/text", "Left message", "Back to appointment", "Back to front desk"];
 
+function formatTime12(value: string) {
+  const [hourPart, minutePart = "00"] = value.split(":");
+  let hour = Number(hourPart);
+  if (Number.isNaN(hour)) return value;
+  const mer = hour >= 12 ? "PM" : "AM";
+  hour = hour % 12;
+  if (hour === 0) hour = 12;
+  return `${hour}:${minutePart.padStart(2, "0")} ${mer}`;
+}
+
 function statusClass(status: Appointment["status"]) {
   if (status === "confirmed") return "slot-confirmed";
   if (status === "allocated") return "slot-allocated";
@@ -287,11 +297,10 @@ export default function AppointmentBookPage() {
               <table className="data-table min-w-[1100px] appt-book-grid">
                 <thead>
                   <tr className="[&>th]:!sticky [&>th]:!top-0 [&>th]:z-[5]">
-                    <th className="w-[64px] !text-center" />
                     {providerGroups.map((group, groupIndex) => (
                       <th
                         key={`prov-${group.doctor.id}`}
-                        colSpan={group.sides.length}
+                        colSpan={group.sides.length + 1}
                         className={`!text-center !normal-case !tracking-normal ${groupIndex > 0 ? "border-l-2 border-l-border" : ""}`}
                       >
                         <div className="flex flex-col items-center justify-center gap-0.5 w-full py-0.5">
@@ -309,19 +318,16 @@ export default function AppointmentBookPage() {
                     ))}
                   </tr>
                   <tr className="[&>th]:!sticky [&>th]:!top-[46px] [&>th]:z-[4] [&>th]:h-8">
-                    <th className="w-[64px] !text-center">
-                      <div className="inline-flex items-center justify-center gap-1">
-                        <Clock className="w-3 h-3 text-muted-foreground" />
-                        TIME
-                      </div>
-                    </th>
                     {providerGroups.map((group, groupIndex) => (
                       <Fragment key={`cols-${group.doctor.id}`}>
-                        {group.sides.map((s, sideIndex) => (
-                          <th
-                            key={s.id}
-                            className={`!text-center ${groupIndex > 0 && sideIndex === 0 ? "border-l-2 border-l-border" : ""}`}
-                          >
+                        <th className={`w-[78px] !text-center ${groupIndex > 0 ? "border-l-2 border-l-border" : ""}`}>
+                          <div className="inline-flex items-center justify-center gap-1">
+                            <Clock className="w-3 h-3 text-muted-foreground" />
+                            TIME
+                          </div>
+                        </th>
+                        {group.sides.map((s) => (
+                          <th key={s.id} className="!text-center">
                             <div className="inline-flex items-center justify-center gap-1">
                               <User className="w-3 h-3 text-muted-foreground" />
                               {s.label.toUpperCase()}
@@ -335,20 +341,19 @@ export default function AppointmentBookPage() {
                 <tbody>
                   {times.map((t) => (
                     <tr key={t}>
-                      <td className="font-semibold text-muted-foreground whitespace-nowrap text-center text-[11px]">
-                        {t}
-                      </td>
                       {providerGroups.map((group, groupIndex) => (
                         <Fragment key={`${t}-${group.doctor.id}`}>
-                          {group.sides.map((s, sideIndex) => {
+                          <td
+                            className={`font-semibold text-muted-foreground whitespace-nowrap text-center text-[11px] ${
+                              groupIndex > 0 ? "border-l-2 border-l-border" : ""
+                            }`}
+                          >
+                            {formatTime12(t)}
+                          </td>
+                          {group.sides.map((s) => {
                             const appt = findSlot(s.id, t);
                             return (
-                              <td
-                                key={s.id}
-                                className={`p-1 align-top h-[44px] ${
-                                  groupIndex > 0 && sideIndex === 0 ? "border-l-2 border-l-border" : ""
-                                }`}
-                              >
+                              <td key={s.id} className="p-1 align-top h-[44px]">
                                 {appt ? (
                                   <button
                                     onClick={() => setSelected(appt)}
@@ -395,7 +400,7 @@ export default function AppointmentBookPage() {
                     .map((a) => (
                       <tr key={a.id} className="cursor-pointer" onClick={() => setSelected(a)}>
                         <td className="font-semibold">
-                          {a.start}–{a.end}
+                          {formatTime12(a.start)}–{formatTime12(a.end)}
                         </td>
                         <td>{sides.find((s) => s.id === a.sideId)?.label}</td>
                         <td>{a.patient}</td>
@@ -430,11 +435,11 @@ export default function AppointmentBookPage() {
               <div className="grid grid-cols-2 gap-2">
                 <div className="field">
                   <label>Start</label>
-                  <div>{selected.start}</div>
+                  <div>{formatTime12(selected.start)}</div>
                 </div>
                 <div className="field">
                   <label>End</label>
-                  <div>{selected.end}</div>
+                  <div>{formatTime12(selected.end)}</div>
                 </div>
               </div>
               <div className="field">
