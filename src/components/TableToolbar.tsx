@@ -26,6 +26,8 @@ export type TableToolbarProps = {
   onFiltersOpenChange?: (open: boolean) => void;
   /** When false, Filter only toggles column filters (no toolbar panel). Default true. */
   showFilterPanel?: boolean;
+  /** Open the filter UI when the toolbar first mounts. */
+  defaultFiltersOpen?: boolean;
 };
 
 /**
@@ -46,9 +48,10 @@ export function TableToolbar({
   className = "",
   onFiltersOpenChange,
   showFilterPanel = true,
+  defaultFiltersOpen = false,
 }: TableToolbarProps) {
   const toolbarId = useId();
-  const [showFilters, setShowFilters] = useState(false);
+  const [showFilters, setShowFilters] = useState(defaultFiltersOpen);
   const [localSearch, setLocalSearch] = useState(search);
   const searchFn = useRef(onSearchChange);
   const refreshFn = useRef(onRefresh);
@@ -84,6 +87,10 @@ export function TableToolbar({
     window.addEventListener(VOICE_EVENT, onVoice);
     return () => window.removeEventListener(VOICE_EVENT, onVoice);
   }, []);
+
+  useEffect(() => {
+    if (defaultFiltersOpen) openFilterToolbar(toolbarId);
+  }, [defaultFiltersOpen, toolbarId]);
 
   // Close this panel if another page/table opens its filter
   useEffect(() => {

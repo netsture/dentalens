@@ -71,10 +71,13 @@ export const NAV_TARGETS: { path: string; label: string }[] = [
   { path: "/patient", label: "Patient Search" },
   { path: "/patient/overview", label: "Patient Overview" },
   { path: "/patient/insurance", label: "Insurance" },
+  { path: "/patient/appointment", label: "Appointment History" },
   { path: "/patient/clinical", label: "Clinical Chart" },
   { path: "/patient/treatment", label: "Treatment Planner" },
   { path: "/patient/authorizations", label: "Authorizations" },
   { path: "/patient/documents", label: "Patient Documents" },
+  { path: "/patient/ledger", label: "Ledger" },
+  { path: "/patient/accounts", label: "Accounts" },
   { path: "/patient/billing", label: "Patient Billing" },
   { path: "/documents", label: "Documents" },
   { path: "/report", label: "Reports" },
@@ -82,6 +85,7 @@ export const NAV_TARGETS: { path: string; label: string }[] = [
   { path: "/back-office", label: "Back Office" },
   { path: "/settings", label: "Settings" },
   { path: "/voice-command", label: "Voice Command" },
+  { path: "/support-guide", label: "Support Guide" },
 ];
 
 export const ACTION_OPTIONS: { id: ManagedVoiceCommand["action"]; label: string }[] = [
@@ -154,10 +158,13 @@ const BUILTIN_ROUTES: { path: string; label: string; aliases: string[] }[] = [
   { path: "/patient", label: "Patient Search", aliases: ["patient", "patients", "patient search", "mareez", "rogi", "dardee"] },
   { path: "/patient/overview", label: "Patient Overview", aliases: ["patient overview", "overview"] },
   { path: "/patient/insurance", label: "Insurance", aliases: ["insurance", "bima", "vimo"] },
+  { path: "/patient/appointment", label: "Appointment History", aliases: ["appointment history", "patient appointment"] },
   { path: "/patient/clinical", label: "Clinical Chart", aliases: ["clinical", "clinical chart", "chart"] },
   { path: "/patient/treatment", label: "Treatment Planner", aliases: ["treatment", "treatment planner"] },
   { path: "/patient/authorizations", label: "Authorizations", aliases: ["authorization", "authorizations"] },
   { path: "/patient/documents", label: "Patient Documents", aliases: ["patient documents"] },
+  { path: "/patient/ledger", label: "Ledger", aliases: ["ledger", "patient ledger"] },
+  { path: "/patient/accounts", label: "Accounts", aliases: ["accounts", "patient accounts"] },
   { path: "/patient/billing", label: "Patient Billing", aliases: ["billing", "bill"] },
   { path: "/documents", label: "Documents", aliases: ["document", "documents", "dastavej"] },
   { path: "/report", label: "Reports", aliases: ["report", "reports", "analytics"] },
@@ -165,6 +172,7 @@ const BUILTIN_ROUTES: { path: string; label: string; aliases: string[] }[] = [
   { path: "/back-office", label: "Back Office", aliases: ["back office", "backoffice"] },
   { path: "/settings", label: "Settings", aliases: ["setting", "settings"] },
   { path: "/voice-command", label: "Voice Command", aliases: ["voice command", "voice commands", "voice"] },
+  { path: "/support-guide", label: "Support Guide", aliases: ["support", "support guide", "help", "how to"] },
 ];
 
 const BUILTIN_ACTIONS: { kind: Exclude<VoiceActionKind, "navigate" | "search" | "search-page" | "view-add" | "unknown">; aliases: string[] }[] = [

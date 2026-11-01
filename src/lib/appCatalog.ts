@@ -1,0 +1,348 @@
+/** Shared app catalog. Sidebar menus and extra pages feed the Support Guide automatically. */
+
+export type AppCatalogItem = {
+  id: string;
+  group: string;
+  name: string;
+  path: string;
+  keywords?: string[];
+  usedFor?: string;
+  steps?: string[];
+};
+
+/** Left sidebar menus. Adding an item here also adds it to Support Guide. */
+export const SIDEBAR_MENU: AppCatalogItem[] = [
+  { id: "dashboard", group: "Practice", name: "Dashboard", path: "/dashboard" },
+  { id: "practice-setup", group: "Practice", name: "Practice Setup", path: "/practice-setup" },
+  { id: "provider-list", group: "Provider", name: "Doctor Screen", path: "/provider" },
+  { id: "appointment-book", group: "Scheduling", name: "Appointment Book", path: "/appointment/book" },
+  { id: "patient-search", group: "Patients", name: "Patient Search", path: "/patient" },
+  { id: "patient-billing", group: "Financial", name: "Patient Billing", path: "/patient/billing" },
+  { id: "documents-office", group: "Financial", name: "Documents", path: "/documents" },
+  { id: "reports", group: "Financial", name: "Analytics & Reports", path: "/report" },
+  { id: "eligibility", group: "Eligibility", name: "Eligibility Check", path: "/eligibility" },
+  { id: "back-office", group: "Back Office", name: "Overview", path: "/back-office" },
+  { id: "settings", group: "Administration", name: "Settings", path: "/settings" },
+  { id: "voice-command", group: "Administration", name: "Voice Command", path: "/voice-command" },
+  { id: "support-guide", group: "Help", name: "Support Guide", path: "/support-guide" },
+];
+
+/** Screens that are not in the sidebar. Adding a route here also adds it to Support Guide. */
+export const EXTRA_APP_PAGES: AppCatalogItem[] = [
+  { id: "find-slot", group: "Scheduling", name: "Find Slot", path: "/appointment/find-slot" },
+  { id: "online-requests", group: "Scheduling", name: "Online Appointment Requests", path: "/appointment/online" },
+  { id: "short-call", group: "Scheduling", name: "Short Call List", path: "/appointment/short-call" },
+  { id: "unscheduled", group: "Scheduling", name: "Unscheduled Treatment", path: "/appointment/unscheduled" },
+  { id: "appointment-recalls", group: "Scheduling", name: "Appointment Recalls", path: "/appointment/recalls" },
+  { id: "patient-overview", group: "Patients", name: "Patient Overview", path: "/patient/overview" },
+  { id: "patient-insurance", group: "Patients", name: "Insurance", path: "/patient/insurance" },
+  { id: "clinical-chart", group: "Patients", name: "Clinical Chart", path: "/patient/clinical" },
+  { id: "treatment-planner", group: "Patients", name: "Treatment Planner", path: "/patient/treatment" },
+  { id: "authorizations", group: "Patients", name: "Authorizations", path: "/patient/authorizations" },
+  { id: "patient-appointment", group: "Patients", name: "Appointment History", path: "/patient/appointment" },
+  { id: "patient-recalls", group: "Patients", name: "Recalls", path: "/patient/recalls" },
+  { id: "print-form", group: "Patients", name: "Print Form", path: "/patient/printform/1494" },
+  { id: "exam-txplan", group: "Provider", name: "Exam Treatment Plan", path: "/patient/treatementplan/17001" },
+  { id: "patient-ledger", group: "Patients", name: "Ledger", path: "/patient/ledger" },
+  { id: "patient-accounts", group: "Patients", name: "Accounts", path: "/patient/accounts" },
+  { id: "patient-documents", group: "Patients", name: "Patient Documents", path: "/patient/documents" },
+];
+
+/** Buttons, modals, and in-page actions. Register new functions here (or with registerSupportGuide). */
+export const APP_FUNCTIONS: AppCatalogItem[] = [
+  {
+    id: "add-patient",
+    group: "Patients",
+    name: "Add Patient / New Patient Registration",
+    path: "/patient?add=1",
+    keywords: [
+      "add patient",
+      "add new patient",
+      "new patient",
+      "new patient registration",
+      "patient registration",
+      "register patient",
+      "registration",
+      "enroll patient",
+      "create patient",
+      "userplus",
+      "email notifications",
+      "enable communications",
+    ],
+    usedFor: "Register a new patient from Patient Search. Opens the Add Patient form, including communication options such as Email Notifications.",
+    steps: [
+      "Open the left sidebar",
+      "Go to Patients → Patient Search",
+      "Click Add Patient in the table toolbar",
+      "Fill the registration form, set Enable Communications, and save",
+    ],
+  },
+  {
+    id: "add-insurance",
+    group: "Patients",
+    name: "Add Insurance",
+    path: "/patient/insurance",
+    keywords: ["add insurance", "new insurance", "insurance plan", "subscriber"],
+    usedFor: "Add an insurance plan to a patient after opening their chart.",
+    steps: ["Open a patient", "Click Insurance in the patient menu", "Click Add Insurance"],
+  },
+  {
+    id: "view-patient",
+    group: "Patients",
+    name: "View Patient Overview",
+    path: "/patient",
+    keywords: ["view patient", "open patient", "patient id", "view button"],
+    usedFor: "Open a patient's overview from the Patient Search table.",
+    steps: ["Go to Patients → Patient Search", "Click the ID in the first column, or click View"],
+  },
+  {
+    id: "search-patient-form",
+    group: "Patients",
+    name: "Search Patient",
+    path: "/patient",
+    keywords: [
+      "search patient",
+      "patient id",
+      "first name",
+      "last name",
+      "phone number",
+      "insurance id",
+      "member id",
+      "ss number",
+    ],
+    usedFor: "Find a patient on Patient Search using Patient ID, name, phone, DOB, Insurance Id, or S# S# No.",
+    steps: ["Open Patients → Patient Search", "Fill one or more fields in Search Patient", "Click Search"],
+  },
+  {
+    id: "header-patient-search",
+    group: "Top bar",
+    name: "Header Patient Search",
+    path: "/patient",
+    keywords: ["header search", "patient search top", "find id", "top search"],
+    usedFor: "Type a patient name, ID, phone, or DOB in the center of the top bar to open that patient.",
+    steps: ["Look at the center of the top bar", "Type in Patient Search...", "Click a name in the list"],
+  },
+  {
+    id: "export-excel",
+    group: "Tables",
+    name: "Export to Excel",
+    path: "/patient",
+    keywords: ["export", "excel", "download", "xls"],
+    usedFor: "Export the currently filtered table rows to Excel from any data table toolbar.",
+    steps: ["Open a page with a table", "Use search or filters if needed", "Click Export"],
+  },
+  {
+    id: "table-filter",
+    group: "Tables",
+    name: "Table Filter",
+    path: "/patient",
+    keywords: ["filter", "column filter", "search table"],
+    usedFor: "Filter table rows with the toolbar Filter button and per-column inputs.",
+    steps: ["Open a page with a table", "Click Filter", "Type in a column filter"],
+  },
+  {
+    id: "table-refresh",
+    group: "Tables",
+    name: "Table Refresh",
+    path: "/patient",
+    keywords: ["refresh", "reload"],
+    usedFor: "Reload the current table view.",
+    steps: ["Open a page with a table", "Click Refresh"],
+  },
+  {
+    id: "add-appointment-history",
+    group: "Patients",
+    name: "Add Appointment",
+    path: "/patient/appointment",
+    keywords: ["add appointment", "new appointment", "book from history"],
+    usedFor: "Open the appointment book to schedule a visit for the current patient.",
+    steps: ["Open a patient", "Click Appointment", "Click Add Appointment"],
+  },
+  {
+    id: "book-appointment",
+    group: "Scheduling",
+    name: "Book Appointment",
+    path: "/appointment/book",
+    keywords: ["book appointment", "new appointment", "schedule visit", "save booking"],
+    usedFor: "Create an appointment on the appointment book.",
+    steps: ["Open Scheduling → Appointment Book", "Pick a chair and time", "Save Booking"],
+  },
+  {
+    id: "check-in",
+    group: "Scheduling",
+    name: "Appointment Check In",
+    path: "/appointment/book",
+    keywords: ["check in", "arrive", "waiting"],
+    usedFor: "Check a patient in from the appointment book.",
+    steps: ["Open Scheduling → Appointment Book", "Select an appointment", "Click Check In"],
+  },
+  {
+    id: "billing-invoice",
+    group: "Financial",
+    name: "Create Invoice",
+    path: "/patient/billing",
+    keywords: ["invoice", "charge", "post charge"],
+    usedFor: "Post an invoice on the patient billing ledger.",
+    steps: ["Open Financial → Patient Billing, or a patient's Ledger", "Click Invoice"],
+  },
+  {
+    id: "account-payment",
+    group: "Financial",
+    name: "Account Payment",
+    path: "/patient/billing",
+    keywords: ["payment", "collect", "visa", "account payment"],
+    usedFor: "Take a patient or insurance payment on the ledger.",
+    steps: ["Open Financial → Patient Billing, or a patient's Ledger", "Click Account payment"],
+  },
+  {
+    id: "present-plan",
+    group: "Patients",
+    name: "Present Treatment Plan",
+    path: "/patient/treatment",
+    keywords: ["present plan", "treatment estimate", "tx present"],
+    usedFor: "Present a treatment plan and fee estimate to the patient.",
+    steps: ["Open a patient", "Click Treatment Planner", "Click Present Plan"],
+  },
+  {
+    id: "voice-mic",
+    group: "Administration",
+    name: "Voice Microphone",
+    path: "/voice-command",
+    keywords: ["microphone", "speak", "siri", "voice button"],
+    usedFor: "Speak a command using the microphone in the bottom-right corner.",
+    steps: ["Click the microphone button in the bottom-right", "Say a command such as go to patient search"],
+  },
+  {
+    id: "density",
+    group: "Top bar",
+    name: "Density (Compact / Standard / Comfort)",
+    path: "/dashboard",
+    keywords: ["density", "compact", "standard", "comfort", "font size"],
+    usedFor: "Change page text size in the main content area. Sidebar stays 12px.",
+    steps: ["Click your profile circle in the top-right", "Under Density pick Compact, Standard, or Comfort"],
+  },
+  {
+    id: "theme",
+    group: "Top bar",
+    name: "Theme colors",
+    path: "/dashboard",
+    keywords: ["theme", "color", "blue", "green", "light green", "coral", "lime", "ff6c60", "c9f279"],
+    usedFor: "Switch the application color theme from the profile menu.",
+    steps: ["Click your profile circle in the top-right", "Under Theme select a color"],
+  },
+  {
+    id: "switch-clinic",
+    group: "Top bar",
+    name: "Switch Clinic / Branch",
+    path: "/dashboard",
+    keywords: ["clinic", "branch", "workspace", "switch office"],
+    usedFor: "Change the active clinic and branch shown in the top bar.",
+    steps: ["Click Clinic or Branch on the left of the top bar", "Select clinic and branch", "Save"],
+  },
+  {
+    id: "topbar-support",
+    group: "Top bar",
+    name: "Support button",
+    path: "/support-guide",
+    keywords: ["support button", "help modal", "how do i"],
+    usedFor: "Open the Support Guide search from the top bar Support button.",
+    steps: ["Click Support in the top bar", "Or open Help → Support Guide in the sidebar"],
+  },
+  {
+    id: "add-corporation",
+    group: "Practice Setup",
+    name: "Add Corporation",
+    path: "/practice-setup",
+    keywords: ["add corporation", "new corporation", "legal entity"],
+    usedFor: "Create a corporation profile for the practice.",
+    steps: ["Open Practice → Practice Setup", "Corporation → Add Corporation"],
+  },
+  {
+    id: "add-office",
+    group: "Practice Setup",
+    name: "Add New Office",
+    path: "/practice-setup",
+    keywords: ["add office", "new office", "location"],
+    usedFor: "Add a clinic office location.",
+    steps: ["Open Practice → Practice Setup", "Office → Add New Office"],
+  },
+  {
+    id: "add-provider",
+    group: "Practice Setup",
+    name: "Add New Provider",
+    path: "/practice-setup",
+    keywords: ["add provider", "new doctor", "add doctor"],
+    usedFor: "Add a provider used for scheduling and billing.",
+    steps: ["Open Practice → Practice Setup", "Provider → Add New Provider"],
+  },
+];
+
+function addSearchPatientField(id: string, name: string, usedFor: string, extraKeywords: string[] = []): AppCatalogItem {
+  return {
+    id: `search-patient-${id}`,
+    group: "Search Patient form",
+    name,
+    path: "/patient",
+    keywords: [name, name.toLowerCase(), "search patient", "patient search", ...extraKeywords],
+    usedFor,
+    steps: ["Open Patients → Patient Search", `Find ${name} in the Search Patient box at the top`, "Click Search"],
+  };
+}
+
+function addPatientField(id: string, name: string, usedFor: string, extraKeywords: string[] = []): AppCatalogItem {
+  return {
+    id: `add-patient-${id}`,
+    group: "Add Patient form",
+    name,
+    path: "/patient?add=1",
+    keywords: [name, name.toLowerCase(), "add patient", "new patient", "add new patient", "registration", ...extraKeywords],
+    usedFor,
+    steps: [
+      "Open Patients → Patient Search",
+      "Click Add Patient",
+      `Find ${name} on the Add New Patient form`,
+    ],
+  };
+}
+
+/**
+ * Fields and checkboxes inside the Add New Patient modal.
+ * Add more form-field entries here when a modal gets new options.
+ */
+export const APP_FORM_FIELDS: AppCatalogItem[] = [
+  addSearchPatientField("patient-id", "Patient ID", "Search the patient list by patient number.", ["patient id", "enter number", "id"]),
+  addSearchPatientField("first-name", "First Name", "Search the patient list by first name.", ["first name"]),
+  addSearchPatientField("last-name", "Last Name", "Search the patient list by last name.", ["last name"]),
+  addSearchPatientField("phone-number", "Phone Number", "Search the patient list by phone number.", ["phone number", "phone"]),
+  addSearchPatientField("dob", "DOB", "Search the patient list by date of birth.", ["dob", "date of birth"]),
+  addSearchPatientField("insurance-id", "Insurance Id", "Search by Member Id1 (INS ID).", ["insurance id", "member id1", "ins id"]),
+  addSearchPatientField("ss-no", "S# S# No-", "Search by Member Id2 (S#S# NO.).", ["s# s# no", "member id2", "ss number"]),
+  addSearchPatientField("search-button", "Search", "Run the Search Patient filters and update the table.", ["search"]),
+  addPatientField("relationship", "Relationship to RP", "Set whether the new patient is Self, Spouse, Dependent Child, or Other to the responsible party.", ["relationship", "responsible party", "self", "spouse", "dependent child"]),
+  addPatientField("prefix", "Prefix", "Choose Mr., Mrs., Ms., Dr., or Miss on the new patient form.", ["prefix", "mr", "mrs", "title"]),
+  addPatientField("more-name", "More Name Options", "Show Middle Name and Preferred Name on the Add Patient form.", ["middle name", "preferred name", "more name options"]),
+  addPatientField("first-name", "First Name", "Enter the patient's first name. Required to save a new patient.", ["first name", "given name"]),
+  addPatientField("last-name", "Last Name", "Enter the patient's last name. Required to save a new patient.", ["last name", "surname"]),
+  addPatientField("dob", "Date of Birth", "Enter the patient's date of birth on the Add Patient form.", ["date of birth", "dob", "birthday"]),
+  addPatientField("gender", "Gender", "Set Male, Female, Other, or Prefer not to say on the Add Patient form.", ["gender", "sex"]),
+  addPatientField("patient-type", "Patient Type", "Choose General Patient or Ortho Patient when registering.", ["patient type", "general patient", "ortho patient", "orthodontic"]),
+  addPatientField("referral", "Referral Source", "Record how the patient found the practice: Patient Referral, Google, Insurance Directory, or Walk-in.", ["referral", "referral source", "walk-in"]),
+  addPatientField("location", "Location", "Assign the new patient to a clinic location such as City Center.", ["location", "office location", "city center"]),
+  addPatientField("address", "Address", "Enter street address, Address Line 2, ZIP, City, and State. Use Verify on ZIP.", ["address", "zip", "city", "state", "verify zip"]),
+  addPatientField("mobile", "Mobile", "Enter the patient's mobile number on the Add Patient form.", ["mobile", "phone", "cell"]),
+  addPatientField("email", "Email", "Enter the patient's email address used for notices and the portal.", ["email", "email address"]),
+  addPatientField(
+    "email-notifications",
+    "Email Notifications",
+    "Turn Email Notifications on or off under Enable Communications when adding a new patient.",
+    ["email notifications", "email notification", "notifications", "notification", "enable communications", "comms"]
+  ),
+  addPatientField("text-comms", "Text Communications", "Allow text messages to the patient from Enable Communications on Add Patient.", ["text", "sms", "text communications"]),
+  addPatientField("voice-comms", "Voice Communications", "Allow voice calls from Enable Communications on Add Patient.", ["voice communications", "call"]),
+  addPatientField("marketing-emails", "Marketing Emails", "Opt the patient into marketing emails on the Add Patient form.", ["marketing emails", "marketing", "promotions"]),
+  addPatientField("patient-portal", "Patient Portal", "Enable Patient Portal access when registering a new patient.", ["patient portal", "portal"]),
+  addPatientField("postcards", "Postcards", "Allow postcard communications from Enable Communications on Add Patient.", ["postcards", "mail"]),
+  addPatientField("ssn", "SSN / Add More Details", "Click Add More Details on Add Patient to enter SSN and extra fields.", ["ssn", "social security", "add more details"]),
+  addPatientField("add-another", "Add another patient", "Save this patient and start another registration from the Add Patient footer.", ["add another patient"]),
+  addPatientField("add-appointment", "Add Appointment from Add Patient", "Save the new patient and continue to book an appointment.", ["add appointment"]),
+];

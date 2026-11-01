@@ -1,0 +1,33 @@
+---
+description: Keep Support Guide in sync when adding menus, pages, or functions
+alwaysApply: true
+---
+
+# Support Guide catalog
+
+When you add a **sidebar menu**, **route**, or **user-facing function** (button, modal, workflow), register it so Support Guide search can find it.
+
+## Menus
+
+Add the item to `SIDEBAR_MENU` in `src/lib/appCatalog.ts`. The Support Guide picks it up automatically. Then render it from that catalog in `Sidebar.tsx`.
+
+## Extra pages (not in the sidebar)
+
+Add to `EXTRA_APP_PAGES` in `src/lib/appCatalog.ts`.
+
+## Form fields and checkboxes (Add Patient Email Notifications, etc.)
+
+Add to `APP_FORM_FIELDS` in `src/lib/appCatalog.ts` (or use `addPatientField`-style helpers). Include the exact on-screen label so Support Guide search finds it.
+
+## In-page functions (Add Patient, Export, Book, etc.)
+
+Add to `APP_FUNCTIONS` in `src/lib/appCatalog.ts`, including:
+
+- `name` people would search (include synonyms)
+- `keywords` such as "new patient registration", "add patient"
+- `path` to open with **Go there**
+- `usedFor` and `steps`
+
+Or call `registerSupportGuide()` from `src/lib/supportGuide.ts` when a feature module loads.
+
+Do not leave a new screen or primary button undocumented.

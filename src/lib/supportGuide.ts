@@ -1,3 +1,5 @@
+import { APP_FORM_FIELDS, APP_FUNCTIONS, EXTRA_APP_PAGES, SIDEBAR_MENU, type AppCatalogItem } from "@/lib/appCatalog";
+
 export type SupportGuideItem = {
   id: string;
   title: string;
@@ -8,133 +10,41 @@ export type SupportGuideItem = {
   steps: string[];
 };
 
-export const SUPPORT_GUIDE: SupportGuideItem[] = [
-  {
-    id: "dashboard",
+const PAGE_DETAILS: Record<string, Partial<Pick<SupportGuideItem, "usedFor" | "steps" | "keywords" | "title">>> = {
+  dashboard: {
     title: "Dashboard",
-    group: "Practice",
-    path: "/dashboard",
     keywords: ["dashboard", "home", "today", "schedule", "overview"],
     usedFor: "See today's schedule, production snapshot, and quick clinic activity.",
     steps: ["Open the left sidebar", "Go to Practice → Dashboard"],
   },
-  {
-    id: "practice-setup",
+  "practice-setup": {
     title: "Practice Setup",
-    group: "Practice",
-    path: "/practice-setup",
     keywords: ["practice setup", "corporation", "office", "clinic setup", "fee"],
     usedFor: "Configure corporation, offices, providers, and fee lists for the practice.",
     steps: ["Open the left sidebar", "Go to Practice → Practice Setup", "Pick a setup section on the left"],
   },
-  {
-    id: "provider-list",
+  "provider-list": {
     title: "Doctor Screen / Providers",
-    group: "Provider",
-    path: "/provider",
     keywords: ["doctor", "provider", "doctor screen", "p2", "schedule patients"],
     usedFor: "Open a provider's daily patient list, clinical tools, and chair-side actions.",
     steps: ["Open the left sidebar", "Go to Provider → Doctor Screen", "Click a provider name to open their screen"],
   },
-  {
-    id: "appointment-book",
-    title: "Appointment Book",
-    group: "Scheduling",
-    path: "/appointment/book",
+  "appointment-book": {
     keywords: ["appointment", "schedule", "book", "chair", "calendar"],
     usedFor: "Book, move, and review appointments by chair and provider.",
     steps: ["Open the left sidebar", "Go to Scheduling → Appointment Book"],
   },
-  {
-    id: "find-slot",
-    title: "Find Slot",
-    group: "Scheduling",
-    path: "/appointment/find-slot",
-    keywords: ["find slot", "available", "open time"],
-    usedFor: "Search open chair times when booking a new visit.",
-    steps: ["Open Appointment Book or Scheduling tools", "Open Find Slot"],
+  "patient-appointment": {
+    keywords: ["appointment history", "patient appointment", "appt history", "time of apt"],
+    usedFor: "Review a patient's past and upcoming appointments, status, and remarks.",
+    steps: ["Open a patient", "In the patient left menu click Appointment (after Insurance)"],
   },
-  {
-    id: "patient-search",
-    title: "Patient Search",
-    group: "Patients",
-    path: "/patient",
-    keywords: ["patient search", "find patient", "patient list", "add patient"],
+  "patient-search": {
+    keywords: ["patient search", "find patient", "patient list", "add patient", "new patient"],
     usedFor: "Search the patient list, add a patient, or open billing and insurance.",
     steps: ["Open the left sidebar", "Go to Patients → Patient Search", "Or type a name in the top-bar Patient Search"],
   },
-  {
-    id: "patient-overview",
-    title: "Patient Overview",
-    group: "Patients",
-    path: "/patient/overview",
-    keywords: ["patient overview", "chart header", "alerts", "patient details"],
-    usedFor: "View one patient's details, balance, alerts, and jump to other patient pages.",
-    steps: ["Search a patient", "Open Patients → Patient Overview", "Or pick a patient from header search"],
-  },
-  {
-    id: "patient-insurance",
-    title: "Patient Insurance",
-    group: "Patients",
-    path: "/patient/insurance",
-    keywords: ["insurance", "plan", "eligibility plan", "deductible", "add insurance"],
-    usedFor: "Review and add insurance plans, deductibles, and maximums for a patient.",
-    steps: ["Open a patient", "In the patient left menu click Insurance", "Or go to Patients → Insurance"],
-  },
-  {
-    id: "clinical-chart",
-    title: "Clinical Chart",
-    group: "Patients",
-    path: "/patient/clinical",
-    keywords: ["clinical", "odontogram", "tooth chart", "charting"],
-    usedFor: "Mark findings on the tooth chart for the selected patient.",
-    steps: ["Open a patient", "In the patient left menu click Clinical Chart"],
-  },
-  {
-    id: "treatment-planner",
-    title: "Treatment Planner",
-    group: "Patients",
-    path: "/patient/treatment",
-    keywords: ["treatment", "tx plan", "procedure", "estimate"],
-    usedFor: "Build treatment phases, estimates, and present a plan to the patient.",
-    steps: ["Open a patient", "In the patient left menu click Treatment Planner"],
-  },
-  {
-    id: "exam-txplan",
-    title: "Exam Treatment Plan",
-    group: "Provider",
-    path: "/patient/treatementplan/17001",
-    keywords: ["exam txplan", "new ex/tx", "exam treatment", "treatementplan"],
-    usedFor: "Open the exam treatment plan page for a patient from the doctor screen New Ex/Tx column.",
-    steps: [
-      "Open Provider → Doctor Screen",
-      "Open a provider such as p1",
-      "In the New Ex/Tx column click EXAM TXPLAN",
-    ],
-  },
-  {
-    id: "recalls",
-    title: "Recalls",
-    group: "Patients",
-    path: "/patient/recalls",
-    keywords: ["recall", "6 month", "hygiene"],
-    usedFor: "Track due recalls such as prophylaxis and periodic exam.",
-    steps: ["Open a patient", "In the patient left menu click Recalls"],
-  },
-  {
-    id: "authorizations",
-    title: "Authorizations",
-    group: "Patients",
-    path: "/patient/authorizations",
-    keywords: ["authorization", "preauth", "pre-auth"],
-    usedFor: "Review insurance authorizations and their status.",
-    steps: ["Open a patient", "In the patient left menu click Authorizations"],
-  },
-  {
-    id: "print-form",
-    title: "Print Form",
-    group: "Patients",
-    path: "/patient/printform/1494",
+  "print-form": {
     keywords: ["print form", "printform", "consent", "examination form", "spanish form"],
     usedFor: "Print English or Spanish patient forms. Check forms, then Print, or click a form name for one PDF.",
     steps: [
@@ -145,123 +55,131 @@ export const SUPPORT_GUIDE: SupportGuideItem[] = [
       "Expand a group, check forms, click Print — or click the form name",
     ],
   },
-  {
-    id: "patient-documents",
-    title: "Patient Documents",
-    group: "Patients",
-    path: "/patient/documents",
-    keywords: ["documents", "files", "upload", "xray file"],
-    usedFor: "Keep consents, images, and clinical files on the patient record.",
-    steps: ["Open a patient", "In the patient left menu click Documents"],
+  "exam-txplan": {
+    keywords: ["exam txplan", "new ex/tx", "exam treatment", "treatementplan"],
+    usedFor: "Open the exam treatment plan page for a patient from the doctor screen New Ex/Tx column.",
+    steps: ["Open Provider → Doctor Screen", "Open a provider such as p1", "In the New Ex/Tx column click EXAM TXPLAN"],
   },
-  {
-    id: "patient-billing",
-    title: "Patient Billing",
-    group: "Financial",
-    path: "/patient/billing",
-    keywords: ["billing", "ledger", "payment", "invoice", "balance"],
-    usedFor: "Post charges, take payments, and review the patient ledger.",
-    steps: ["Open the left sidebar", "Go to Financial → Patient Billing", "Or from a patient page click Billing"],
+  "patient-ledger": {
+    keywords: ["ledger", "patient ledger", "transactions"],
+    usedFor: "Open the selected patient's billing ledger inside the patient workspace.",
+    steps: ["Open a patient", "In the patient left menu under Account click Ledger"],
   },
-  {
-    id: "documents-office",
-    title: "Office Documents",
-    group: "Financial",
-    path: "/documents",
-    keywords: ["office documents", "shared files"],
-    usedFor: "Browse practice-level documents outside a single patient chart.",
-    steps: ["Open the left sidebar", "Go to Financial → Documents"],
+  "patient-accounts": {
+    keywords: ["accounts", "patient accounts", "proc id", "office fees"],
+    usedFor: "Review procedure and payment rows, office fees, and patient balances.",
+    steps: ["Open a patient", "In the patient left menu under Account click Accounts"],
   },
-  {
-    id: "reports",
-    title: "Analytics & Reports",
-    group: "Financial",
-    path: "/report",
-    keywords: ["report", "analytics", "production", "collections"],
-    usedFor: "Run production, collections, and other practice reports.",
-    steps: ["Open the left sidebar", "Go to Financial → Analytics & Reports"],
+  "support-guide": {
+    keywords: ["support", "help", "guide", "how to", "search functions"],
+    usedFor: "Search every DentSaas menu and function, then jump to that screen.",
+    steps: ["Open the left sidebar", "Go to Help → Support Guide", "Type a function name in the center search box"],
   },
-  {
-    id: "eligibility",
-    title: "Eligibility Check",
-    group: "Eligibility",
-    path: "/eligibility",
-    keywords: ["eligibility", "benefits", "coverage", "awaited", "new message"],
-    usedFor: "Check insurance eligibility before the visit and reply to eligibility messages.",
-    steps: ["Open the left sidebar", "Go to Eligibility → Eligibility Check", "Filter by office, date, or legend", "Use View/Add to open that patient's insurance"],
-  },
-  {
-    id: "back-office",
-    title: "Back Office",
-    group: "Back Office",
-    path: "/back-office",
-    keywords: ["back office", "claims follow up"],
-    usedFor: "Open the back-office overview for claims and office follow-up work.",
-    steps: ["Open the left sidebar", "Go to Back Office → Overview"],
-  },
-  {
-    id: "settings",
-    title: "Settings",
-    group: "Administration",
-    path: "/settings",
-    keywords: ["settings", "profile", "theme", "password"],
-    usedFor: "Update practice and user settings.",
-    steps: ["Open the left sidebar", "Go to Administration → Settings", "Or open the profile menu → Settings"],
-  },
-  {
-    id: "voice-command",
-    title: "Voice Command",
-    group: "Administration",
-    path: "/voice-command",
-    keywords: ["voice", "microphone", "speak", "siri"],
-    usedFor: "Add and manage spoken commands for search, refresh, and navigation.",
-    steps: ["Open the left sidebar", "Go to Administration → Voice Command", "Or use the microphone in the bottom-right"],
-  },
-  {
-    id: "density",
-    title: "Density (Compact / Standard / Comfort)",
-    group: "Top bar",
-    path: "/dashboard",
-    keywords: ["density", "compact", "standard", "comfort", "font size"],
-    usedFor: "Change page text size in the main content area. Sidebar stays 12px.",
-    steps: ["Click your profile circle in the top-right", "Under Density pick Compact, Standard, or Comfort"],
-  },
-  {
-    id: "theme",
-    title: "Theme colors",
-    group: "Top bar",
-    path: "/dashboard",
-    keywords: ["theme", "color", "blue", "green"],
-    usedFor: "Switch the application color theme.",
-    steps: ["Click your profile circle in the top-right", "Click a Theme color dot"],
-  },
-  {
-    id: "header-patient-search",
-    title: "Header Patient Search",
-    group: "Top bar",
-    path: "/patient",
-    keywords: ["header search", "patient search top", "find id"],
-    usedFor: "Type a patient name, ID, phone, or DOB in the center of the top bar to open that patient.",
-    steps: ["Look at the center of the top bar", "Type in Patient Search...", "Click a name in the list"],
-  },
-  {
-    id: "switch-clinic",
-    title: "Switch Clinic / Branch",
-    group: "Top bar",
-    path: "/dashboard",
-    keywords: ["clinic", "branch", "workspace", "switch office"],
-    usedFor: "Change the active clinic and branch shown in the top bar.",
-    steps: ["Click Clinic or Branch on the left of the top bar", "Select clinic and branch", "Save"],
-  },
-];
+};
+
+const SYNONYMS: Record<string, string[]> = {
+  registration: ["register", "add", "new", "enroll", "enrollment", "create"],
+  register: ["registration", "add", "new", "enroll", "create"],
+  add: ["new", "create", "register", "registration"],
+  new: ["add", "create", "register"],
+  create: ["add", "new", "register"],
+  patient: ["patients", "chart", "mareez"],
+  billing: ["ledger", "invoice", "payment", "bill"],
+  ledger: ["billing", "accounts", "transactions"],
+  appointment: ["schedule", "booking", "book"],
+  book: ["appointment", "schedule"],
+  doctor: ["provider"],
+  provider: ["doctor"],
+  help: ["support", "guide"],
+  support: ["help", "guide"],
+  notification: ["notifications", "email", "alerts"],
+  notifications: ["notification", "email", "alerts"],
+  email: ["emails", "notification", "notifications"],
+  emails: ["email"],
+};
+
+const extraItems: SupportGuideItem[] = [];
+
+function wordsFrom(value: string) {
+  return value
+    .toLowerCase()
+    .split(/[^a-z0-9]+/)
+    .filter((word) => word.length > 1);
+}
+
+function catalogToGuide(item: AppCatalogItem): SupportGuideItem {
+  const detail = PAGE_DETAILS[item.id];
+  const autoKeywords = [
+    item.name,
+    item.group,
+    item.path,
+    ...wordsFrom(item.name),
+    ...wordsFrom(item.group),
+    ...wordsFrom(item.path),
+  ];
+  return {
+    id: item.id,
+    title: detail?.title ?? item.name,
+    group: item.group,
+    path: item.path,
+    keywords: [...new Set([...(item.keywords ?? []), ...(detail?.keywords ?? []), ...autoKeywords])],
+    usedFor: item.usedFor ?? detail?.usedFor ?? `Open ${item.name} from the ${item.group} menu.`,
+    steps: item.steps ?? detail?.steps ?? [`Open the left sidebar`, `Go to ${item.group} → ${item.name}`],
+  };
+}
+
+function mergeGuide(items: SupportGuideItem[]) {
+  const map = new Map<string, SupportGuideItem>();
+  items.forEach((item) => map.set(item.id, item));
+  return [...map.values()];
+}
+
+/** Call this when a new feature is added so it appears in Support Guide. */
+export function registerSupportGuide(item: SupportGuideItem | SupportGuideItem[]) {
+  const list = Array.isArray(item) ? item : [item];
+  list.forEach((entry) => {
+    const index = extraItems.findIndex((current) => current.id === entry.id);
+    if (index >= 0) extraItems[index] = entry;
+    else extraItems.push(entry);
+  });
+}
+
+export function getSupportGuide(): SupportGuideItem[] {
+  return mergeGuide([
+    ...SIDEBAR_MENU.map(catalogToGuide),
+    ...EXTRA_APP_PAGES.map(catalogToGuide),
+    ...APP_FUNCTIONS.map(catalogToGuide),
+    ...APP_FORM_FIELDS.map(catalogToGuide),
+    ...extraItems,
+  ]);
+}
+
+/** @deprecated use getSupportGuide() — kept as a live snapshot for existing imports */
+export const SUPPORT_GUIDE = getSupportGuide();
+
+function normalize(value: string) {
+  return value.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+}
+
+function expandToken(token: string) {
+  const extra = token.endsWith("s") && token.length > 3 ? [token.slice(0, -1)] : [`${token}s`];
+  return [token, ...extra, ...(SYNONYMS[token] ?? [])];
+}
+
+function itemMatches(item: SupportGuideItem, query: string) {
+  const hay = normalize(
+    [item.title, item.group, item.usedFor, item.path, ...item.keywords, ...item.steps].join(" ")
+  );
+  const q = normalize(query);
+  if (!q) return true;
+  if (hay.includes(q)) return true;
+  const tokens = q.split(" ").filter(Boolean);
+  return tokens.every((token) => expandToken(token).some((variant) => hay.includes(variant)));
+}
 
 export function searchSupportGuide(query: string): SupportGuideItem[] {
-  const q = query.trim().toLowerCase();
-  if (!q) return SUPPORT_GUIDE;
-  return SUPPORT_GUIDE.filter((item) => {
-    const hay = [item.title, item.group, item.usedFor, item.path, ...item.keywords, ...item.steps]
-      .join(" ")
-      .toLowerCase();
-    return hay.includes(q);
-  });
+  const catalog = getSupportGuide();
+  const q = query.trim();
+  if (!q) return catalog;
+  return catalog.filter((item) => itemMatches(item, q));
 }

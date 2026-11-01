@@ -19,8 +19,10 @@ import {
   Wallet,
   X,
 } from "lucide-react";
+import { useSearchParams } from "react-router-dom";
 import { TableToolbar } from "@/components/TableToolbar";
 import { StatusBadge } from "@/components/StatusBadge";
+import { getPatientById } from "@/lib/patients";
 
 type Appointment = {
   id: string;
@@ -95,12 +97,14 @@ function statusClass(status: Appointment["status"]) {
 }
 
 export default function AppointmentBookPage() {
+  const [searchParams] = useSearchParams();
+  const bookedPatient = getPatientById(searchParams.get("id") || "");
   const [date, setDate] = useState(() => new Date());
   const [view, setView] = useState<"grid" | "list">("grid");
   const [doctorFilter, setDoctorFilter] = useState("all");
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(bookedPatient?.name ?? "");
   const [selected, setSelected] = useState<Appointment | null>(null);
-  const [showBook, setShowBook] = useState(false);
+  const [showBook, setShowBook] = useState(() => Boolean(bookedPatient));
   const [showReschedule, setShowReschedule] = useState(false);
   const [otherType, setOtherType] = useState<string[]>([]);
   const [remarks, setRemarks] = useState("");
@@ -172,6 +176,11 @@ export default function AppointmentBookPage() {
     <div className="flex flex-col gap-2 h-full min-h-0">
       <div className="flex items-center gap-2 flex-wrap">
         <div className="panel-title">Appointment Book</div>
+        {bookedPatient && (
+          <span className="badge bg-primary/10 text-primary">
+            {bookedPatient.name} (#{bookedPatient.id})
+          </span>
+        )}
         <div className="flex items-center gap-1 border border-border rounded-[3px] overflow-hidden">
           <button type="button" className="btn rounded-none border-0 h-7" onClick={() => shiftDay(-1)}>
             <ChevronLeft className="w-3.5 h-3.5" />
@@ -615,7 +624,10 @@ export default function AppointmentBookPage() {
             <div className="p-4 grid grid-cols-2 gap-3">
               <div className="field col-span-2">
                 <label>Patient</label>
-                <input placeholder="Search or type patient name" />
+                <input
+                  placeholder="Search or type patient name"
+                  defaultValue={bookedPatient ? `${bookedPatient.name} (#${bookedPatient.id})` : ""}
+                />
               </div>
               <div className="field">
                 <label>Doctor</label>

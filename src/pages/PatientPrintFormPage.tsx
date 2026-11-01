@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 import {
   AlertTriangle,
+  BookOpen,
   CalendarDays,
   ChevronDown,
   ChevronRight,
@@ -9,6 +10,7 @@ import {
   FileCheck2,
   FileText,
   History,
+  Landmark,
   MessageSquare,
   Printer,
   ShieldCheck,
@@ -24,6 +26,7 @@ import { PRINT_FORM_GROUPS, type FormLang, type PrintFormItem } from "@/lib/prin
 const workspaceNav = [
   { key: "overview", label: "Overview", icon: UserCircle2, path: "/patient/overview" },
   { key: "insurance", label: "Insurance", icon: ShieldCheck, path: "/patient/insurance" },
+  { key: "appointment", label: "Appointment", icon: CalendarDays, path: "/patient/appointment" },
   { key: "clinical", label: "Clinical Chart", icon: Stethoscope, path: "/patient/clinical" },
   { key: "treatment", label: "Treatment Planner", icon: ClipboardList, path: "/patient/treatment" },
   { key: "recalls", label: "Recalls", icon: History, path: "/patient/recalls" },
@@ -132,6 +135,12 @@ export default function PatientPrintFormPage() {
             );
           })}
           <div className="menu-group-title">Account</div>
+          <Link to={`/patient/ledger${idQuery}`} className="sidebar-item">
+            <BookOpen className="w-3.5 h-3.5" /> Ledger
+          </Link>
+          <Link to={`/patient/accounts${idQuery}`} className="sidebar-item">
+            <Landmark className="w-3.5 h-3.5" /> Accounts
+          </Link>
           <Link to={`/patient/billing${idQuery}`} className="sidebar-item">
             <Wallet className="w-3.5 h-3.5" /> Billing
           </Link>

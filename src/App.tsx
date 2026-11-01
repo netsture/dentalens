@@ -20,6 +20,7 @@ import EligibilityPage from "@/pages/EligibilityPage";
 import VoiceCommandPage from "@/pages/VoiceCommandPage";
 import PatientPrintFormPage from "@/pages/PatientPrintFormPage";
 import PatientTreatmentPlanPage from "@/pages/PatientTreatmentPlanPage";
+import SupportGuidePage from "@/pages/SupportGuidePage";
 
 export default function App() {
   return (
@@ -41,6 +42,7 @@ export default function App() {
           <Route path="/patient" element={<PatientPage />} />
           <Route path="/patient/overview" element={<PatientWorkspacePage />} />
           <Route path="/patient/insurance" element={<PatientWorkspacePage />} />
+          <Route path="/patient/appointment" element={<PatientWorkspacePage />} />
           <Route path="/patient/clinical" element={<PatientWorkspacePage />} />
           <Route path="/patient/treatment" element={<PatientWorkspacePage />} />
           <Route path="/patient/recalls" element={<PatientWorkspacePage />} />
@@ -48,6 +50,8 @@ export default function App() {
           <Route path="/patient/printform/:patientId" element={<PatientPrintFormPage />} />
           <Route path="/patient/treatementplan/:patientId" element={<PatientTreatmentPlanPage />} />
           <Route path="/patient/documents" element={<PatientWorkspacePage />} />
+          <Route path="/patient/ledger" element={<PatientWorkspacePage />} />
+          <Route path="/patient/accounts" element={<PatientWorkspacePage />} />
           <Route path="/patient/billing" element={<PatientBillingPage />} />
           <Route path="/documents" element={<DocumentsPage />} />
           <Route path="/report" element={<ReportPage />} />
@@ -55,6 +59,7 @@ export default function App() {
           <Route path="/back-office" element={<BlankSectionPage />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/voice-command" element={<VoiceCommandPage />} />
+          <Route path="/support-guide" element={<SupportGuidePage />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

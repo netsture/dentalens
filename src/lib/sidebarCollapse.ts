@@ -30,6 +30,7 @@ export const SIDEBAR_COLLAPSE_PAGES: SidebarCollapsePage[] = [
   { id: "patient-search", label: "Patient Search", group: "Patients", path: "/patient", match: "exact" },
   { id: "patient-overview", label: "Patient Overview", group: "Patients", path: "/patient/overview", match: "exact" },
   { id: "patient-insurance", label: "Patient Insurance", group: "Patients", path: "/patient/insurance", match: "exact" },
+  { id: "patient-appointment", label: "Appointment History", group: "Patients", path: "/patient/appointment", match: "exact" },
   { id: "clinical", label: "Clinical Chart", group: "Patients", path: "/patient/clinical", match: "exact" },
   { id: "treatment-planner", label: "Treatment Planner", group: "Patients", path: "/patient/treatment", match: "exact" },
   { id: "patient-recalls", label: "Patient Recalls", group: "Patients", path: "/patient/recalls", match: "exact" },
@@ -44,6 +45,7 @@ export const SIDEBAR_COLLAPSE_PAGES: SidebarCollapsePage[] = [
   { id: "back-office", label: "Back Office", group: "Back Office", path: "/back-office", match: "exact" },
   { id: "settings", label: "Settings", group: "Administration", path: "/settings", match: "exact" },
   { id: "voice-command", label: "Voice Command", group: "Administration", path: "/voice-command", match: "exact" },
+  { id: "support-guide", label: "Support Guide", group: "Help", path: "/support-guide", match: "exact" },
 ];
 
 export const DEFAULT_SIDEBAR_COLLAPSE: SidebarCollapseSettings = {

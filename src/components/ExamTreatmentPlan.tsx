@@ -36,16 +36,28 @@ import {
 } from "@/lib/treatmentPlan";
 
 type SortDir = "asc" | "desc";
-type ExamSortKey = "date" | "teeth" | "surface" | "button" | "doctor" | "remarks";
+type ExamSortKey = "date" | "teeth" | "surface" | "hasButton" | "needButton" | "doctor" | "remarks";
 
 const EXAM_COLUMNS: { key: ExamSortKey; label: string }[] = [
   { key: "date", label: "Date" },
   { key: "teeth", label: "Tooth Number(s) or Letter(s)" },
   { key: "surface", label: "Tooth Surface" },
-  { key: "button", label: "Tx. Button" },
+  { key: "hasButton", label: "Has Tx. Button" },
+  { key: "needButton", label: "Need Tx. Button" },
   { key: "doctor", label: "Doctor" },
   { key: "remarks", label: "Remarks" },
 ];
+
+function txButtonLabel(row: ExamRow, kind: ExamKind) {
+  if (row.kind !== kind) return "";
+  return row.ada ? `${row.button} (${row.ada})` : row.button;
+}
+
+function examSortValue(row: ExamRow, key: ExamSortKey) {
+  if (key === "hasButton") return txButtonLabel(row, "has");
+  if (key === "needButton") return txButtonLabel(row, "need");
+  return String(row[key] ?? "");
+}
 
 type SpeechRec = {
   lang: string;
@@ -589,7 +601,9 @@ export function ExamTreatmentPlan({
       return true;
     });
     const dir = sort.dir === "asc" ? 1 : -1;
-    return [...filtered].sort((a, b) => String(a[sort.key] ?? "").localeCompare(String(b[sort.key] ?? ""), undefined, { numeric: true }) * dir);
+    return [...filtered].sort(
+      (a, b) => examSortValue(a, sort.key).localeCompare(examSortValue(b, sort.key), undefined, { numeric: true }) * dir
+    );
   }, [rows, q, sort]);
 
   const hasRows = visibleRows.filter((row) => row.kind === "has");
@@ -657,7 +671,7 @@ export function ExamTreatmentPlan({
         <tbody>
           {list.length === 0 ? (
             <tr>
-              <td colSpan={8} className="text-muted-foreground">
+              <td colSpan={9} className="text-muted-foreground">
                 {empty}
               </td>
             </tr>
@@ -670,10 +684,8 @@ export function ExamTreatmentPlan({
                 <td>{row.date}</td>
                 <td>{row.teeth || "—"}</td>
                 <td>{row.surface || "—"}</td>
-                <td>
-                  {row.button}
-                  {row.ada ? ` (${row.ada})` : ""}
-                </td>
+                <td>{txButtonLabel(row, "has") || "—"}</td>
+                <td>{txButtonLabel(row, "need") || "—"}</td>
                 <td>{row.doctor}</td>
                 <td>
                   <input

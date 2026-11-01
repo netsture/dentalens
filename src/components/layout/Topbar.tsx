@@ -172,16 +172,16 @@ export function Topbar({
 
           <div className="relative" ref={profileRef}>
             <button
-              className="w-[36px] h-[36px] rounded-full bg-primary text-white font-bold text-[11px] flex items-center justify-center ring-2 ring-primary/30 hover:ring-primary/60 cursor-pointer border-none"
+              className="w-[36px] h-[36px] rounded-full bg-primary text-primary-foreground font-bold text-[11px] flex items-center justify-center ring-2 ring-primary/30 hover:ring-primary/60 cursor-pointer border-none"
               onClick={() => setShowProfile((v) => !v)}
             >
               {initials}
             </button>
 
             {showProfile && (
-              <div className="absolute right-0 top-full mt-1 w-[220px] bg-card border border-border rounded-[4px] shadow-lg p-2 flex flex-col gap-2 z-[1010]">
+              <div className="absolute right-0 top-full mt-1 w-[240px] bg-card border border-border rounded-[4px] shadow-lg p-2 flex flex-col gap-2 z-[1010]">
                 <div className="flex items-center gap-2 pb-2">
-                  <div className="w-8 h-8 rounded-full bg-primary text-white font-bold text-[12px] flex items-center justify-center shrink-0">
+                  <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground font-bold text-[12px] flex items-center justify-center shrink-0">
                     {initials}
                   </div>
                   <div className="flex flex-col min-w-0">
@@ -214,10 +214,15 @@ export function Topbar({
                   </div>
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
-                    Theme
-                  </span>
-                  <div className="flex items-center gap-2 px-0.5">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                      Theme
+                    </span>
+                    <span className="text-[10px] font-semibold text-foreground truncate">
+                      {THEMES.find((t) => t.id === theme)?.label}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-1">
                     {THEMES.map((t) => {
                       const selected = theme === t.id;
                       return (
@@ -228,14 +233,27 @@ export function Topbar({
                           aria-label={`${t.label} theme`}
                           aria-pressed={selected}
                           onClick={() => selectTheme(t.id)}
-                          className={`relative w-6 h-6 rounded-full border-none cursor-pointer shrink-0 transition-transform hover:scale-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring ${
-                            selected ? "ring-2 ring-offset-1 ring-foreground/40 scale-105" : "ring-1 ring-border"
+                          className={`flex items-center gap-1.5 h-7 px-1.5 rounded-[3px] border-none cursor-pointer text-left ${
+                            selected ? "bg-primary/15 ring-1 ring-primary" : "bg-transparent hover:bg-secondary"
                           }`}
-                          style={{ backgroundColor: t.swatch }}
                         >
-                          {selected ? (
-                            <Check className="w-3 h-3 text-white absolute inset-0 m-auto drop-shadow-sm" strokeWidth={3} />
-                          ) : null}
+                          <span
+                            className={`relative w-4 h-4 rounded-full shrink-0 ring-1 ${
+                              selected ? "ring-foreground/40" : "ring-border"
+                            }`}
+                            style={{ backgroundColor: t.swatch }}
+                          >
+                            {selected ? (
+                              <Check
+                                className="w-2.5 h-2.5 absolute inset-0 m-auto"
+                                strokeWidth={3}
+                                style={{ color: t.check }}
+                              />
+                            ) : null}
+                          </span>
+                          <span className={`text-[11px] truncate ${selected ? "font-bold text-foreground" : "font-medium text-muted-foreground"}`}>
+                            {t.label}
+                          </span>
                         </button>
                       );
                     })}

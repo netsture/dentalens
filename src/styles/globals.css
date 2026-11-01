@@ -142,6 +142,66 @@
   --ring: hsl(215, 25%, 32%);
 }
 
+[data-theme="light-green"] {
+  --background: hsl(110, 28%, 97%);
+  --foreground: hsl(120, 28%, 12%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(120, 28%, 12%);
+  --primary: #86C56A;
+  --primary-hover: #6eae53;
+  --primary-foreground: #1a3314;
+  --secondary: hsl(110, 22%, 93%);
+  --secondary-hover: hsl(110, 22%, 88%);
+  --secondary-foreground: hsl(120, 28%, 22%);
+  --muted: hsl(110, 22%, 93%);
+  --muted-foreground: hsl(120, 10%, 38%);
+  --accent: hsl(110, 40%, 90%);
+  --accent-foreground: hsl(120, 30%, 20%);
+  --border: hsl(110, 16%, 84%);
+  --input: hsl(110, 16%, 84%);
+  --ring: #86C56A;
+}
+
+[data-theme="coral"] {
+  --background: hsl(6, 40%, 98%);
+  --foreground: hsl(8, 30%, 14%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(8, 30%, 14%);
+  --primary: #FF6C60;
+  --primary-hover: #e85a4f;
+  --primary-foreground: #ffffff;
+  --secondary: hsl(8, 30%, 94%);
+  --secondary-hover: hsl(8, 30%, 89%);
+  --secondary-foreground: hsl(8, 28%, 24%);
+  --muted: hsl(8, 30%, 94%);
+  --muted-foreground: hsl(8, 10%, 40%);
+  --accent: hsl(6, 70%, 93%);
+  --accent-foreground: hsl(6, 50%, 28%);
+  --border: hsl(8, 20%, 86%);
+  --input: hsl(8, 20%, 86%);
+  --ring: #FF6C60;
+}
+
+[data-theme="lime"] {
+  --background: hsl(80, 40%, 97%);
+  --foreground: hsl(85, 28%, 12%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(85, 28%, 12%);
+  --primary: #c9f279;
+  --primary-hover: #b4db5e;
+  --primary-foreground: #2a3d0c;
+  --secondary: hsl(80, 28%, 93%);
+  --secondary-hover: hsl(80, 28%, 88%);
+  --secondary-foreground: hsl(85, 28%, 20%);
+  --muted: hsl(80, 28%, 93%);
+  --muted-foreground: hsl(85, 10%, 38%);
+  --accent: hsl(80, 50%, 90%);
+  --accent-foreground: hsl(85, 30%, 18%);
+  --border: hsl(80, 20%, 84%);
+  --input: hsl(80, 20%, 84%);
+  --ring: #c9f279;
+}
+
 html.density-compact {
   --erp-font-size: 11px;
   --erp-grid-gap: 4px;

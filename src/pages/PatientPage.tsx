@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import {
   ArrowDown,
   ArrowUp,
   ArrowUpDown,
+  Eye,
   FilterX,
   Phone,
   Plus,
@@ -17,15 +18,63 @@ import { exportToExcel } from "@/lib/exportToExcel";
 import { StatusBadge } from "@/components/StatusBadge";
 
 const seedPatients = [
-  { id: "16665", name: "Denise Wingard", phone: "215-555-0142", dob: "03-12-1984", balance: "$948.80", lastVisit: "Dec 10, 2020", status: "Active" },
-  { id: "17001", name: "JOHNSONN ELLA", phone: "484-903-7236", dob: "02-27-2012", balance: "$0.00", lastVisit: "Today", status: "Active" },
-  { id: "17002", name: "BRAKE ZOIEY", phone: "201-616-6586", dob: "08-28-2012", balance: "$120.00", lastVisit: "Today", status: "Active" },
-  { id: "17003", name: "MCNUTT PHEONIX", phone: "484-597-1934", dob: "02-19-2012", balance: "$45.00", lastVisit: "Today", status: "Active" },
-  { id: "17004", name: "CURRY NEVAEH", phone: "484-554-6555", dob: "02-15-2005", balance: "$0.00", lastVisit: "Yesterday", status: "New" },
-  { id: "17005", name: "DELGADO GENESIS", phone: "862-247-7212", dob: "03-03-2010", balance: "$210.00", lastVisit: "Today", status: "Active" },
-  { id: "17006", name: "BALSECA SAMUEL", phone: "201-552-0729", dob: "05-12-2009", balance: "$0.00", lastVisit: "Today", status: "New" },
-  { id: "17007", name: "ESCOBAR TEJADA DARA", phone: "484-375-5283", dob: "02-01-2013", balance: "$75.00", lastVisit: "Today", status: "Inactive" },
+  { id: "16665", name: "Denise Wingard", firstName: "Denise", lastName: "Wingard", phone: "215-555-0142", dob: "03-12-1984", insuranceId: "INS16665", ssNo: "SS-16665", balance: "$948.80", lastVisit: "Dec 10, 2020", status: "Active" },
+  { id: "17001", name: "JOHNSONN ELLA", firstName: "ELLA", lastName: "JOHNSONN", phone: "484-903-7236", dob: "02-27-2012", insuranceId: "", ssNo: "", balance: "$0.00", lastVisit: "Today", status: "Active" },
+  { id: "17002", name: "BRAKE ZOIEY", firstName: "ZOIEY", lastName: "BRAKE", phone: "201-616-6586", dob: "08-28-2012", insuranceId: "", ssNo: "", balance: "$120.00", lastVisit: "Today", status: "Active" },
+  { id: "17003", name: "MCNUTT PHEONIX", firstName: "PHEONIX", lastName: "MCNUTT", phone: "484-597-1934", dob: "02-19-2012", insuranceId: "", ssNo: "", balance: "$45.00", lastVisit: "Today", status: "Active" },
+  { id: "17004", name: "CURRY NEVAEH", firstName: "NEVAEH", lastName: "CURRY", phone: "484-554-6555", dob: "02-15-2005", insuranceId: "", ssNo: "", balance: "$0.00", lastVisit: "Yesterday", status: "New" },
+  { id: "17005", name: "DELGADO GENESIS", firstName: "GENESIS", lastName: "DELGADO", phone: "862-247-7212", dob: "03-03-2010", insuranceId: "", ssNo: "", balance: "$210.00", lastVisit: "Today", status: "Active" },
+  { id: "17006", name: "BALSECA SAMUEL", firstName: "SAMUEL", lastName: "BALSECA", phone: "201-552-0729", dob: "05-12-2009", insuranceId: "INS17006", ssNo: "SS-17006", balance: "$0.00", lastVisit: "Today", status: "New" },
+  { id: "17007", name: "ESCOBAR TEJADA DARA", firstName: "DARA", lastName: "ESCOBAR TEJADA", phone: "484-375-5283", dob: "02-01-2013", insuranceId: "", ssNo: "", balance: "$75.00", lastVisit: "Today", status: "Inactive" },
 ];
+
+type AdvancedSearch = {
+  patientId: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  dob: string;
+  insuranceId: string;
+  ssNo: string;
+};
+
+const emptyAdvancedSearch: AdvancedSearch = {
+  patientId: "",
+  firstName: "",
+  lastName: "",
+  phone: "",
+  dob: "",
+  insuranceId: "",
+  ssNo: "",
+};
+
+function digits(value: string) {
+  return value.replace(/\D/g, "");
+}
+
+function SearchField({
+  label,
+  value,
+  onChange,
+  placeholder,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+}) {
+  return (
+    <label className="flex items-center gap-2 min-w-0">
+      <span className="w-[104px] shrink-0 text-[11px] font-medium text-foreground">{label}</span>
+      <input
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className="flex-1 min-w-0 h-7 px-2 border border-border rounded-[3px] bg-background text-foreground text-[12px] outline-none focus:border-primary"
+      />
+    </label>
+  );
+}
 
 type PatientRow = (typeof seedPatients)[number];
 type SortKey = keyof Pick<PatientRow, "id" | "name" | "phone" | "dob" | "lastVisit" | "balance" | "status">;
@@ -59,6 +108,8 @@ export default function PatientPage() {
   const [showAddPatient, setShowAddPatient] = useState(false);
   const [showAddInsurance, setShowAddInsurance] = useState(false);
   const [insuranceRp, setInsuranceRp] = useState({ id: "1590", name: "Green, Craig" });
+  const [searchForm, setSearchForm] = useState<AdvancedSearch>(emptyAdvancedSearch);
+  const [appliedSearch, setAppliedSearch] = useState<AdvancedSearch>(emptyAdvancedSearch);
 
   useEffect(() => {
     if (searchParams.get("add") === "1") {
@@ -95,6 +146,18 @@ export default function PatientPage() {
         if (!hit) return false;
       }
 
+      const adv = appliedSearch;
+      if (adv.patientId.trim() && !row.id.toLowerCase().includes(adv.patientId.trim().toLowerCase())) return false;
+      if (adv.firstName.trim() && !row.firstName.toLowerCase().includes(adv.firstName.trim().toLowerCase())) return false;
+      if (adv.lastName.trim() && !row.lastName.toLowerCase().includes(adv.lastName.trim().toLowerCase())) return false;
+      if (adv.phone.trim()) {
+        const needle = digits(adv.phone);
+        if (!needle || !digits(row.phone).includes(needle)) return false;
+      }
+      if (adv.dob.trim() && !row.dob.toLowerCase().includes(adv.dob.trim().toLowerCase())) return false;
+      if (adv.insuranceId.trim() && !row.insuranceId.toLowerCase().includes(adv.insuranceId.trim().toLowerCase())) return false;
+      if (adv.ssNo.trim() && !row.ssNo.toLowerCase().includes(adv.ssNo.trim().toLowerCase())) return false;
+
       for (const col of columns) {
         const f = (filters[col.key] ?? "").trim();
         if (!f) continue;
@@ -116,7 +179,7 @@ export default function PatientPage() {
       return 0;
     });
     return list;
-  }, [q, filters, sortKey, sortDir, tick, rows]);
+  }, [q, filters, sortKey, sortDir, tick, rows, appliedSearch]);
 
   const handleRefresh = () => {
     setRefreshing(true);
@@ -179,6 +242,15 @@ export default function PatientPage() {
     );
   };
 
+  const setSearchField = (key: keyof AdvancedSearch, value: string) => {
+    setSearchForm((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const handleAdvancedSearch = (event: FormEvent) => {
+    event.preventDefault();
+    setAppliedSearch(searchForm);
+  };
+
   const openInsurance = (patient: { id: string; name: string }) => {
     setInsuranceRp(patient);
     setShowAddPatient(false);
@@ -189,11 +261,56 @@ export default function PatientPage() {
     <div className="flex flex-col gap-2 h-full min-h-0">
       <div>
         <h1 className="text-[16px] font-bold">Patients</h1>
-        <p className="text-[11px] text-muted-foreground">
-          Showing {filtered.length} of {rows.length} records
-          {activeFilterCount > 0 ? ` · ${activeFilterCount} column filter(s) active` : ""}
-        </p>
       </div>
+
+      <form className="panel p-3 shrink-0" onSubmit={handleAdvancedSearch}>
+        <div className="text-[13px] font-bold text-primary mb-3">Search Patient</div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-2 items-center">
+          <SearchField
+            label="Patient ID"
+            value={searchForm.patientId}
+            onChange={(v) => setSearchField("patientId", v)}
+            placeholder="Enter Number"
+          />
+          <SearchField
+            label="Phone Number"
+            value={searchForm.phone}
+            onChange={(v) => setSearchField("phone", v)}
+          />
+          <SearchField
+            label="S# S# No-"
+            value={searchForm.ssNo}
+            onChange={(v) => setSearchField("ssNo", v)}
+            placeholder="Member Id2 (S#S# NO.)"
+          />
+          <SearchField
+            label="First Name"
+            value={searchForm.firstName}
+            onChange={(v) => setSearchField("firstName", v)}
+          />
+          <SearchField
+            label="DOB"
+            value={searchForm.dob}
+            onChange={(v) => setSearchField("dob", v)}
+          />
+          <div className="flex items-center gap-2 min-w-0 md:pl-[112px]">
+            <button type="submit" className="btn btn-primary min-w-[88px]">
+              Search
+            </button>
+          </div>
+          <SearchField
+            label="Last Name"
+            value={searchForm.lastName}
+            onChange={(v) => setSearchField("lastName", v)}
+          />
+          <SearchField
+            label="Insurance Id"
+            value={searchForm.insuranceId}
+            onChange={(v) => setSearchField("insuranceId", v)}
+            placeholder="Member Id1 (INS ID)"
+          />
+        </div>
+      </form>
 
       <TableToolbar
         search={q}
@@ -221,6 +338,10 @@ export default function PatientPage() {
       />
 
       <div className="panel flex-1 min-h-0 flex flex-col overflow-hidden">
+        <div className="flex justify-end px-2 py-1.5 text-[11px] text-muted-foreground shrink-0 border-b border-border">
+          Showing {filtered.length} of {rows.length} records
+          {activeFilterCount > 0 ? ` · ${activeFilterCount} column filter(s) active` : ""}
+        </div>
         <div className="table-wrap flex-1 border-0 rounded-none">
           <table className="data-table">
             <thead>
@@ -237,7 +358,7 @@ export default function PatientPage() {
                     </button>
                   </th>
                 ))}
-                <th></th>
+                <th>Actions</th>
               </tr>
               {filtersOpen && (
                 <tr className="bg-secondary/80">
@@ -260,7 +381,15 @@ export default function PatientPage() {
               ) : (
                 filtered.map((p) => (
                   <tr key={p.id}>
-                    <td className="font-semibold text-muted-foreground">#{p.id}</td>
+                    <td className="font-semibold">
+                      <Link
+                        to={`/patient/overview?id=${p.id}`}
+                        className="text-primary hover:underline"
+                        title={`View ${p.name}`}
+                      >
+                        #{p.id}
+                      </Link>
+                    </td>
                     <td className="font-semibold">{p.name}</td>
                     <td>
                       <span className="inline-flex items-center gap-1">
@@ -278,7 +407,10 @@ export default function PatientPage() {
                     </td>
                     <td>
                       <div className="flex gap-1 justify-end">
-                        <Link to="/patient/billing" className="btn h-6 px-2">
+                        <Link to={`/patient/overview?id=${p.id}`} className="btn h-6 px-2" title={`View ${p.name}`}>
+                          <Eye className="w-3 h-3" /> View
+                        </Link>
+                        <Link to={`/patient/billing?id=${p.id}`} className="btn h-6 px-2">
                           <Wallet className="w-3 h-3" /> Billing
                         </Link>
                         <button type="button" className="btn h-6 px-2">
@@ -301,12 +433,17 @@ export default function PatientPage() {
           const displayName = patient.name.includes(",")
             ? patient.name.split(",").map((p) => p.trim()).reverse().join(" ")
             : patient.name;
+          const parts = displayName.split(/\s+/).filter(Boolean);
           setRows((prev) => [
             {
               id: patient.id,
               name: displayName,
+              firstName: parts.length > 1 ? parts[parts.length - 1] : displayName,
+              lastName: parts.length > 1 ? parts.slice(0, -1).join(" ") : "",
               phone: "—",
               dob: "01-01-1979",
+              insuranceId: "",
+              ssNo: "",
               balance: "$0.00",
               lastVisit: "—",
               status: "New",

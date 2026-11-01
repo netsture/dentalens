@@ -1,9 +1,11 @@
-import { useState, type ComponentType, type ReactNode } from "react";
+import { useEffect, useState, type ComponentType, type ReactNode } from "react";
 import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import {
   Activity,
   Bell,
+  BookOpen,
   CalendarDays,
+  Landmark,
   ClipboardList,
   FileCheck2,
   FileText,
@@ -22,19 +24,29 @@ import {
 import { AddInsuranceModal } from "@/components/AddInsuranceModal";
 import { AddPatientModal } from "@/components/AddPatientModal";
 import { StatusBadge } from "@/components/StatusBadge";
+import { getPatientById } from "@/lib/patients";
+import { PatientAppointmentHistoryPanel } from "@/components/PatientAppointmentHistoryPanel";
+import { PatientAccountsPanel } from "@/components/PatientAccountsPanel";
 import { PatientDocumentsPanel } from "@/components/PatientDocumentsPanel";
 import { PatientInsurancePlansTable } from "@/components/PatientInsurancePlansTable";
+import PatientBillingPage from "@/pages/PatientBillingPage";
 
-type SectionKey = "overview" | "insurance" | "clinical" | "treatment" | "recalls" | "authorizations" | "documents";
+type SectionKey = "overview" | "insurance" | "appointment" | "clinical" | "treatment" | "recalls" | "authorizations" | "documents" | "ledger" | "accounts";
 
 const sections: { key: SectionKey; label: string; icon: ComponentType<{ className?: string }> }[] = [
   { key: "overview", label: "Overview", icon: UserCircle2 },
   { key: "insurance", label: "Insurance", icon: ShieldCheck },
+  { key: "appointment", label: "Appointment", icon: CalendarDays },
   { key: "clinical", label: "Clinical Chart", icon: Stethoscope },
   { key: "treatment", label: "Treatment Planner", icon: ClipboardList },
   { key: "recalls", label: "Recalls", icon: History },
   { key: "authorizations", label: "Authorizations", icon: FileCheck2 },
   { key: "documents", label: "Documents", icon: FileText },
+];
+
+const accountSections: { key: SectionKey; label: string; icon: ComponentType<{ className?: string }> }[] = [
+  { key: "ledger", label: "Ledger", icon: BookOpen },
+  { key: "accounts", label: "Accounts", icon: Landmark },
 ];
 
 const treatments = [
@@ -279,10 +291,20 @@ export default function PatientWorkspacePage() {
   const [showActions, setShowActions] = useState(false);
   const [showAddPatient, setShowAddPatient] = useState(false);
   const [showAddInsurance, setShowAddInsurance] = useState(false);
-  const active = sections.find((item) => item.key === section) || sections[0];
+  const active = [...sections, ...accountSections].find((item) => item.key === section) || sections[0];
   const patientId = searchParams.get("id") || "1494";
-  const patient = workspacePatients[patientId] ?? { name: "Patient", detail: "Opened from eligibility" };
-  const idQuery = searchParams.get("id") ? `?id=${searchParams.get("id")}` : "";
+  const catalogPatient = getPatientById(patientId);
+  const patient =
+    workspacePatients[patientId] ??
+    (catalogPatient
+      ? { name: catalogPatient.name, detail: `${catalogPatient.dob} · ${catalogPatient.status}` }
+      : { name: "Patient", detail: "Opened from eligibility" });
+  const idQuery = `?id=${patientId}`;
+
+  useEffect(() => {
+    if (searchParams.get("id")) return;
+    navigate(`${location.pathname}${idQuery}`, { replace: true });
+  }, [idQuery, location.pathname, navigate, searchParams]);
 
   return (
     <div className="flex flex-col h-full min-h-0 gap-2">
@@ -329,21 +351,43 @@ export default function PatientWorkspacePage() {
             return [link];
           })}
           <div className="menu-group-title">Account</div>
+          {accountSections.map((item) => {
+            const Icon = item.icon;
+            return (
+              <Link
+                key={item.key}
+                to={`/patient/${item.key}${idQuery}`}
+                className={`sidebar-item ${section === item.key ? "active" : ""}`}
+              >
+                <Icon className="w-3.5 h-3.5" /> {item.label}
+              </Link>
+            );
+          })}
           <Link to={`/patient/billing${idQuery}`} className="sidebar-item"><Wallet className="w-3.5 h-3.5" /> Billing</Link>
         </aside>
 
         <main className="flex-1 min-w-0 overflow-auto">
-          <div className="flex items-center gap-2 mb-2">
-            <active.icon className="w-4 h-4 text-primary" />
-            <h2 className="text-[13px] font-bold">{active.label}</h2>
+          <div className="flex items-center justify-between gap-2 mb-2">
+            <div className="flex items-center gap-2">
+              <active.icon className="w-4 h-4 text-primary" />
+              <h2 className="text-[13px] font-bold">{section === "appointment" ? "Appointment History" : active.label}</h2>
+            </div>
+            {section === "appointment" && (
+              <Link to={`/appointment/book?id=${patientId}`} className="btn btn-primary">
+                <Plus className="w-3.5 h-3.5" /> Add Appointment
+              </Link>
+            )}
           </div>
           {section === "overview" && <Overview />}
           {section === "insurance" && <Insurance onAdd={() => setShowAddInsurance(true)} />}
+          {section === "appointment" && <PatientAppointmentHistoryPanel patientId={patientId} />}
           {section === "clinical" && <ToothChart />}
           {section === "treatment" && <TreatmentPlanner />}
           {section === "recalls" && <SimpleTable section="recalls" />}
           {section === "authorizations" && <SimpleTable section="authorizations" />}
           {section === "documents" && <PatientDocumentsPanel />}
+          {section === "ledger" && <PatientBillingPage embedded />}
+          {section === "accounts" && <PatientAccountsPanel />}
         </main>
       </div>
 

@@ -1,0 +1,537 @@
+# Build Dynamic Patient Forms Management & PDF Printing System
+
+## Existing Technology Stack
+
+- Frontend: React + Vite
+- Backend: Python + FastAPI
+- Database: MySQL
+- PDF Generation: Python ReportLab + pypdf
+- Barcode: Code 128
+- Existing application: Dental Practice Management System
+
+IMPORTANT:
+Implement this functionality inside the existing application. First inspect the existing project structure, authentication, database schema, patient tables, office tables, API conventions, UI components and permissions. Reuse existing components and database connections. Do not create a separate application or duplicate existing patient records.
+
+## 1. Main Objective
+
+Develop a complete Dynamic Patient Forms Management System.
+
+Administrators must be able to manage patient form categories, upload existing PDF templates, configure dynamic patient information, barcode positions, headers, footers and page layouts.
+
+Regular users must be able to select a patient, select a form category, select one or multiple forms, generate the PDF, preview it, print it and download it.
+
+The generated PDF must reproduce the uploaded original PDF as accurately as possible, including page dimensions, layout, fonts, tables, lines, spacing, barcode positions, headers and footers.
+
+Use the attached original 4-page PDF as the reference template.
+
+Do not redesign or modernize the original PDF.
+
+## 2. Admin Panel
+
+Create a new menu:
+
+Admin → Patient Forms Management
+
+Submenus:
+
+1. Form Categories
+2. Manage Forms
+3. PDF Template Management
+4. Header & Footer Settings
+5. Barcode Settings
+6. Form Version History
+7. Print History
+
+### A. Form Category Management
+
+Admin can:
+- Create categories.
+- Edit categories.
+- Delete categories if unused.
+- Activate/deactivate categories.
+- Set display order.
+
+Example categories:
+- Clinical Forms
+- Consent Forms
+- Medical History
+- Treatment Forms
+- Anesthesia Forms
+- Financial Forms
+- Referral Forms
+
+### B. Manage Forms
+
+Admin can:
+- Create a new form.
+- Edit existing forms.
+- Assign a category.
+- Upload an existing PDF.
+- Duplicate a form.
+- Activate/deactivate a form.
+- Configure office availability.
+- Configure user-role permissions.
+- Set form display order.
+- Publish a form version.
+- Preview the PDF.
+
+Each form should contain:
+- Form name
+- Category
+- Description
+- PDF template
+- Page count
+- Paper size
+- Orientation
+- Barcode configuration
+- Header/footer configuration
+- Status
+- Version number
+
+## 3. Original PDF Template Editor
+
+Create a PDF Template Editor in the admin panel.
+
+The editor must support:
+
+1. Upload existing PDF.
+2. Display PDF pages individually.
+3. Display each page as a background.
+4. Add dynamic text fields over the PDF.
+5. Configure exact X/Y positions.
+6. Configure width and height.
+7. Configure font family, font size, weight and alignment.
+8. Configure barcode positions and dimensions.
+9. Add static text.
+10. Add patient information fields.
+11. Add office information fields.
+12. Add doctor/staff information fields.
+13. Configure page-specific fields.
+14. Configure page numbering.
+15. Save template configuration.
+16. Preview the final generated PDF.
+
+Use millimeters or PDF points for positioning.
+
+The editor must support multiple pages.
+
+IMPORTANT:
+The existing PDF should remain the background master template wherever possible. Overlay dynamic values and barcodes without changing the original design.
+
+Do not rasterize the entire PDF as the final output. Preserve vector text and graphics wherever possible.
+
+For forms created from scratch, optionally provide a separate drag-and-drop form builder.
+
+## 4. Original PDF Reproduction
+
+Use the attached original PDF as the initial template.
+
+Reproduce all four pages:
+
+### Page 1: Follow Up Form
+- Patient information header
+- Corporate name
+- Patient name
+- DOB and age
+- Insurance
+- Office name and address
+- Date/time
+- Doctor/staff name
+- Disclaimer
+- Follow Up Form title
+- Date field
+- Patient name field
+- CC section
+- Subjective section
+- Objective section
+- Assessment section
+- Plan section
+- Dentist signature
+- Footer barcode
+- Original page numbering
+
+### Pages 2 and 3: Consent for Anesthesia and Extraction of Teeth
+- Original consent title
+- Patient name and date
+- Consent paragraphs
+- Extraction risk information
+- Anesthesia information
+- Patient/legal guardian signature
+- Name and relationship
+- Doctor signature
+- Witness signature
+- Date fields
+- Footer barcode
+- Original page numbering
+
+### Page 4: Anesthesia Record
+- Patient information
+- Surgical procedure
+- Pre-OP evaluation
+- Anesthesia timing
+- IV site
+- Presedation review
+- Monitoring chart/grid
+- Brief physical examination
+- Prescription section
+- Intraoperative section
+- Recovery room
+- Discharge orders
+- Post-procedure discharge criteria
+- Footer barcode
+
+Keep the original positioning, dimensions and layout.
+
+## 5. Patient Information Header
+
+Create a reusable PDF header component.
+
+Dynamic fields:
+
+- Corporate name
+- Patient ID
+- Patient first name
+- Patient last name
+- DOB
+- Age
+- Insurance
+- Office name
+- Office address
+- Generated date/time
+- Doctor/staff name
+- Disclaimer
+
+The header must be configurable from the admin panel.
+
+Apply the same header consistently to every page.
+
+Support different header configurations for different forms when required.
+
+## 6. Barcode Generation
+
+Use Code 128 barcode generation.
+
+Barcode values must be configurable and generated according to the existing application barcode rules.
+
+For the uploaded reference PDF, the sample values are:
+
+Page 1: 00015300047886000422001
+Page 2: 00015300047886000423001
+Page 3: 00015300047886000423002
+Page 4: 00015300047886000424001
+
+IMPORTANT:
+Preserve leading zeros.
+
+Do not convert barcode values to integers.
+
+Store barcode values as VARCHAR.
+
+Support:
+- Barcode at top-right.
+- Barcode at bottom.
+- Page-specific barcode values.
+- Configurable barcode width and height.
+- Configurable barcode X/Y position.
+- Human-readable barcode text.
+- Barcode preview.
+
+Do not hardcode the sample barcode values in production. Implement a configurable barcode-generation service and connect it to the existing barcode numbering rules.
+
+## 7. User Panel – Patient Form Printing
+
+Create a new user menu:
+
+Patient → Forms / Print Forms
+
+Workflow:
+
+1. Search/select patient.
+2. Load patient details from the existing patient database.
+3. Display available form categories.
+4. Select a category.
+5. Display available forms.
+6. Allow selecting multiple forms.
+7. Display form details and page count.
+8. Generate PDF.
+9. Open PDF preview.
+10. Print PDF.
+11. Download PDF.
+
+UI requirements:
+
+- Search patient by patient ID or name.
+- Display patient name and DOB.
+- Display selected office.
+- Category-based form list.
+- Checkbox selection for multiple forms.
+- Select All option.
+- Generate PDF button.
+- Preview button.
+- Print button.
+- Download button.
+
+Users should only see forms they are authorized to access.
+
+## 8. PDF Generation Backend
+
+Implement a reusable Python PDF generation service using:
+
+- ReportLab
+- pypdf
+- python-barcode
+- Pillow
+
+Generation workflow:
+
+1. Receive patient ID, form IDs and office ID.
+2. Validate user authentication and office permissions.
+3. Fetch patient details.
+4. Fetch office details.
+5. Fetch doctor/staff information.
+6. Fetch published form templates.
+7. Load original PDF templates.
+8. Generate page-specific barcode values.
+9. Generate barcode images.
+10. Overlay dynamic patient information.
+11. Merge generated overlays with original PDF pages.
+12. Preserve original PDF dimensions and layout.
+13. Add page numbers where configured.
+14. Generate the final PDF.
+15. Save the generated PDF securely.
+16. Store the submission and print-history information.
+17. Return a secure download/preview URL.
+
+Support multi-page forms and multiple selected forms in one PDF.
+
+Do not load unnecessarily large files into memory.
+
+Use temporary files or controlled file streams for PDF processing.
+
+## 9. MySQL Database
+
+Create migrations for these tables:
+
+1. patient_form_category
+2. patient_form_template
+3. patient_form_version
+4. patient_form_settings
+5. patient_form_submission
+6. patient_form_submission_data
+7. patient_form_print_log
+
+Suggested fields:
+
+patient_form_category:
+- id
+- name
+- description
+- status
+- sortOrder
+- createdAt
+- updatedAt
+
+patient_form_template:
+- id
+- categoryId
+- formName
+- description
+- pdfTemplatePath
+- pageCount
+- paperSize
+- orientation
+- status
+- createdBy
+- createdAt
+- updatedAt
+
+patient_form_version:
+- id
+- formId
+- versionNo
+- layoutJson
+- templatePath
+- status
+- createdBy
+- createdAt
+
+patient_form_settings:
+- id
+- formId
+- headerConfig
+- footerConfig
+- barcodeConfig
+- pageConfig
+- createdAt
+- updatedAt
+
+patient_form_submission:
+- id
+- formId
+- versionId
+- patId
+- officeId
+- barcodeValue
+- pdfPath
+- createdBy
+- createdAt
+
+patient_form_print_log:
+- id
+- submissionId
+- userId
+- action
+- ipAddress
+- createdAt
+
+Use appropriate indexes and foreign keys where compatible with the existing database.
+
+Follow existing database naming conventions if they differ.
+
+Store uploaded PDF templates and generated PDFs outside publicly accessible directories.
+
+## 10. FastAPI Endpoints
+
+Implement:
+
+GET /api/admin/patient-form-categories
+
+POST /api/admin/patient-form-categories
+
+PUT /api/admin/patient-form-categories/{id}
+
+DELETE /api/admin/patient-form-categories/{id}
+
+GET /api/admin/patient-forms
+
+POST /api/admin/patient-forms
+
+PUT /api/admin/patient-forms/{id}
+
+POST /api/admin/patient-forms/{id}/upload-template
+
+GET /api/admin/patient-forms/{id}/preview
+
+POST /api/admin/patient-forms/{id}/publish
+
+GET /api/patient-forms/categories
+
+GET /api/patient-forms/available
+
+POST /api/patient-forms/generate
+
+GET /api/patient-forms/submissions/{id}/preview
+
+GET /api/patient-forms/submissions/{id}/download
+
+POST /api/patient-forms/submissions/{id}/print-log
+
+GET /api/patient-forms/print-history
+
+Use Pydantic request/response schemas, proper validation, error handling and authentication.
+
+Adapt endpoint naming to existing API conventions if necessary.
+
+## 11. PDF Preview and Printing
+
+Implement PDF preview using the browser PDF viewer.
+
+Requirements:
+
+- Preview all pages.
+- Zoom in/out.
+- Navigate pages.
+- Print.
+- Download.
+- Preserve original page size.
+- Support US Letter and A4.
+- Print without changing the original PDF dimensions.
+- Avoid unwanted browser-added headers and footers where possible.
+
+Provide a separate PDF download endpoint with authorization.
+
+## 12. Version Management
+
+When an admin updates a form:
+
+- Do not overwrite previously published versions.
+- Create a new version.
+- Keep previous PDF templates.
+- Preserve historical patient submissions.
+- Ensure previously generated PDFs remain unchanged.
+
+Each patient form submission must record which template version was used.
+
+## 13. Security
+
+This is a dental patient management application, so patient information must be protected.
+
+Implement:
+- Existing authentication integration.
+- Role-based access control.
+- Office-level access restrictions.
+- Patient-level access validation.
+- Secure PDF storage.
+- Authorized PDF downloads.
+- File type and file size validation.
+- PDF upload validation.
+- Audit logs.
+- Secure temporary file cleanup.
+- Protection against unauthorized template modification.
+
+Do not put sensitive patient information directly into publicly accessible barcode URLs.
+
+## 14. Expected UI
+
+Admin:
+- Modern dashboard.
+- Category management.
+- Forms listing.
+- PDF template upload.
+- PDF page editor.
+- Header/footer configuration.
+- Barcode configuration.
+- Live PDF preview.
+- Publish and version history.
+
+User:
+- Patient search.
+- Form category selection.
+- Available forms.
+- Multiple form selection.
+- PDF generation.
+- Preview, print and download.
+
+Use the existing application's design system and responsive layout.
+
+## 15. Implementation Instructions
+
+Before coding:
+
+1. Inspect the existing React application.
+2. Inspect the FastAPI application.
+3. Inspect MySQL database structure.
+4. Identify existing patient, office, doctor and user tables.
+5. Identify existing authentication and permission systems.
+6. Inspect the attached original 4-page PDF.
+7. Identify how the current barcode numbering is generated.
+8. Prepare an implementation plan.
+
+Then implement in phases.
+
+Do not replace existing functionality.
+
+Do not create duplicate patient, office or authentication tables.
+
+Do not use mock patient information in production.
+
+Do not hardcode patient data or barcode values.
+
+Create reusable components and services.
+
+Provide database migration scripts.
+
+Test the generated PDF against the original reference, page by page, including page dimensions, barcode readability, alignment, font sizes and content positions.
+
+DELIVERABLE:
+A fully functional Patient Forms Management System where admins can upload and manage original PDF templates and users can select patients, generate the original-looking PDF, preview it, print it and download it.

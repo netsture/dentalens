@@ -27,6 +27,7 @@ const TONE_BY_STATUS: Record<string, Tone> = {
   overdue: "red",
   "no-show": "red",
   noshow: "red",
+  "not arrived": "red",
   pending: "amber",
   waiting: "amber",
   allocated: "amber",

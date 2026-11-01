@@ -1,16 +1,21 @@
-export type AppTheme = "blue" | "green" | "orange" | "teal" | "slate";
+export type AppTheme = "blue" | "green" | "orange" | "teal" | "slate" | "light-green" | "coral" | "lime";
 
 export const THEMES: {
   id: AppTheme;
   label: string;
   /** Swatch color shown in the profile menu */
   swatch: string;
+  /** Check-mark color on the swatch */
+  check: string;
 }[] = [
-  { id: "blue", label: "Blue", swatch: "#1a3a5c" },
-  { id: "green", label: "Green", swatch: "#1f6b4a" },
-  { id: "orange", label: "Orange", swatch: "#c45c16" },
-  { id: "teal", label: "Teal", swatch: "#0f6e6e" },
-  { id: "slate", label: "Slate", swatch: "#3d4f66" },
+  { id: "blue", label: "Blue", swatch: "#1a3a5c", check: "#ffffff" },
+  { id: "green", label: "Green", swatch: "#1f6b4a", check: "#ffffff" },
+  { id: "orange", label: "Orange", swatch: "#c45c16", check: "#ffffff" },
+  { id: "teal", label: "Teal", swatch: "#0f6e6e", check: "#ffffff" },
+  { id: "slate", label: "Slate", swatch: "#3d4f66", check: "#ffffff" },
+  { id: "light-green", label: "Light green", swatch: "#86C56A", check: "#1a3314" },
+  { id: "coral", label: "Coral", swatch: "#FF6C60", check: "#ffffff" },
+  { id: "lime", label: "Lime", swatch: "#c9f279", check: "#2a3d0c" },
 ];
 
 export const THEME_STORAGE_KEY = "dl-theme";

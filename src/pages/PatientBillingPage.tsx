@@ -211,7 +211,7 @@ const aging = [
   { label: "Other Insurance", values: ["$0.00", "$0.00", "$0.00", "$0.00", "$0.00"] },
 ];
 
-export default function PatientBillingPage() {
+export default function PatientBillingPage({ embedded = false }: { embedded?: boolean }) {
   const [active, setActive] = useState("Billing");
   const [openId, setOpenId] = useState<string | null>("inv-5131");
   const [q, setQ] = useState("");
@@ -245,15 +245,17 @@ export default function PatientBillingPage() {
 
   return (
     <div className="flex flex-col gap-2 h-full min-h-0">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-[16px] font-bold">Patient Billing</h1>
-          <p className="text-[11px] text-muted-foreground">Ledger, claims and account aging</p>
+      {!embedded && (
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-[16px] font-bold">Patient Billing</h1>
+            <p className="text-[11px] text-muted-foreground">Ledger, claims and account aging</p>
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="grid grid-cols-12 gap-2 flex-1 min-h-0">
-        <div className="col-span-12 xl:col-span-9 flex flex-col gap-2 min-h-0">
+        <div className={`col-span-12 flex flex-col gap-2 min-h-0 ${embedded ? "" : "xl:col-span-9"}`}>
           <TableToolbar
             search={q}
             onSearchChange={setQ}
@@ -432,6 +434,7 @@ export default function PatientBillingPage() {
           </div>
         </div>
 
+        {!embedded && (
         <aside className="col-span-12 xl:col-span-3 flex flex-col gap-2">
           <div className="panel p-3">
             <div className="relative mb-3">
@@ -516,6 +519,7 @@ export default function PatientBillingPage() {
             </table>
           </div>
         </aside>
+        )}
       </div>
     </div>
   );

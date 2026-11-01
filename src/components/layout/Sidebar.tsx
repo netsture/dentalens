@@ -6,40 +6,39 @@ import {
   Wallet,
   FileText,
   BarChart3,
-  FileCheck2,
-  ListChecks,
   Settings,
-  ShieldCheck,
-  Stethoscope,
   Building2,
   Search,
   UserRound,
   BadgeCheck,
   Briefcase,
   Mic,
+  CircleHelp,
   X,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ComponentType } from "react";
+import { SIDEBAR_MENU } from "@/lib/appCatalog";
 
-const menuItems = [
-  { group: "Practice", name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
-  { group: "Practice", name: "Practice Setup", path: "/practice-setup", icon: Building2 },
-  { group: "Provider", name: "Doctor Screen", path: "/provider", icon: UserRound },
-  { group: "Scheduling", name: "Appointment Book", path: "/appointment/book", icon: CalendarDays },
-  { group: "Patients", name: "Patient Search", path: "/patient", icon: Users },
-  { group: "Patients", name: "Patient Overview", path: "/patient/overview", icon: LayoutDashboard },
-  { group: "Patients", name: "Insurance", path: "/patient/insurance", icon: ShieldCheck },
-  { group: "Patients", name: "Clinical Chart", path: "/patient/clinical", icon: Stethoscope },
-  { group: "Patients", name: "Treatment Planner", path: "/patient/treatment", icon: ListChecks },
-  { group: "Patients", name: "Authorizations", path: "/patient/authorizations", icon: FileCheck2 },
-  { group: "Financial", name: "Patient Billing", path: "/patient/billing", icon: Wallet },
-  { group: "Financial", name: "Documents", path: "/documents", icon: FileText },
-  { group: "Financial", name: "Analytics & Reports", path: "/report", icon: BarChart3 },
-  { group: "Eligibility", name: "Eligibility Check", path: "/eligibility", icon: BadgeCheck },
-  { group: "Back Office", name: "Overview", path: "/back-office", icon: Briefcase },
-  { group: "Administration", name: "Settings", path: "/settings", icon: Settings },
-  { group: "Administration", name: "Voice Command", path: "/voice-command", icon: Mic },
-];
+const menuIcons: Record<string, ComponentType<{ className?: string }>> = {
+  "/dashboard": LayoutDashboard,
+  "/practice-setup": Building2,
+  "/provider": UserRound,
+  "/appointment/book": CalendarDays,
+  "/patient": Users,
+  "/patient/billing": Wallet,
+  "/documents": FileText,
+  "/report": BarChart3,
+  "/eligibility": BadgeCheck,
+  "/back-office": Briefcase,
+  "/settings": Settings,
+  "/voice-command": Mic,
+  "/support-guide": CircleHelp,
+};
+
+const menuItems = SIDEBAR_MENU.map((item) => ({
+  ...item,
+  icon: menuIcons[item.path] ?? FileText,
+}));
 
 export function Sidebar({ expanded, flyout = false }: { expanded: boolean; flyout?: boolean }) {
   const location = useLocation();
