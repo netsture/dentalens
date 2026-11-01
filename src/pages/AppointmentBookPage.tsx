@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import {
   AlertTriangle,
   Ban,
+  CalendarDays,
   ChevronLeft,
   ChevronRight,
   Clock,
@@ -14,7 +15,7 @@ import {
   Printer,
   Receipt,
   Settings2,
-  Stethoscope,
+  User,
   UserPlus,
   Wallet,
   X,
@@ -119,6 +120,11 @@ export default function AppointmentBookPage() {
     [doctorFilter]
   );
 
+  const bookDateLabel = `${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}-${date.getFullYear()}`;
+
+  const providerDisplayName = (name: string) =>
+    `${name.replace(/^Dr\.\s*/i, "").toUpperCase()} (DOCTOR)`;
+
   const appointments = useMemo(() => {
     void tick;
     let list = seed;
@@ -131,6 +137,23 @@ export default function AppointmentBookPage() {
       (a) => a.patient.toLowerCase().includes(q) || a.type.toLowerCase().includes(q)
     );
   }, [search, statusFilter, tick]);
+
+  const providerGroups = useMemo(() => {
+    return doctors
+      .filter((doc) => visibleSides.some((side) => side.doctorId === doc.id))
+      .map((doc) => {
+        const docSides = visibleSides.filter((side) => side.doctorId === doc.id);
+        const docAppts = appointments.filter(
+          (appt) => docSides.some((side) => side.id === appt.sideId) && appt.status !== "blocked"
+        );
+        return {
+          doctor: doc,
+          sides: docSides,
+          totalPat: docAppts.length,
+          newPat: docAppts.filter((appt) => /new patient/i.test(appt.type)).length,
+        };
+      });
+  }, [visibleSides, appointments]);
 
   useEffect(() => {
     if (!selected && !showBook && !showReschedule) return;
@@ -261,53 +284,93 @@ export default function AppointmentBookPage() {
           </div>
           {view === "grid" ? (
             <div className="overflow-auto flex-1">
-              <table className="data-table min-w-[900px]">
+              <table className="data-table min-w-[1100px] appt-book-grid">
                 <thead>
-                  <tr>
-                    <th className="w-[70px]">
-                      <Clock className="w-3.5 h-3.5 inline" /> Time
-                    </th>
-                    {visibleSides.map((s) => {
-                      const doc = doctors.find((d) => d.id === s.doctorId);
-                      return (
-                        <th key={s.id}>
-                          <div>{s.label}</div>
-                          <div className="font-medium normal-case tracking-normal text-[10px] text-muted-foreground flex items-center gap-1 mt-0.5">
-                            <Stethoscope className="w-3 h-3" /> {doc?.name}
+                  <tr className="[&>th]:!sticky [&>th]:!top-0 [&>th]:z-[5]">
+                    <th className="w-[64px] !text-center" />
+                    {providerGroups.map((group, groupIndex) => (
+                      <th
+                        key={`prov-${group.doctor.id}`}
+                        colSpan={group.sides.length}
+                        className={`!text-center !normal-case !tracking-normal ${groupIndex > 0 ? "border-l-2 border-l-border" : ""}`}
+                      >
+                        <div className="flex flex-col items-center justify-center gap-0.5 w-full py-0.5">
+                          <div className="flex items-center justify-center gap-1.5 font-bold text-[12px] text-foreground">
+                            {providerDisplayName(group.doctor.name)}
+                            <CalendarDays className="w-3.5 h-3.5 text-muted-foreground" />
                           </div>
-                        </th>
-                      );
-                    })}
+                          <div className="text-[10px] font-medium text-muted-foreground whitespace-nowrap">
+                            TOTAL PAT: {group.totalPat}
+                            <span className="mx-2">NEW PAT: {group.newPat}</span>
+                            ({bookDateLabel})
+                          </div>
+                        </div>
+                      </th>
+                    ))}
+                  </tr>
+                  <tr className="[&>th]:!sticky [&>th]:!top-[46px] [&>th]:z-[4] [&>th]:h-8">
+                    <th className="w-[64px] !text-center">
+                      <div className="inline-flex items-center justify-center gap-1">
+                        <Clock className="w-3 h-3 text-muted-foreground" />
+                        TIME
+                      </div>
+                    </th>
+                    {providerGroups.map((group, groupIndex) => (
+                      <Fragment key={`cols-${group.doctor.id}`}>
+                        {group.sides.map((s, sideIndex) => (
+                          <th
+                            key={s.id}
+                            className={`!text-center ${groupIndex > 0 && sideIndex === 0 ? "border-l-2 border-l-border" : ""}`}
+                          >
+                            <div className="inline-flex items-center justify-center gap-1">
+                              <User className="w-3 h-3 text-muted-foreground" />
+                              {s.label.toUpperCase()}
+                            </div>
+                          </th>
+                        ))}
+                      </Fragment>
+                    ))}
                   </tr>
                 </thead>
                 <tbody>
                   {times.map((t) => (
                     <tr key={t}>
-                      <td className="font-semibold text-muted-foreground whitespace-nowrap">{t}</td>
-                      {visibleSides.map((s) => {
-                        const appt = findSlot(s.id, t);
-                        return (
-                          <td key={s.id} className="p-1 align-top h-[44px]">
-                            {appt ? (
-                              <button
-                                onClick={() => setSelected(appt)}
-                                className={`w-full text-left px-1.5 py-1 rounded-[2px] border-none cursor-pointer ${statusClass(appt.status)}`}
+                      <td className="font-semibold text-muted-foreground whitespace-nowrap text-center text-[11px]">
+                        {t}
+                      </td>
+                      {providerGroups.map((group, groupIndex) => (
+                        <Fragment key={`${t}-${group.doctor.id}`}>
+                          {group.sides.map((s, sideIndex) => {
+                            const appt = findSlot(s.id, t);
+                            return (
+                              <td
+                                key={s.id}
+                                className={`p-1 align-top h-[44px] ${
+                                  groupIndex > 0 && sideIndex === 0 ? "border-l-2 border-l-border" : ""
+                                }`}
                               >
-                                <div className="text-[10px] font-bold truncate">{appt.patient}</div>
-                                <div className="text-[9px] text-muted-foreground truncate">
-                                  {appt.type} {appt.plan ? `· ${appt.plan}` : ""}
-                                </div>
-                              </button>
-                            ) : (
-                              <button
-                                onClick={() => setShowBook(true)}
-                                className="w-full h-full min-h-[36px] border border-dashed border-transparent hover:border-border hover:bg-secondary/60 rounded-[2px] cursor-pointer bg-transparent"
-                                title="Book slot"
-                              />
-                            )}
-                          </td>
-                        );
-                      })}
+                                {appt ? (
+                                  <button
+                                    onClick={() => setSelected(appt)}
+                                    className={`w-full text-left px-1.5 py-1 rounded-[2px] border-none cursor-pointer ${statusClass(appt.status)}`}
+                                  >
+                                    <div className="text-[10px] font-bold truncate">{appt.patient}</div>
+                                    <div className="text-[9px] text-muted-foreground truncate">
+                                      {appt.type} {appt.plan ? `· ${appt.plan}` : ""}
+                                    </div>
+                                  </button>
+                                ) : (
+                                  <button
+                                    onClick={() => setShowBook(true)}
+                                    className="w-full h-full min-h-[36px] border border-dashed border-transparent hover:border-border hover:bg-secondary/60 rounded-[2px] cursor-pointer bg-transparent"
+                                    title="Book slot"
+                                  />
+                                )}
+                              </td>
+                            );
+                          })}
+                        </Fragment>
+                      ))}
                     </tr>
                   ))}
                 </tbody>
