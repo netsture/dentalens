@@ -1,3 +1,5 @@
+import { findProviderBySpokenName, providerDisplayName, providers } from "@/lib/providers";
+
 export type VoiceLang = "en-US" | "hi-IN" | "gu-IN";
 
 export type VoiceActionKind =
@@ -59,6 +61,10 @@ export const NAV_TARGETS: { path: string; label: string }[] = [
   { path: "/dashboard", label: "Dashboard" },
   { path: "/practice-setup", label: "Practice Setup" },
   { path: "/provider", label: "Doctor Screen" },
+  ...providers.map((provider) => ({
+    path: `/provider/${provider.id}`,
+    label: providerDisplayName(provider.name),
+  })),
   { path: "/appointment/book", label: "Appointment Book" },
   { path: "/appointment/find-slot", label: "Find Slot" },
   { path: "/appointment/recalls", label: "Recalls" },
@@ -111,7 +117,7 @@ function normalize(text: string) {
 function stripLead(text: string) {
   return text
     .replace(
-      /^(please |kindly |can you |could you |i want to |i need to |take me to |navigate to |go to |open |show |show me |display |launch |start |switch to )+/i,
+      /^(please |kindly |can you |could you |i want to |i need to |take me to |navigate to |go to |going to |open |opening |opened |show |showing |show me |display |displaying |launch |launching |start |starting |switch to )+/i,
       ""
     )
     .replace(/^(the |a |an )+/i, "")
@@ -234,6 +240,21 @@ export function listBuiltInCommands(): ManagedVoiceCommand[] {
     enabled: true,
     builtIn: true,
   }));
+  const providerRoutes = providers.map((provider) => {
+    const name = providerDisplayName(provider.name);
+    const extras = [`go to ${name}`, `open ${name}`, `opening ${name}`, ...(provider.aliases ?? [])];
+    return {
+      id: `builtin-nav-/provider/${provider.id}`,
+      phrase: name.toLowerCase(),
+      extraPhrases: extras.join(", "),
+      action: "navigate" as const,
+      path: `/provider/${provider.id}`,
+      query: "",
+      language: "all" as const,
+      enabled: true,
+      builtIn: true,
+    };
+  });
   const search: ManagedVoiceCommand = {
     id: "builtin-search",
     phrase: "search",
@@ -256,7 +277,7 @@ export function listBuiltInCommands(): ManagedVoiceCommand[] {
     enabled: true,
     builtIn: true,
   };
-  return [...routes, ...actions, search, viewAdd];
+  return [...routes, ...providerRoutes, ...actions, search, viewAdd];
 }
 
 export function loadCustomCommands(): ManagedVoiceCommand[] {
@@ -327,6 +348,15 @@ export function parseVoiceCommand(raw: string): VoiceAction {
   const text = normalize(original);
   const stripped = stripLead(text);
 
+  const provider = findProviderBySpokenName(stripped) ?? findProviderBySpokenName(text) ?? findProviderBySpokenName(original);
+  if (provider) {
+    return {
+      kind: "navigate",
+      path: `/provider/${provider.id}`,
+      label: providerDisplayName(provider.name),
+    };
+  }
+
   const custom = loadCustomCommands().filter((item) => item.enabled);
   for (const command of custom) {
     if (phrasesOf(command).some((phrase) => matchAlias(stripped, phrase) || matchAlias(text, phrase))) {
@@ -362,6 +392,13 @@ export function parseVoiceCommand(raw: string): VoiceAction {
     if (action.aliases.some((alias) => matchAlias(stripped, alias) || matchAlias(text, alias))) {
       return { kind: action.kind };
     }
+  }
+
+  const exactRoute = BUILTIN_ROUTES.find((route) =>
+    route.aliases.some((alias) => normalize(alias) === stripped || normalize(alias) === text)
+  );
+  if (exactRoute) {
+    return { kind: "navigate", path: exactRoute.path, label: exactRoute.label };
   }
 
   const ranked = BUILTIN_ROUTES.map((route) => {

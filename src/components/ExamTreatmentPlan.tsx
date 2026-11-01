@@ -1,18 +1,16 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
 import {
   AlertTriangle,
   ArrowDown,
   ArrowUp,
   ArrowUpDown,
   CheckCircle2,
-  FilterX,
   Mic,
   Plus,
+  RefreshCw,
   Trash2,
   X,
 } from "lucide-react";
-import { TableToolbar } from "@/components/TableToolbar";
-import { exportToExcel } from "@/lib/exportToExcel";
 import {
   ADA_CODES,
   HAS_BUTTONS,
@@ -25,7 +23,6 @@ import {
   UPPER_MOUTH_AREAS,
   formatTeeth,
   parseTxSpeech,
-  SURFACES,
   seedExistingExams,
   seedInsurance,
   todayMdY,
@@ -111,40 +108,117 @@ function Tooth({
   code,
   selected,
   onClick,
+  onHover,
+  arch,
 }: {
   code: string;
   selected: boolean;
   onClick: () => void;
+  onHover?: (code: string) => void;
+  arch: "upper" | "lower";
 }) {
+  const img = <img src={toothImage(code)} alt="" />;
+  const num = <span className="tx-tooth-num">{code}</span>;
   return (
-    <button type="button" className={`tx-tooth ${selected ? "is-on" : ""}`} title={`Tooth ${code}`} onClick={onClick}>
-      <img src={toothImage(code)} alt={code} />
-      <span>{code}</span>
+    <button
+      type="button"
+      data-tooth={code}
+      className={`tx-tooth is-${arch}${selected ? " is-on" : ""}`}
+      title={`Tooth ${code}`}
+      aria-label={`Tooth ${code}`}
+      aria-pressed={selected}
+      draggable={false}
+      onClick={onClick}
+      onPointerEnter={() => onHover?.(code)}
+    >
+      {arch === "upper" ? (
+        <>
+          {img}
+          {num}
+        </>
+      ) : (
+        <>
+          {num}
+          {img}
+        </>
+      )}
     </button>
   );
 }
 
-function MouthButtons({
-  areas,
-  onPick,
+function ArchChart({
+  upper,
+  lower,
+  narrow,
+  selectedTeeth,
+  onToggle,
+  onHover,
 }: {
-  areas: MouthArea[];
-  onPick: (area: MouthArea) => void;
+  upper?: string[];
+  lower?: string[];
+  narrow?: boolean;
+  selectedTeeth: string[];
+  onToggle: (code: string) => void;
+  onHover?: (code: string) => void;
 }) {
-  return (
-    <div className="tx-mouth-row">
-      {areas.map((area) => (
-        <button
-          key={area.id}
-          type="button"
-          title={area.title}
-          className={`tx-mouth-btn tone-${area.tone}`}
-          onClick={() => onPick(area)}
-        >
-          {area.label}
-        </button>
+  const band = (codes: string[], arch: "upper" | "lower") => (
+    <div className={`tx-odo-row is-${arch}`}>
+      {codes.map((code) => (
+        <Tooth
+          key={`${arch}-${code}`}
+          code={code}
+          arch={arch}
+          selected={selectedTeeth.includes(code)}
+          onClick={() => onToggle(code)}
+          onHover={onHover}
+        />
       ))}
     </div>
+  );
+
+  return (
+    <div className={`tx-odo${narrow ? " is-narrow" : ""}`}>
+      {upper ? band(upper, "upper") : null}
+      {lower ? band(lower, "lower") : null}
+    </div>
+  );
+}
+
+function MouthToggle({ open, onToggle }: { open: boolean; onToggle: () => void }) {
+  return (
+    <button type="button" className="tx-mouth-toggle" onClick={onToggle} title={open ? "Collapse mouth area" : "Expand mouth area"}>
+      MOUTH AREA
+      <span className="tx-mouth-toggle-icon">{open ? "−" : "+"}</span>
+    </button>
+  );
+}
+
+function MouthBar({
+  area,
+  onPick,
+  pill = false,
+}: {
+  area: MouthArea;
+  onPick: (area: MouthArea) => void;
+  pill?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      title={area.title}
+      className={`tx-mouth-bar tone-${area.tone} ${pill ? "is-pill" : ""}`}
+      onClick={() => onPick(area)}
+    >
+      {area.label}
+    </button>
+  );
+}
+
+function FieldRefresh({ onClick, title }: { onClick: () => void; title: string }) {
+  return (
+    <button type="button" className="tx-field-refresh" onClick={onClick} title={title}>
+      <RefreshCw />
+    </button>
   );
 }
 
@@ -189,6 +263,8 @@ export function ExamTreatmentPlan({
   const [multiTooth, setMultiTooth] = useState(false);
   const [showPrimary, setShowPrimary] = useState(true);
   const [showPermanent, setShowPermanent] = useState(true);
+  const [showUpperMouth, setShowUpperMouth] = useState(false);
+  const [showLowerMouth, setShowLowerMouth] = useState(false);
   const [selectedTeeth, setSelectedTeeth] = useState<string[]>([]);
   const [hasSurface, setHasSurface] = useState("");
   const [needSurface, setNeedSurface] = useState("");
@@ -204,10 +280,7 @@ export function ExamTreatmentPlan({
     key: "type",
     dir: "asc",
   });
-  const [filtersOpen, setFiltersOpen] = useState(false);
-  const [colFilter, setColFilter] = useState<Record<string, string>>({});
   const [sort, setSort] = useState<{ key: ExamSortKey; dir: SortDir }>({ key: "date", dir: "desc" });
-  const [refreshing, setRefreshing] = useState(false);
   const [adaOpen, setAdaOpen] = useState(false);
   const [alert, setAlert] = useState<{ type: "error" | "ok"; text: string } | null>(null);
   const [listenKind, setListenKind] = useState<ExamKind | null>(null);
@@ -215,6 +288,16 @@ export function ExamTreatmentPlan({
   const recRef = useRef<SpeechRec | null>(null);
   const listenKindRef = useRef<ExamKind | null>(null);
   const applySpeechRef = useRef<(kind: ExamKind, spoken: string) => void>(() => {});
+  const selectedRef = useRef<string[]>([]);
+  const multiRef = useRef(false);
+  const skipToothClick = useRef(false);
+  const toothDrag = useRef<{
+    on: boolean;
+    moved: boolean;
+    start: string | null;
+    codes: string[];
+    base: string[];
+  }>({ on: false, moved: false, start: null, codes: [], base: [] });
 
   const insurance = useMemo(() => {
     const rows = seedInsurance(patientName, insuranceLabel);
@@ -229,14 +312,88 @@ export function ExamTreatmentPlan({
   }, [alert]);
 
   const teethValue = formatTeeth(selectedTeeth);
+  selectedRef.current = selectedTeeth;
+  multiRef.current = multiTooth;
 
-  const toggleTooth = (code: string) => {
+  const commitTooth = (code: string) => {
     setSelectedTeeth((current) => {
-      if (multiTooth) {
+      if (multiRef.current) {
         return current.includes(code) ? current.filter((item) => item !== code) : [...current, code];
       }
       return current.length === 1 && current[0] === code ? [] : [code];
     });
+  };
+
+  const toggleTooth = (code: string) => {
+    if (skipToothClick.current) return;
+    commitTooth(code);
+  };
+
+  const toothFromPoint = (clientX: number, clientY: number) => {
+    const node = document.elementFromPoint(clientX, clientY);
+    return node?.closest("[data-tooth]")?.getAttribute("data-tooth") ?? null;
+  };
+
+  const applyToothDrag = (codes: string[]) => {
+    if (multiRef.current) {
+      const next = new Set(toothDrag.current.base);
+      codes.forEach((item) => next.add(item));
+      setSelectedTeeth(Array.from(next));
+      return;
+    }
+    setSelectedTeeth(codes);
+  };
+
+  const addDragTooth = (code: string) => {
+    if (!toothDrag.current.on || toothDrag.current.codes.includes(code)) return;
+    toothDrag.current.moved = true;
+    toothDrag.current.codes = [...toothDrag.current.codes, code];
+    skipToothClick.current = true;
+    applyToothDrag(toothDrag.current.codes);
+  };
+
+  useEffect(() => {
+    const onMove = (event: globalThis.PointerEvent) => {
+      if (!toothDrag.current.on) return;
+      const code = toothFromPoint(event.clientX, event.clientY);
+      if (code) addDragTooth(code);
+    };
+    const onUp = () => {
+      const drag = toothDrag.current;
+      if (!drag.on) return;
+      drag.on = false;
+      if (!drag.moved && drag.start) {
+        skipToothClick.current = true;
+        commitTooth(drag.start);
+        window.setTimeout(() => {
+          skipToothClick.current = false;
+        }, 0);
+      } else {
+        skipToothClick.current = false;
+      }
+    };
+    document.addEventListener("pointermove", onMove);
+    document.addEventListener("pointerup", onUp);
+    document.addEventListener("pointercancel", onUp);
+    return () => {
+      document.removeEventListener("pointermove", onMove);
+      document.removeEventListener("pointerup", onUp);
+      document.removeEventListener("pointercancel", onUp);
+    };
+  }, []);
+
+  const onTeethPointerDown = (event: PointerEvent<HTMLDivElement>) => {
+    if (event.button !== 0) return;
+    const code = toothFromPoint(event.clientX, event.clientY);
+    if (!code) return;
+    skipToothClick.current = false;
+    toothDrag.current = {
+      on: true,
+      moved: false,
+      start: code,
+      codes: [code],
+      base: selectedRef.current,
+    };
   };
 
   const pickMouth = (area: MouthArea) => {
@@ -293,6 +450,7 @@ export function ExamTreatmentPlan({
   const applySpeechTx = (kind: ExamKind, spoken: string) => {
     const buttons = kind === "has" ? HAS_BUTTONS : NEED_BUTTONS;
     const parsed = parseTxSpeech(spoken, buttons);
+    if (parsed.teeth.length > 1) setMultiTooth(true);
     if (parsed.teeth.length) setSelectedTeeth(parsed.teeth);
     if (parsed.surfaces.length) {
       const joined = parsed.surfaces.join(":");
@@ -304,8 +462,12 @@ export function ExamTreatmentPlan({
     const surface = parsed.surfaces.length ? parsed.surfaces.join(":") : kind === "has" ? hasSurface : needSurface;
 
     if (parsed.buttons.length === 0) {
-      if (parsed.teeth.length) {
-        setAlert({ type: "ok", text: `Tooth ${teeth} selected. Speak a procedure.` });
+      if (parsed.teeth.length || parsed.surfaces.length) {
+        const bits = [
+          parsed.teeth.length ? `Tooth ${teeth}` : "",
+          parsed.surfaces.length ? `surface ${surface.replace(/:/g, ", ")}` : "",
+        ].filter(Boolean);
+        setAlert({ type: "ok", text: `${bits.join(" and ")} selected.` });
         return;
       }
       setAlert({
@@ -424,15 +586,11 @@ export function ExamTreatmentPlan({
         .join(" ")
         .toLowerCase();
       if (query && !blob.includes(query)) return false;
-      return EXAM_COLUMNS.every((col) => {
-        const filter = colFilter[col.key]?.trim().toLowerCase();
-        if (!filter) return true;
-        return String(row[col.key] ?? "").toLowerCase().includes(filter);
-      });
+      return true;
     });
     const dir = sort.dir === "asc" ? 1 : -1;
     return [...filtered].sort((a, b) => String(a[sort.key] ?? "").localeCompare(String(b[sort.key] ?? ""), undefined, { numeric: true }) * dir);
-  }, [rows, q, colFilter, sort]);
+  }, [rows, q, sort]);
 
   const hasRows = visibleRows.filter((row) => row.kind === "has");
   const needRows = visibleRows.filter((row) => row.kind === "need");
@@ -473,33 +631,6 @@ export function ExamTreatmentPlan({
     setAlert({ type: "ok", text: `Treatment plan created from ${source.length} Need item(s).` });
   };
 
-  const handleExport = () => {
-    exportToExcel(
-      `exam-txplan-${patientId}.xls`,
-      ["Type", "Date", "Tooth", "Surface", "Tx Button", "ADA", "Doctor", "Remarks"],
-      visibleRows.map((row) => [
-        row.kind === "has" ? "Exam/Existing/Has" : "Need",
-        row.date,
-        row.teeth,
-        row.surface,
-        row.button,
-        row.ada,
-        row.doctor,
-        row.remarks,
-      ]),
-      "Exam Tx Plan"
-    );
-  };
-
-  const handleRefresh = () => {
-    setRefreshing(true);
-    window.setTimeout(() => {
-      setQ("");
-      setColFilter({});
-      setRefreshing(false);
-    }, 250);
-  };
-
   const renderExamTable = (list: ExamRow[], empty: string) => (
     <div className="table-wrap">
       <table className="data-table">
@@ -522,25 +653,6 @@ export function ExamTreatmentPlan({
             ))}
             <th>Actions</th>
           </tr>
-          {filtersOpen ? (
-            <tr>
-              <th />
-              {EXAM_COLUMNS.map((col) => (
-                <th key={`f-${col.key}`}>
-                  <input
-                    className="w-full border border-border rounded-sm px-1 py-0.5 bg-card"
-                    value={colFilter[col.key] ?? ""}
-                    onChange={(event) => setColFilter((current) => ({ ...current, [col.key]: event.target.value }))}
-                  />
-                </th>
-              ))}
-              <th>
-                <button type="button" className="btn" onClick={() => setColFilter({})}>
-                  <FilterX className="w-3 h-3" />
-                </button>
-              </th>
-            </tr>
-          ) : null}
         </thead>
         <tbody>
           {list.length === 0 ? (
@@ -676,64 +788,87 @@ export function ExamTreatmentPlan({
 
       <div className="tx-work">
         <aside className="panel p-2 tx-chart">
-          <div className="flex items-center justify-between mb-1">
-            <button type="button" className="tx-mouth-area">
-              Mouth Area
-            </button>
-          </div>
-          <MouthButtons areas={UPPER_MOUTH_AREAS} onPick={pickMouth} />
+          <div className="tx-mouth-stack">
+            <MouthToggle open={showUpperMouth} onToggle={() => setShowUpperMouth((value) => !value)} />
+            {showUpperMouth ? (
+              <>
+                <MouthBar area={UPPER_MOUTH_AREAS[0]} onPick={pickMouth} />
+                <MouthBar area={UPPER_MOUTH_AREAS[1]} onPick={pickMouth} />
+                <div className="tx-mouth-quint">
+                  {UPPER_MOUTH_AREAS.slice(2).map((area) => (
+                    <MouthBar key={area.id} area={area} onPick={pickMouth} pill />
+                  ))}
+                </div>
+              </>
+            ) : null}
 
-          <button type="button" className="tx-dentition" onClick={() => setShowPermanent((value) => !value)}>
-            Secondary/Permanent Dentition (Adult Teeth)
-          </button>
-          {showPermanent ? (
-            <>
-              <div className="tx-arch">
-                {PERMANENT_UPPER.map((code) => (
-                  <Tooth key={code} code={code} selected={selectedTeeth.includes(code)} onClick={() => toggleTooth(code)} />
-                ))}
-              </div>
-              <div className="tx-arch">
-                {PERMANENT_LOWER.map((code) => (
-                  <Tooth key={code} code={code} selected={selectedTeeth.includes(code)} onClick={() => toggleTooth(code)} />
-                ))}
-              </div>
-            </>
-          ) : null}
+            <div className="tx-teeth-drag" onPointerDown={onTeethPointerDown}>
+              <button type="button" className="tx-dentition" onClick={() => setShowPermanent((value) => !value)}>
+                Secondary/Permanent Dentition (Adult Teeth)
+              </button>
+              {showPermanent ? (
+                <ArchChart
+                  upper={PERMANENT_UPPER}
+                  selectedTeeth={selectedTeeth}
+                  onToggle={toggleTooth}
+                  onHover={addDragTooth}
+                />
+              ) : null}
 
-          <button type="button" className="tx-dentition" onClick={() => setShowPrimary((value) => !value)}>
-            Primary Dentition (Deciduous/Baby Teeth)
-          </button>
-          {showPrimary ? (
-            <>
-              <div className="tx-arch">
-                {PRIMARY_UPPER.map((code) => (
-                  <Tooth key={code} code={code} selected={selectedTeeth.includes(code)} onClick={() => toggleTooth(code)} />
-                ))}
-              </div>
-              <div className="tx-arch">
-                {PRIMARY_LOWER.map((code) => (
-                  <Tooth key={code} code={code} selected={selectedTeeth.includes(code)} onClick={() => toggleTooth(code)} />
-                ))}
-              </div>
-            </>
-          ) : null}
+              {showPrimary ? (
+                <ArchChart
+                  narrow
+                  upper={PRIMARY_UPPER}
+                  lower={PRIMARY_LOWER}
+                  selectedTeeth={selectedTeeth}
+                  onToggle={toggleTooth}
+                  onHover={addDragTooth}
+                />
+              ) : null}
 
-          <MouthButtons areas={LOWER_MOUTH_AREAS} onPick={pickMouth} />
-          <div className="flex justify-end mt-1">
-            <button type="button" className="tx-mouth-area">
-              Mouth Area
-            </button>
+              {showPermanent ? (
+                <ArchChart
+                  lower={PERMANENT_LOWER}
+                  selectedTeeth={selectedTeeth}
+                  onToggle={toggleTooth}
+                  onHover={addDragTooth}
+                />
+              ) : null}
+
+              <button type="button" className="tx-dentition" onClick={() => setShowPrimary((value) => !value)}>
+                Primary Dentition (Deciduous/Baby Teeth)
+              </button>
+            </div>
+
+            {showLowerMouth ? (
+              <>
+                <div className="tx-mouth-quint">
+                  {LOWER_MOUTH_AREAS.slice(0, 5).map((area) => (
+                    <MouthBar key={area.id} area={area} onPick={pickMouth} pill />
+                  ))}
+                </div>
+                <MouthBar area={LOWER_MOUTH_AREAS[5]} onPick={pickMouth} />
+                <MouthBar area={LOWER_MOUTH_AREAS[6]} onPick={pickMouth} />
+              </>
+            ) : null}
+            <MouthToggle open={showLowerMouth} onToggle={() => setShowLowerMouth((value) => !value)} />
           </div>
         </aside>
 
         <div className="tx-entry">
-          <div className="flex flex-wrap items-center gap-2 justify-between">
-            <label className="inline-flex items-center gap-1.5">
+          <div className="flex flex-wrap items-center gap-2">
+            <label className="inline-flex items-center gap-1.5 shrink-0">
               <input type="checkbox" checked={multiTooth} onChange={(event) => setMultiTooth(event.target.checked)} />
               Tic here for multi tooth selection.
             </label>
-            <div className="flex flex-wrap gap-1">
+            {listenKind ? (
+              <div className="tx-listen-bar" role="status">
+                <span className="tx-listen-dot" />
+                <strong>Listening</strong>
+                <span>{speechText || "Say a procedure, e.g. tooth 8 PA XRAY"}</span>
+              </div>
+            ) : null}
+            <div className="flex flex-wrap gap-1 ml-auto">
               <button type="button" className="btn">
                 Button Maintenance
               </button>
@@ -743,11 +878,9 @@ export function ExamTreatmentPlan({
           <div className="tx-fields">
             <div className="field">
               <label>Teeth No</label>
-              <div className="flex gap-1">
+              <div className="tx-field-with-refresh">
                 <input readOnly value={teethValue} placeholder="Teeth No" />
-                <button type="button" className="btn" onClick={clearTeeth} title="Clear teeth">
-                  <X className="w-3 h-3" />
-                </button>
+                <FieldRefresh onClick={clearTeeth} title="Refresh teeth" />
               </div>
             </div>
           </div>
@@ -766,30 +899,13 @@ export function ExamTreatmentPlan({
                 </button>
               </header>
               <div className="tx-box-body">
-                {listenKind === "has" ? (
-                  <p className="tx-speech">{speechText || "Listening… say a procedure, e.g. PA XRAY or tooth 8 amalgam"}</p>
-                ) : null}
                 <div className="flex flex-wrap items-start gap-3">
                   <SurfacePad value={hasSurface} onToggle={(surface) => setHasSurface((current) => toggleToken(current, surface))} />
                   <div className="field min-w-[140px]">
                     <label>Has Surface</label>
-                    <div className="flex gap-1">
-                      <select
-                        value=""
-                        onChange={(event) => {
-                          if (event.target.value) setHasSurface((current) => toggleToken(current, event.target.value));
-                        }}
-                      >
-                        <option value="">{hasSurface || "- Has Surface -"}</option>
-                        {SURFACES.map((surface) => (
-                          <option key={surface} value={surface}>
-                            {surface}{hasSurface.split(":").includes(surface) ? " ✓" : ""}
-                          </option>
-                        ))}
-                      </select>
-                      <button type="button" className="btn" onClick={() => setHasSurface("")} title="Clear has surface">
-                        <X className="w-3 h-3" />
-                      </button>
+                    <div className="tx-field-with-refresh">
+                      <input readOnly value={hasSurface} placeholder="Has Surface" />
+                      <FieldRefresh onClick={() => setHasSurface("")} title="Refresh has surface" />
                     </div>
                   </div>
                   <div className="field min-w-[180px] flex-1">
@@ -833,30 +949,13 @@ export function ExamTreatmentPlan({
                 </button>
               </header>
               <div className="tx-box-body">
-                {listenKind === "need" ? (
-                  <p className="tx-speech">{speechText || "Listening… say a procedure, e.g. CROWN or tooth 14 composite"}</p>
-                ) : null}
                 <div className="flex flex-wrap items-start gap-3">
                   <SurfacePad value={needSurface} onToggle={(surface) => setNeedSurface((current) => toggleToken(current, surface))} />
                   <div className="field min-w-[140px]">
                     <label>Need Surface</label>
-                    <div className="flex gap-1">
-                      <select
-                        value=""
-                        onChange={(event) => {
-                          if (event.target.value) setNeedSurface((current) => toggleToken(current, event.target.value));
-                        }}
-                      >
-                        <option value="">{needSurface || "- Need Surface -"}</option>
-                        {SURFACES.map((surface) => (
-                          <option key={surface} value={surface}>
-                            {surface}{needSurface.split(":").includes(surface) ? " ✓" : ""}
-                          </option>
-                        ))}
-                      </select>
-                      <button type="button" className="btn" onClick={() => setNeedSurface("")} title="Clear need surface">
-                        <X className="w-3 h-3" />
-                      </button>
+                    <div className="tx-field-with-refresh">
+                      <input readOnly value={needSurface} placeholder="Need Surface" />
+                      <FieldRefresh onClick={() => setNeedSurface("")} title="Refresh need surface" />
                     </div>
                   </div>
                   <div className="field min-w-[180px] flex-1">
@@ -1004,17 +1103,15 @@ export function ExamTreatmentPlan({
 
       <section className="panel p-2">
         <div className="flex items-center justify-between gap-2 mb-2 flex-wrap">
-          <TableToolbar
-            search={q}
-            onSearchChange={setQ}
-            searchPlaceholder="Search exam / need…"
-            onRefresh={handleRefresh}
-            refreshing={refreshing}
-            onFiltersOpenChange={setFiltersOpen}
-            showFilterPanel={false}
-            onExport={handleExport}
-            exportLabel="Export"
-          />
+          <div className="relative flex items-center w-full max-w-[320px] min-w-[180px]">
+            <input
+              type="text"
+              placeholder="Search exam / need…"
+              value={q}
+              onChange={(event) => setQ(event.target.value)}
+              className="w-full h-7 px-3 text-[11px] bg-background border border-border rounded-[3px] outline-none focus:border-primary text-foreground placeholder:text-muted-foreground"
+            />
+          </div>
           <label className="inline-flex items-center gap-1.5 shrink-0">
             <input type="checkbox" checked={combine} onChange={(event) => setCombine(event.target.checked)} />
             Combine table layout

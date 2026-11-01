@@ -42,6 +42,10 @@ export const PERMANENT_UPPER = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10
 export const PERMANENT_LOWER = ["32", "31", "30", "29", "28", "27", "26", "25", "24", "23", "22", "21", "20", "19", "18", "17"];
 export const PRIMARY_UPPER = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
 export const PRIMARY_LOWER = ["T", "S", "R", "Q", "P", "O", "N", "M", "L", "K"];
+export const SUPER_PERMANENT_UPPER = ["51", "52", "53", "54", "55", "56", "57", "58", "59", "60", "61", "62", "63", "64", "65", "66"];
+export const SUPER_PERMANENT_LOWER = ["82", "81", "80", "79", "78", "77", "76", "75", "74", "73", "72", "71", "70", "69", "68", "67"];
+export const SUPER_PRIMARY_UPPER = ["AS", "BS", "CS", "DS", "ES", "FS", "GS", "HS", "IS", "JS"];
+export const SUPER_PRIMARY_LOWER = ["TS", "SS", "RS", "QS", "PS", "OS", "NS", "MS", "LS", "KS"];
 export const PERMANENT_ALL = [...PERMANENT_UPPER, ...PERMANENT_LOWER.slice().reverse()];
 export const PRIMARY_ALL = [...PRIMARY_UPPER, ...PRIMARY_LOWER.slice().reverse()];
 
@@ -75,7 +79,7 @@ export const UPPER_MOUTH_AREAS: MouthArea[] = [
   { id: "fua", label: "FUA", title: "FULL UPPER ARCH [MAXILLARY ARCH-01]", permanent: rangeNums(1, 16), primary: letters("A", "J"), tone: "green" },
   { id: "urq", label: "URQ", title: "UPPER RIGHT QUADRANT [URQ-10]", permanent: rangeNums(1, 8), primary: letters("A", "E"), tone: "red" },
   { id: "urs", label: "URS", title: "UR SEXTANT [03]", permanent: rangeNums(1, 5), primary: letters("A", "B"), tone: "gold" },
-  { id: "uas", label: "UAS", title: "UPPER ANTERIOR SEXTANT [04]", permanent: rangeNums(6, 11), primary: letters("C", "H"), tone: "gold" },
+  { id: "uas", label: "UAS", title: "UPPER ANTERIOR SEXTANT [04]", permanent: rangeNums(6, 11), primary: letters("C", "H"), tone: "green" },
   { id: "uls", label: "ULS", title: "UL SEXTANT [05]", permanent: rangeNums(12, 16), primary: letters("I", "J"), tone: "gold" },
   { id: "ulq", label: "ULQ", title: "UPPER LEFT QUADRANT [ULQ-20]", permanent: rangeNums(9, 16), primary: letters("F", "J"), tone: "red" },
 ];
@@ -83,7 +87,7 @@ export const UPPER_MOUTH_AREAS: MouthArea[] = [
 export const LOWER_MOUTH_AREAS: MouthArea[] = [
   { id: "lrq", label: "LRQ", title: "LOWER RIGHT QUADRANT [LRQ-40]", permanent: rangeNums(25, 32), primary: letters("P", "T"), tone: "red" },
   { id: "lrs", label: "LRS", title: "LR SEXTANT [08]", permanent: rangeNums(28, 32), primary: letters("S", "T"), tone: "gold" },
-  { id: "las", label: "LAS", title: "LOWER ANTERIOR SEXTANT [07]", permanent: rangeNums(22, 27), primary: letters("M", "R"), tone: "gold" },
+  { id: "las", label: "LAS", title: "LOWER ANTERIOR SEXTANT [07]", permanent: rangeNums(22, 27), primary: letters("M", "R"), tone: "green" },
   { id: "lls", label: "LLS", title: "LL SEXTANT [06]", permanent: rangeNums(17, 21), primary: letters("K", "L"), tone: "gold" },
   { id: "llq", label: "LLQ", title: "LOWER LEFT QUADRANT [LLQ-30]", permanent: rangeNums(17, 24), primary: letters("K", "O"), tone: "red" },
   { id: "fla", label: "FLA", title: "FULL LOWER ARCH [MANDIBULAR ARCH-02]", permanent: rangeNums(17, 32), primary: letters("K", "T"), tone: "green" },
@@ -207,7 +211,30 @@ export const ADA_CODES: { code: string; desc: string; type: string }[] = [
 export const SURFACES = ["B/F", "M", "I/O", "D", "L"] as const;
 
 export function toothImage(code: string) {
+  if (/^[A-T]S$/i.test(code) || /^(5[1-9]|6[0-9]|7[0-9]|8[0-2])$/.test(code)) return `/teeth/super/${code.toUpperCase()}.png`;
   return /^[A-T]$/.test(code) ? `/teeth/A-T/${code}.png` : `/teeth/1-32/${code}.png`;
+}
+
+export type ToothShape = "molar" | "premolar" | "canine" | "incisor";
+
+const MOLARS = new Set(["1", "2", "3", "14", "15", "16", "17", "18", "19", "30", "31", "32", "A", "B", "I", "J", "K", "L", "S", "T"]);
+const PREMOLARS = new Set(["4", "5", "12", "13", "20", "21", "28", "29"]);
+const CANINES = new Set(["6", "11", "22", "27", "C", "H", "M", "R"]);
+
+function baseTooth(code: string) {
+  const key = code.toUpperCase();
+  if (/^[A-T]S$/.test(key)) return key[0];
+  const n = Number(key);
+  if (n >= 51 && n <= 82) return String(n - 50);
+  return key;
+}
+
+export function toothShape(code: string): ToothShape {
+  const key = baseTooth(code);
+  if (MOLARS.has(key)) return "molar";
+  if (PREMOLARS.has(key)) return "premolar";
+  if (CANINES.has(key)) return "canine";
+  return "incisor";
 }
 
 export function formatTeeth(codes: string[]) {
@@ -375,6 +402,12 @@ function normalizeSpeech(text: string) {
     .forEach(([word, num]) => {
       next = next.replace(new RegExp(`\\b${word}\\b`, "g"), num);
     });
+  next = next.replace(/\bselect(?:ing)?\s+(?:the\s+)?/g, "");
+  next = next.replace(/\b(?:please|choose|pick|mark)\s+/g, "");
+  next = next.replace(/\b(?:tooth|teeth)\s+(?:numbers?|no\.?|num|#)\b/g, "tooth");
+  next = next.replace(/\b(?:numbers?|no\.?)\s+(?=\d)/g, "tooth ");
+  next = next.replace(/\bsurfaces?\b/g, "surface");
+  next = next.replace(/\b(?:and|or|&|plus)\b/g, ",");
   return next.replace(/\s+/g, " ").trim();
 }
 
@@ -383,32 +416,83 @@ function hasSpeechPhrase(text: string, phrase: string) {
   return new RegExp(`(?:^|\\s)${escaped}(?:\\s|$)`).test(text);
 }
 
+const TOOTH_TOKEN = "(?:3[0-2]|[12]\\d|[1-9]|[a-t])";
+
+function addToothRange(found: Set<string>, from: string, to: string) {
+  const a = Number(from);
+  const b = Number(to);
+  if (!Number.isFinite(a) || !Number.isFinite(b)) {
+    found.add(from.toUpperCase());
+    found.add(to.toUpperCase());
+    return;
+  }
+  const step = a <= b ? 1 : -1;
+  for (let n = a; step > 0 ? n <= b : n >= b; n += step) {
+    if (n >= 1 && n <= 32) found.add(String(n));
+  }
+}
+
 function extractSpeechTeeth(text: string) {
   const found = new Set<string>();
-  const regex = /\b(?:tooth|teeth|number|#)\s+((?:[a-t]|[1-9]|[12]\d|3[0-2])(?:\s*(?:,|and)?\s*(?:[a-t]|[1-9]|[12]\d|3[0-2]))*)/gi;
+  const list = `${TOOTH_TOKEN}(?:\\s*(?:,|to|-)?\\s*${TOOTH_TOKEN})*`;
+  const regex = new RegExp(`\\b(?:tooth|teeth|#)\\s*(${list})`, "gi");
   let match = regex.exec(text);
   while (match) {
-    const tokens = match[1].match(/\b(?:[1-9]|[12]\d|3[0-2]|[a-t])\b/gi) ?? [];
-    tokens.forEach((token) => found.add(token.toUpperCase()));
+    const chunk = match[1];
+    const range = chunk.match(new RegExp(`^(${TOOTH_TOKEN})\\s*(?:to|-)\\s*(${TOOTH_TOKEN})$`, "i"));
+    if (range) {
+      addToothRange(found, range[1], range[2]);
+    } else {
+      const tokens = chunk.match(new RegExp(`\\b${TOOTH_TOKEN}\\b`, "gi")) ?? [];
+      tokens.forEach((token) => found.add(token.toUpperCase()));
+    }
     match = regex.exec(text);
   }
   return Array.from(found);
 }
 
+const SURFACE_MAP: Record<string, string> = {
+  mesial: "M",
+  m: "M",
+  distal: "D",
+  d: "D",
+  buccal: "B/F",
+  facial: "B/F",
+  "b f": "B/F",
+  bf: "B/F",
+  b: "B/F",
+  f: "B/F",
+  lingual: "L",
+  palatal: "L",
+  l: "L",
+  occlusal: "I/O",
+  incisal: "I/O",
+  "i o": "I/O",
+  io: "I/O",
+  i: "I/O",
+  o: "I/O",
+};
+
 function extractSpeechSurfaces(text: string) {
-  const map: Array<[RegExp, string]> = [
-    [/\b(mesial| m )\b/, "M"],
-    [/\b(distal| d )\b/, "D"],
-    [/\b(buccal|facial|b\/f| b | f )\b/, "B/F"],
-    [/\b(lingual|palatal| l )\b/, "L"],
-    [/\b(occlusal|incisal|i\/o| o | i )\b/, "I/O"],
-  ];
-  const padded = ` ${text} `;
-  const surfaces: string[] = [];
-  map.forEach(([pattern, value]) => {
-    if (pattern.test(padded) && !surfaces.includes(value)) surfaces.push(value);
+  const found: string[] = [];
+  const add = (value: string) => {
+    if (!found.includes(value)) found.push(value);
+  };
+
+  (["mesial", "distal", "buccal", "facial", "lingual", "palatal", "occlusal", "incisal"] as const).forEach((name) => {
+    if (new RegExp(`\\b${name}\\b`).test(text)) add(SURFACE_MAP[name]);
   });
-  return surfaces;
+
+  if (/\bsurface\b/.test(text)) {
+    const after = text.split(/\bsurface\b/).slice(1).join(" ");
+    const tokens = after.match(/\b(?:mesial|distal|buccal|facial|lingual|palatal|occlusal|incisal|b\s*f|i\s*o|[bmdliof])\b/g) ?? [];
+    tokens.forEach((token) => {
+      const value = SURFACE_MAP[token.replace(/\s+/g, " ")];
+      if (value) add(value);
+    });
+  }
+
+  return found;
 }
 
 export function parseTxSpeech(spoken: string, buttons: ProcButton[]) {

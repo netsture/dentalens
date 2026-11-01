@@ -2,11 +2,13 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { HelpCircle, Mic, MicOff, X } from "lucide-react";
 import { useAuth } from "@/lib/auth";
+import { findProviderBySpokenName, providerDisplayName } from "@/lib/providers";
 import {
   confirmPhrase,
   dispatchVoiceEvent,
   parseVoiceCommand,
   VOICE_LANGS,
+  type VoiceAction,
   type VoiceLang,
 } from "@/lib/voiceCommands";
 
@@ -32,6 +34,30 @@ function getRecognition(): SpeechRec | null {
 }
 
 const LANG_KEY = "dentsaas-voice-lang";
+const INCOMPLETE_LEAD = /^(please|kindly|can you|could you|i want to|i need to|take me to|navigate to|go to|go|open|opening|show|show me|display|launch|start|switch to)?\s*$/i;
+
+function fullTranscript(event: { results: ArrayLike<{ 0: { transcript: string }; isFinal: boolean }> }) {
+  let text = "";
+  let allFinal = true;
+  for (let i = 0; i < event.results.length; i++) {
+    const result = event.results[i];
+    text += result?.[0]?.transcript ?? "";
+    if (!result?.isFinal) allFinal = false;
+  }
+  return { text: text.replace(/\s+/g, " ").trim(), allFinal };
+}
+
+function resolveAction(spoken: string): VoiceAction {
+  const parsed = parseVoiceCommand(spoken);
+  if (parsed.kind !== "unknown") return parsed;
+  const provider = findProviderBySpokenName(spoken);
+  if (!provider) return parsed;
+  return {
+    kind: "navigate",
+    path: `/provider/${provider.id}`,
+    label: providerDisplayName(provider.name),
+  };
+}
 
 function speak(text: string, lang: VoiceLang) {
   if (!window.speechSynthesis) return;
@@ -55,6 +81,7 @@ export function VoiceCommand() {
   const [compact, setCompact] = useState(false);
   const recRef = useRef<SpeechRec | null>(null);
   const listeningRef = useRef(false);
+  const lastConfirmRef = useRef("");
   const idleTimer = useRef<number>(0);
 
   const bumpActivity = () => {
@@ -88,9 +115,18 @@ export function VoiceCommand() {
   }, [listening, panelOpen]);
 
   const runAction = (spoken: string) => {
-    const action = parseVoiceCommand(spoken);
-    setStatus(confirmPhrase(action, lang));
-    speak(confirmPhrase(action, lang), lang);
+    const heard = spoken.trim().toLowerCase();
+    const lastConfirm = lastConfirmRef.current.toLowerCase();
+    if (lastConfirm && (heard === lastConfirm || lastConfirm.startsWith(heard) || heard === lastConfirm.replace(/^opening\s+/, "open "))) {
+      setStatus(lastConfirmRef.current);
+      return;
+    }
+
+    const action = resolveAction(spoken);
+    const confirm = confirmPhrase(action, lang);
+    lastConfirmRef.current = confirm;
+    setStatus(confirm);
+    speak(confirm, lang);
 
     switch (action.kind) {
       case "navigate":
@@ -161,17 +197,23 @@ export function VoiceCommand() {
       return;
     }
     recRef.current?.abort();
+    window.speechSynthesis?.cancel();
+    lastConfirmRef.current = "";
     rec.lang = lang;
     rec.continuous = false;
     rec.interimResults = true;
     rec.onresult = (event) => {
-      const last = event.results[event.results.length - 1];
-      const text = last?.[0]?.transcript ?? "";
+      const { text, allFinal } = fullTranscript(event);
       setTranscript(text);
-      if (last?.isFinal && text.trim()) {
-        stop();
-        runAction(text);
+      if (!allFinal || !text) return;
+      if (INCOMPLETE_LEAD.test(text)) {
+        setStatus("Listening… say the doctor name");
+        return;
       }
+      listeningRef.current = false;
+      setListening(false);
+      rec.abort();
+      runAction(text);
     };
     rec.onerror = (event) => {
       listeningRef.current = false;
@@ -287,6 +329,8 @@ export function VoiceCommand() {
                 <div className="font-bold mb-1">English</div>
                 <ul className="space-y-1 text-muted-foreground">
                   <li>Go to dashboard</li>
+                  <li>Go to doctor screen</li>
+                  <li>Open Savani Niranjan</li>
                   <li>Open patients</li>
                   <li>Open eligibility</li>
                   <li>Search Morell</li>
