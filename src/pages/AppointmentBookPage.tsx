@@ -44,25 +44,31 @@ const doctors = [
 ];
 
 const sides = [
-  { id: "s1", label: "Side 1", doctorId: "d1" },
-  { id: "s2", label: "Side 2", doctorId: "d1" },
-  { id: "s3", label: "Side 3", doctorId: "d1" },
-  { id: "s4", label: "Side 4", doctorId: "d2" },
-  { id: "s5", label: "Side 5", doctorId: "d2" },
-  { id: "s6", label: "Side 6", doctorId: "d3" },
+  { id: "d1-s1", label: "Side 1", doctorId: "d1" },
+  { id: "d1-s2", label: "Side 2", doctorId: "d1" },
+  { id: "d1-s3", label: "Side 3", doctorId: "d1" },
+  { id: "d2-s1", label: "Side 1", doctorId: "d2" },
+  { id: "d2-s2", label: "Side 2", doctorId: "d2" },
+  { id: "d2-s3", label: "Side 3", doctorId: "d2" },
+  { id: "d2-s4", label: "Side 4", doctorId: "d2" },
+  { id: "d2-s5", label: "Side 5", doctorId: "d2" },
+  { id: "d2-s6", label: "Side 6", doctorId: "d2" },
+  { id: "d3-s1", label: "Side 1", doctorId: "d3" },
+  { id: "d3-s2", label: "Side 2", doctorId: "d3" },
+  { id: "d3-s3", label: "Side 3", doctorId: "d3" },
 ];
 
 const seed: Appointment[] = [
-  { id: "a1", sideId: "s1", start: "09:00", end: "09:30", patient: "JOHNSONN ELLA", type: "AWC 16X22", status: "confirmed", plan: "D", phone: "484-903-7236" },
-  { id: "a2", sideId: "s2", start: "09:00", end: "09:30", patient: "BRAKE ZOIEY", type: "EVAL SPAC", status: "confirmed", plan: "M", phone: "201-616-6586" },
-  { id: "a3", sideId: "s3", start: "09:00", end: "09:30", patient: "BRAKE ZAKAI", type: "EVAL SPAC", status: "confirmed", plan: "M", phone: "201-616-6586" },
-  { id: "a4", sideId: "s1", start: "09:30", end: "10:00", patient: "MCNUTT PHEONIX", type: "AWC .018", status: "allocated", plan: "M", phone: "484-597-1934" },
-  { id: "a5", sideId: "s2", start: "09:30", end: "10:00", patient: "HOLLENBACH OLIVIA", type: "EVAL BITE", status: "allocated", plan: "M", phone: "272-879-9001" },
-  { id: "a6", sideId: "s4", start: "09:30", end: "10:00", patient: "CURRY NEVAEH", type: "NEW PATIENT", status: "message", plan: "L.M", phone: "484-554-6555" },
-  { id: "a7", sideId: "s1", start: "10:00", end: "10:30", patient: "DELGADO GENESIS", type: "AWC", status: "confirmed", plan: "M", phone: "862-247-7212" },
-  { id: "a8", sideId: "s2", start: "10:00", end: "10:30", patient: "BALSECA SAMUEL", type: "NEW PATIENT", status: "confirmed", plan: "M", phone: "201-552-0729" },
-  { id: "a9", sideId: "s5", start: "09:00", end: "10:00", patient: "BLOCKED", type: "Blocked", status: "blocked" },
-  { id: "a10", sideId: "s6", start: "09:00", end: "10:00", patient: "BLOCKED", type: "Out of office", status: "blocked" },
+  { id: "a1", sideId: "d1-s1", start: "09:00", end: "09:30", patient: "JOHNSONN ELLA", type: "AWC 16X22", status: "confirmed", plan: "D", phone: "484-903-7236" },
+  { id: "a2", sideId: "d1-s2", start: "09:00", end: "09:30", patient: "BRAKE ZOIEY", type: "EVAL SPAC", status: "confirmed", plan: "M", phone: "201-616-6586" },
+  { id: "a3", sideId: "d1-s3", start: "09:00", end: "09:30", patient: "BRAKE ZAKAI", type: "EVAL SPAC", status: "confirmed", plan: "M", phone: "201-616-6586" },
+  { id: "a4", sideId: "d1-s1", start: "09:30", end: "10:00", patient: "MCNUTT PHEONIX", type: "AWC .018", status: "allocated", plan: "M", phone: "484-597-1934" },
+  { id: "a5", sideId: "d1-s2", start: "09:30", end: "10:00", patient: "HOLLENBACH OLIVIA", type: "EVAL BITE", status: "allocated", plan: "M", phone: "272-879-9001" },
+  { id: "a6", sideId: "d2-s1", start: "09:30", end: "10:00", patient: "CURRY NEVAEH", type: "NEW PATIENT", status: "message", plan: "L.M", phone: "484-554-6555" },
+  { id: "a7", sideId: "d1-s1", start: "10:00", end: "10:30", patient: "DELGADO GENESIS", type: "AWC", status: "confirmed", plan: "M", phone: "862-247-7212" },
+  { id: "a8", sideId: "d1-s2", start: "10:00", end: "10:30", patient: "BALSECA SAMUEL", type: "NEW PATIENT", status: "confirmed", plan: "M", phone: "201-552-0729" },
+  { id: "a9", sideId: "d2-s2", start: "09:00", end: "10:00", patient: "BLOCKED", type: "Blocked", status: "blocked" },
+  { id: "a10", sideId: "d3-s1", start: "09:00", end: "10:00", patient: "BLOCKED", type: "Out of office", status: "blocked" },
 ];
 
 const times = ["08:00", "08:30", "09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00"];
@@ -707,10 +713,15 @@ export default function AppointmentBookPage() {
               </div>
               <div className="field">
                 <label>Side</label>
-                <select defaultValue="s1">
-                  {sides.map((s) => (
-                    <option key={s.id} value={s.id}>{s.label}</option>
-                  ))}
+                <select defaultValue="d1-s1">
+                  {sides.map((s) => {
+                    const doc = doctors.find((d) => d.id === s.doctorId);
+                    return (
+                      <option key={s.id} value={s.id}>
+                        {s.label} · {doc?.name.replace(/^Dr\.\s*/i, "")}
+                      </option>
+                    );
+                  })}
                 </select>
               </div>
               <div className="field">
