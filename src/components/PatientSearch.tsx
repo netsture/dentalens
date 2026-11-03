@@ -50,7 +50,7 @@ export function PatientSearch() {
   };
 
   return (
-    <div className="relative w-full max-w-[420px]" ref={wrapRef}>
+    <div className="relative w-full max-w-none md:max-w-[420px]" ref={wrapRef}>
       <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
       <input
         type="text"

@@ -40,7 +40,17 @@ const menuItems = SIDEBAR_MENU.map((item) => ({
   icon: menuIcons[item.path] ?? FileText,
 }));
 
-export function Sidebar({ expanded, flyout = false }: { expanded: boolean; flyout?: boolean }) {
+export function Sidebar({
+  expanded,
+  flyout = false,
+  collapsedHidden = false,
+  onNavigate,
+}: {
+  expanded: boolean;
+  flyout?: boolean;
+  collapsedHidden?: boolean;
+  onNavigate?: () => void;
+}) {
   const location = useLocation();
   const [query, setQuery] = useState("");
 
@@ -62,7 +72,7 @@ export function Sidebar({ expanded, flyout = false }: { expanded: boolean; flyou
     <aside
       className={`app-sidebar bg-secondary border-r border-border flex flex-col shrink-0 overflow-hidden transition-[width] duration-200 h-full ${
         flyout ? "absolute inset-y-0 left-0 z-40" : ""
-      } ${expanded ? "w-[240px]" : "w-[52px]"} ${
+      } ${expanded ? "w-[240px]" : collapsedHidden ? "w-0 border-r-0" : "w-[52px]"} ${
         flyout && expanded ? "shadow-[4px_0_16px_rgba(15,23,42,0.12)]" : ""
       }`}
     >
@@ -101,6 +111,7 @@ export function Sidebar({ expanded, flyout = false }: { expanded: boolean; flyou
                   key={item.path}
                   to={item.path}
                   title={item.name}
+                  onClick={onNavigate}
                   className={`sidebar-item ${
                     expanded ? "" : "justify-center px-0"
                   } ${active ? "active" : "text-foreground hover:bg-secondary-hover"}`}

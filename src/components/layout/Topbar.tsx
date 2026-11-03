@@ -26,9 +26,11 @@ import {
 export function Topbar({
   onToggleSidebar,
   sidebarExpanded,
+  compact = false,
 }: {
   onToggleSidebar: () => void;
   sidebarExpanded: boolean;
+  compact?: boolean;
 }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -80,64 +82,75 @@ export function Topbar({
     <header className="topbar bg-card border-b border-border flex items-center shrink-0 relative z-[100]">
       <div
         className={`shrink-0 flex items-center gap-2 h-full border-r border-border transition-[width] duration-200 ${
-          sidebarExpanded ? "w-[240px] pl-3 pr-3" : "w-[52px] justify-center px-1"
+          compact
+            ? "w-auto pl-2 pr-2"
+            : sidebarExpanded
+              ? "w-[240px] pl-3 pr-3"
+              : "w-[52px] justify-center px-1"
         }`}
       >
         <button
           onClick={onToggleSidebar}
-          className="w-7 h-7 flex items-center justify-center rounded-[3px] hover:bg-secondary border-none bg-transparent cursor-pointer text-foreground shrink-0"
+          className="w-8 h-8 flex items-center justify-center rounded-[3px] hover:bg-secondary border-none bg-transparent cursor-pointer text-foreground shrink-0"
           title={sidebarExpanded ? "Collapse sidebar" : "Expand sidebar"}
+          aria-label={sidebarExpanded ? "Collapse sidebar" : "Open sidebar"}
         >
           <Menu className="w-4 h-4" />
         </button>
-        {sidebarExpanded && (
+        {(compact || sidebarExpanded) && (
           <a href="/dashboard" className="flex items-center gap-2 opacity-90 hover:opacity-100 min-w-0">
             <div className="w-7 h-7 rounded-[4px] bg-primary text-primary-foreground font-black text-[11px] flex items-center justify-center shrink-0">
               DL
             </div>
-            <span className="font-bold text-[13px] tracking-tight text-foreground truncate">
+            <span className={`font-bold text-[13px] tracking-tight text-foreground truncate ${compact ? "hidden min-[420px]:inline" : ""}`}>
               DentSaas<span className="font-medium text-primary">.ai</span>
             </span>
           </a>
         )}
       </div>
 
-      <div className="flex-1 grid grid-cols-[1fr_minmax(220px,420px)_1fr] items-center pr-3 h-full min-w-0">
-        <div className="flex items-stretch h-full min-w-0">
-          <button
-            type="button"
-            onClick={() => setShowWorkspace(true)}
-            className="flex flex-col justify-center px-4 h-full border-r border-border bg-secondary/40 min-w-0 border-l-0 border-t-0 border-b-0 cursor-pointer hover:bg-secondary text-left"
-            title="Switch clinic"
-          >
-            <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground leading-none mb-0.5 flex items-center gap-1">
-              <Building className="w-2.5 h-2.5" /> Clinic
-            </span>
-            <span className="text-[12px] font-semibold text-foreground truncate max-w-[160px]">
-              {workspace.clinic}
-            </span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setShowWorkspace(true)}
-            className="hidden md:flex flex-col justify-center px-4 h-full border-r border-border bg-secondary/40 border-l-0 border-t-0 border-b-0 cursor-pointer hover:bg-secondary text-left"
-            title="Switch branch"
-          >
-            <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground leading-none mb-0.5 flex items-center gap-1">
-              <MapPin className="w-2.5 h-2.5" /> Branch
-            </span>
-            <span className="text-[12px] text-muted-foreground truncate max-w-[140px]">
-              {workspace.branch}
-            </span>
-          </button>
-        </div>
+      <div
+        className={`flex-1 items-center pr-2 sm:pr-3 h-full min-w-0 ${
+          compact ? "flex gap-2" : "grid grid-cols-[1fr_minmax(160px,420px)_1fr]"
+        }`}
+      >
+        {!compact && (
+          <div className="flex items-stretch h-full min-w-0">
+            <button
+              type="button"
+              onClick={() => setShowWorkspace(true)}
+              className="flex flex-col justify-center px-4 h-full border-r border-border bg-secondary/40 min-w-0 border-l-0 border-t-0 border-b-0 cursor-pointer hover:bg-secondary text-left"
+              title="Switch clinic"
+            >
+              <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground leading-none mb-0.5 flex items-center gap-1">
+                <Building className="w-2.5 h-2.5" /> Clinic
+              </span>
+              <span className="text-[12px] font-semibold text-foreground truncate max-w-[160px]">
+                {workspace.clinic}
+              </span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowWorkspace(true)}
+              className="hidden md:flex flex-col justify-center px-4 h-full border-r border-border bg-secondary/40 border-l-0 border-t-0 border-b-0 cursor-pointer hover:bg-secondary text-left"
+              title="Switch branch"
+            >
+              <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground leading-none mb-0.5 flex items-center gap-1">
+                <MapPin className="w-2.5 h-2.5" /> Branch
+              </span>
+              <span className="text-[12px] text-muted-foreground truncate max-w-[140px]">
+                {workspace.branch}
+              </span>
+            </button>
+          </div>
+        )}
 
-        <div className="flex justify-center px-2 min-w-0">
+        <div className={`flex justify-center px-1 sm:px-2 min-w-0 ${compact ? "flex-1" : ""}`}>
           <PatientSearch />
         </div>
 
-        <div className="flex items-center justify-end gap-1.5">
-          <div className="w-px h-6 bg-border mx-1 shrink-0" />
+        <div className="flex items-center justify-end gap-0.5 sm:gap-1.5 shrink-0">
+          <div className="hidden sm:block w-px h-6 bg-border mx-1 shrink-0" />
 
           <button
             type="button"
@@ -146,7 +159,7 @@ export function Topbar({
             onClick={() => setShowSupport(true)}
           >
             <CircleHelp className="w-3.5 h-3.5" />
-            Support
+            <span className="hidden lg:inline">Support</span>
           </button>
 
           <button className="relative w-9 h-9 flex items-center justify-center rounded-full hover:bg-secondary border-none bg-transparent cursor-pointer">
@@ -179,7 +192,7 @@ export function Topbar({
             </button>
 
             {showProfile && (
-              <div className="absolute right-0 top-full mt-1 w-[240px] bg-card border border-border rounded-[4px] shadow-lg p-2 flex flex-col gap-2 z-[1010]">
+              <div className="absolute right-0 top-full mt-1 w-[min(240px,calc(100vw-16px))] bg-card border border-border rounded-[4px] shadow-lg p-2 flex flex-col gap-2 z-[1010]">
                 <div className="flex items-center gap-2 pb-2">
                   <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground font-bold text-[12px] flex items-center justify-center shrink-0">
                     {initials}

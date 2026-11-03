@@ -139,7 +139,7 @@ export function TableToolbar({
   return (
     <header className={`flex flex-col gap-2 shrink-0 ${className}`}>
       <div className="flex items-center justify-between gap-3 w-full flex-wrap">
-        <div className="relative flex items-center w-full max-w-[320px] min-w-[180px]">
+        <div className="relative flex items-center w-full min-w-0 sm:max-w-[320px] sm:min-w-[180px]">
           <Search className="w-3.5 h-3.5 absolute left-2 text-muted-foreground pointer-events-none" />
           <input
             type="text"

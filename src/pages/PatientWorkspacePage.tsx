@@ -367,7 +367,40 @@ export default function PatientWorkspacePage() {
         </aside>
 
         <main className="flex-1 min-w-0 overflow-auto">
-          <div className="flex items-center justify-between gap-2 mb-2">
+          <div className="md:hidden mb-2">
+            <div className="field">
+              <label>Section</label>
+              <select
+                value={section}
+                onChange={(event) => {
+                  const key = event.target.value;
+                  if (key === "printform") {
+                    navigate(`/patient/printform/${patientId}`);
+                    return;
+                  }
+                  if (key === "billing") {
+                    navigate(`/patient/billing${idQuery}`);
+                    return;
+                  }
+                  navigate(`/patient/${key}${idQuery}`);
+                }}
+              >
+                <optgroup label="Patient">
+                  {sections.map((item) => (
+                    <option key={item.key} value={item.key}>{item.label}</option>
+                  ))}
+                  <option value="printform">Print Form</option>
+                </optgroup>
+                <optgroup label="Account">
+                  {accountSections.map((item) => (
+                    <option key={item.key} value={item.key}>{item.label}</option>
+                  ))}
+                  <option value="billing">Billing</option>
+                </optgroup>
+              </select>
+            </div>
+          </div>
+          <div className="flex items-center justify-between gap-2 mb-2 flex-wrap">
             <div className="flex items-center gap-2">
               <active.icon className="w-4 h-4 text-primary" />
               <h2 className="text-[13px] font-bold">{section === "appointment" ? "Appointment History" : active.label}</h2>

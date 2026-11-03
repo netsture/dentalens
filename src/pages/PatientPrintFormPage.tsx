@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, Navigate, useParams } from "react-router-dom";
+import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
 import {
   AlertTriangle,
   BookOpen,
@@ -37,6 +37,7 @@ const workspaceNav = [
 
 export default function PatientPrintFormPage() {
   const { patientId = "" } = useParams();
+  const navigate = useNavigate();
   const patient = getPatientById(patientId);
   const [lang, setLang] = useState<FormLang>("en");
   const [openGroups, setOpenGroups] = useState<string[]>([]);
@@ -147,6 +148,43 @@ export default function PatientPrintFormPage() {
         </aside>
 
         <main className="flex-1 min-w-0 overflow-auto flex flex-col gap-2">
+          <div className="md:hidden">
+            <div className="field">
+              <label>Section</label>
+              <select
+                defaultValue="printform"
+                onChange={(event) => {
+                  const key = event.target.value;
+                  if (key === "printform") return;
+                  if (key === "billing") {
+                    navigate(`/patient/billing${idQuery}`);
+                    return;
+                  }
+                  if (key === "ledger") {
+                    navigate(`/patient/ledger${idQuery}`);
+                    return;
+                  }
+                  if (key === "accounts") {
+                    navigate(`/patient/accounts${idQuery}`);
+                    return;
+                  }
+                  const item = workspaceNav.find((entry) => entry.key === key);
+                  navigate(`${item?.path ?? "/patient/overview"}${idQuery}`);
+                }}
+              >
+                <optgroup label="Patient">
+                  {workspaceNav.map((item) => (
+                    <option key={item.key} value={item.key}>{item.label}</option>
+                  ))}
+                </optgroup>
+                <optgroup label="Account">
+                  <option value="ledger">Ledger</option>
+                  <option value="accounts">Accounts</option>
+                  <option value="billing">Billing</option>
+                </optgroup>
+              </select>
+            </div>
+          </div>
           <div className="flex flex-col items-start gap-2">
             <div className="flex items-center gap-2">
               <Printer className="w-4 h-4 text-primary" />

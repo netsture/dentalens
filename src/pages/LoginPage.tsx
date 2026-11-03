@@ -63,7 +63,7 @@ export default function LoginPage() {
     <div className="w-full flex flex-col lg:flex-row font-sans min-h-screen">
       
 
-      <div className="flex-1 flex flex-col items-center bg-[#f3f9fa] px-4 sm:px-6 py-8 sm:py-10 sticky top-0 h-screen overflow-y-auto">
+      <div className="flex-1 flex flex-col items-center bg-[#f3f9fa] px-4 sm:px-6 py-8 sm:py-10 lg:sticky lg:top-0 min-h-dvh lg:h-screen overflow-y-auto">
         <div className="w-full max-w-[420px] flex flex-col my-auto py-4">
           <div className="lg:hidden flex items-center gap-2 mb-8">
             <Link to="/" className="flex items-center gap-2">

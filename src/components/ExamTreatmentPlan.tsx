@@ -1115,7 +1115,7 @@ export function ExamTreatmentPlan({
 
       <section className="panel p-2">
         <div className="flex items-center justify-between gap-2 mb-2 flex-wrap">
-          <div className="relative flex items-center w-full max-w-[320px] min-w-[180px]">
+          <div className="relative flex items-center w-full min-w-0 sm:max-w-[320px] sm:min-w-[180px]">
             <input
               type="text"
               placeholder="Search exam / need…"

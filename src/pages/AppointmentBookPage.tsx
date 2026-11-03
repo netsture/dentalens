@@ -500,7 +500,7 @@ export default function AppointmentBookPage() {
             </div>
 
             <div className="p-3 flex flex-col gap-3">
-              <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
                 {[
                   ["Patient ID", patientExtras[selected.patient]?.id ?? selected.id.replace("a", "16")],
                   ["Patient Name", selected.patient],
@@ -695,7 +695,7 @@ export default function AppointmentBookPage() {
               <div className="panel-title">Book Appointment</div>
               <button className="btn" onClick={() => setShowBook(false)}>Close</button>
             </div>
-            <div className="p-4 grid grid-cols-2 gap-3">
+            <div className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="field col-span-2">
                 <label>Patient</label>
                 <input
