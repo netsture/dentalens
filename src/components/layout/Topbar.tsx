@@ -251,10 +251,17 @@ export function Topbar({
                           }`}
                         >
                           <span
-                            className={`relative w-4 h-4 rounded-full shrink-0 ring-1 ${
-                              selected ? "ring-foreground/40" : "ring-border"
-                            }`}
-                            style={{ backgroundColor: t.swatch }}
+                            className={`relative shrink-0 ring-1 ${
+                              t.icon === "bar"
+                                ? "w-7 h-3.5 rounded-[2px]"
+                                : t.icon === "palette"
+                                  ? "w-4 h-4 rounded-[2px]"
+                                  : "w-4 h-4 rounded-full"
+                            } ${selected ? "ring-foreground/40" : "ring-border"}`}
+                            style={{
+                              backgroundColor: t.swatch,
+                              backgroundImage: t.gradient,
+                            }}
                           >
                             {selected ? (
                               <Check

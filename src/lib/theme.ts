@@ -1,4 +1,14 @@
-export type AppTheme = "blue" | "green" | "orange" | "teal" | "slate" | "light-green" | "coral" | "lime";
+export type AppTheme =
+  | "blue"
+  | "green"
+  | "orange"
+  | "teal"
+  | "slate"
+  | "light-green"
+  | "coral"
+  | "lime"
+  | "ocean"
+  | "jade";
 
 export const THEMES: {
   id: AppTheme;
@@ -7,6 +17,10 @@ export const THEMES: {
   swatch: string;
   /** Check-mark color on the swatch */
   check: string;
+  /** Optional gradient fill for the profile-menu icon */
+  gradient?: string;
+  /** Profile-menu icon shape. Defaults to a solid circle. */
+  icon?: "bar" | "palette";
 }[] = [
   { id: "blue", label: "Blue", swatch: "#1a3a5c", check: "#ffffff" },
   { id: "green", label: "Green", swatch: "#1f6b4a", check: "#ffffff" },
@@ -16,6 +30,22 @@ export const THEMES: {
   { id: "light-green", label: "Light green", swatch: "#86C56A", check: "#1a3314" },
   { id: "coral", label: "Coral", swatch: "#FF6C60", check: "#ffffff" },
   { id: "lime", label: "Lime", swatch: "#c9f279", check: "#2a3d0c" },
+  {
+    id: "ocean",
+    label: "Ocean",
+    swatch: "#1789A8",
+    check: "#ffffff",
+    gradient: "linear-gradient(90deg, #14A59E 0%, #1789A8 50%, #1C6FB1 100%)",
+    icon: "bar",
+  },
+  {
+    id: "jade",
+    label: "Jade",
+    swatch: "#07866D",
+    check: "#ffffff",
+    icon: "bar",
+    gradient: "linear-gradient(90deg, #174B3D 0%, #07866D 50%, #36C9A0 100%)",
+  },
 ];
 
 export const THEME_STORAGE_KEY = "dl-theme";

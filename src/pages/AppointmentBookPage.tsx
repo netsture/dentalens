@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState, type MouseEvent } from "react";
 import {
   AlertTriangle,
   Ban,
@@ -7,6 +7,7 @@ import {
   ChevronRight,
   Clock,
   FileText,
+  Info,
   LayoutGrid,
   List as ListIcon,
   Mail,
@@ -27,6 +28,7 @@ import { getPatientById } from "@/lib/patients";
 
 type Appointment = {
   id: string;
+  day: string;
   sideId: string;
   start: string;
   end: string;
@@ -36,6 +38,21 @@ type Appointment = {
   plan?: string;
   phone?: string;
 };
+
+function toDayKey(value: Date) {
+  const month = String(value.getMonth() + 1).padStart(2, "0");
+  const day = String(value.getDate()).padStart(2, "0");
+  return `${value.getFullYear()}-${month}-${day}`;
+}
+
+function parseDay(value: string) {
+  const [year, month, day] = value.split("-").map(Number);
+  return new Date(year, (month || 1) - 1, day || 1);
+}
+
+function isSameDay(a: Date, b: Date) {
+  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+}
 
 const doctors = [
   { id: "d1", name: "Dr. Rollins Thomas" },
@@ -58,7 +75,7 @@ const sides = [
   { id: "d3-s3", label: "Side 3", doctorId: "d3" },
 ];
 
-const seed: Appointment[] = [
+const seed: Omit<Appointment, "day">[] = [
   { id: "a1", sideId: "d1-s1", start: "09:00", end: "09:30", patient: "JOHNSONN ELLA", type: "AWC 16X22", status: "confirmed", plan: "D", phone: "484-903-7236" },
   { id: "a2", sideId: "d1-s2", start: "09:00", end: "09:30", patient: "BRAKE ZOIEY", type: "EVAL SPAC", status: "confirmed", plan: "M", phone: "201-616-6586" },
   { id: "a3", sideId: "d1-s3", start: "09:00", end: "09:30", patient: "BRAKE ZAKAI", type: "EVAL SPAC", status: "confirmed", plan: "M", phone: "201-616-6586" },
@@ -113,6 +130,162 @@ function statusClass(status: Appointment["status"]) {
   return "slot-blocked";
 }
 
+function toMinutes(value: string) {
+  const [hour, minute] = value.split(":").map(Number);
+  return hour * 60 + minute;
+}
+
+function addMinutes(value: string, minutes: number) {
+  const total = toMinutes(value) + minutes;
+  const hour = Math.floor((((total % (24 * 60)) + 24 * 60) % (24 * 60)) / 60);
+  const minute = ((total % 60) + 60) % 60;
+  return `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
+}
+
+function slotLength(appt: Appointment) {
+  const length = toMinutes(appt.end) - toMinutes(appt.start);
+  return length > 0 ? length : 30;
+}
+
+type SlotTarget = { sideId: string; time: string };
+type BookMenu =
+  | { kind: "appt"; x: number; y: number; appt: Appointment }
+  | { kind: "slot"; x: number; y: number; slot: SlotTarget };
+
+function menuPoint(event: MouseEvent) {
+  return {
+    x: Math.min(event.clientX, window.innerWidth - 400),
+    y: Math.min(event.clientY, window.innerHeight - 168),
+  };
+}
+
+function BookCalendar({
+  value,
+  onSelect,
+  floating = true,
+  title,
+}: {
+  value: Date;
+  onSelect: (next: Date) => void;
+  floating?: boolean;
+  title?: string;
+}) {
+  const [month, setMonth] = useState(() => new Date(value.getFullYear(), value.getMonth(), 1));
+  const year = month.getFullYear();
+  const monthIndex = month.getMonth();
+  const firstWeekday = new Date(year, monthIndex, 1).getDay();
+  const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+  const cells = [
+    ...Array.from({ length: firstWeekday }, () => null),
+    ...Array.from({ length: daysInMonth }, (_, index) => index + 1),
+  ];
+  const today = new Date();
+
+  return (
+    <div className={`${floating ? "absolute left-0 top-full mt-1 z-30" : "relative"} w-[248px] bg-card border border-border rounded-[4px] shadow-lg p-2`}>
+      {title ? <div className="text-[11px] font-bold text-foreground px-0.5 pb-2">{title}</div> : null}
+      <div className="flex items-center justify-between gap-1 mb-2">
+        <button
+          type="button"
+          className="btn h-7 w-7 px-0"
+          aria-label="Previous month"
+          onClick={() => setMonth(new Date(year, monthIndex - 1, 1))}
+        >
+          <ChevronLeft className="w-3.5 h-3.5" />
+        </button>
+        <div className="text-[12px] font-bold text-foreground">
+          {month.toLocaleDateString("en-US", { month: "long", year: "numeric" })}
+        </div>
+        <button
+          type="button"
+          className="btn h-7 w-7 px-0"
+          aria-label="Next month"
+          onClick={() => setMonth(new Date(year, monthIndex + 1, 1))}
+        >
+          <ChevronRight className="w-3.5 h-3.5" />
+        </button>
+      </div>
+      <div className="grid grid-cols-7 gap-0.5 text-center">
+        {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((label) => (
+          <div key={label} className="h-6 text-[10px] font-bold text-muted-foreground leading-6">
+            {label}
+          </div>
+        ))}
+        {cells.map((day, index) => {
+          if (!day) return <div key={`empty-${index}`} className="h-7" />;
+          const cellDate = new Date(year, monthIndex, day);
+          const selected = isSameDay(cellDate, value);
+          const isToday = isSameDay(cellDate, today);
+          return (
+            <button
+              key={day}
+              type="button"
+              onClick={() => onSelect(cellDate)}
+              className={`h-7 rounded-[3px] border cursor-pointer text-[11px] font-semibold ${
+                selected
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : isToday
+                    ? "bg-primary/10 text-primary border-primary/40"
+                    : "bg-transparent text-foreground border-transparent hover:bg-secondary"
+              }`}
+            >
+              {day}
+            </button>
+          );
+        })}
+      </div>
+      <button
+        type="button"
+        className="btn w-full mt-2"
+        onClick={() => onSelect(new Date())}
+      >
+        Today
+      </button>
+    </div>
+  );
+}
+
+function MenuButton({
+  label,
+  onClick,
+  danger = false,
+  hint,
+}: {
+  label: string;
+  onClick: () => void;
+  danger?: boolean;
+  hint?: string;
+}) {
+  return (
+    <div className="relative flex items-center hover:bg-secondary">
+      <button
+        type="button"
+        className={`flex-1 text-left px-3 h-7 text-[12px] font-medium border-none bg-transparent cursor-pointer ${
+          danger ? "text-destructive" : "text-foreground"
+        }`}
+        onClick={onClick}
+      >
+        {label}
+      </button>
+      {hint ? (
+        <span
+          className="group relative shrink-0 mr-2 flex items-center"
+          onMouseDown={(event) => event.stopPropagation()}
+          onClick={(event) => event.stopPropagation()}
+        >
+          <Info className="w-3.5 h-3.5 text-[#e1a347]" aria-label="How Move works" />
+          <span
+            role="tooltip"
+            className="hidden group-hover:block absolute left-full top-1/2 z-[2300] ml-2 w-[190px] -translate-y-1/2 px-2 py-1.5 rounded-[3px] border border-[#e1a347] bg-[#fdf1dd] text-[10px] font-normal leading-snug text-foreground shadow-md whitespace-normal"
+          >
+            {hint}
+          </span>
+        </span>
+      ) : null}
+    </div>
+  );
+}
+
 export default function AppointmentBookPage() {
   const [searchParams] = useSearchParams();
   const bookedPatient = getPatientById(searchParams.get("id") || "");
@@ -129,21 +302,35 @@ export default function AppointmentBookPage() {
   const [rescheduleNotice, setRescheduleNotice] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState("all");
   const [refreshing, setRefreshing] = useState(false);
-  const [tick, setTick] = useState(0);
+  const [allAppointments, setAllAppointments] = useState<Appointment[]>(() => {
+    const day = toDayKey(new Date());
+    return seed.map((appt) => ({ ...appt, day }));
+  });
+  const [movingId, setMovingId] = useState<string | null>(null);
+  const [draggingId, setDraggingId] = useState<string | null>(null);
+  const draggingRef = useRef<string | null>(null);
+  const skipClickRef = useRef(false);
+  const [dropKey, setDropKey] = useState<string | null>(null);
+  const [menu, setMenu] = useState<BookMenu | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
+  const [calendarOpen, setCalendarOpen] = useState(false);
+  const [moveToDate, setMoveToDate] = useState<{ appt: Appointment; x: number; y: number } | null>(null);
+  const calendarRef = useRef<HTMLDivElement>(null);
+  const moveDateRef = useRef<HTMLDivElement>(null);
 
   const visibleSides = useMemo(
     () => (doctorFilter === "all" ? sides : sides.filter((s) => s.doctorId === doctorFilter)),
     [doctorFilter]
   );
 
+  const selectedDay = toDayKey(date);
   const bookDateLabel = `${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}-${date.getFullYear()}`;
 
   const providerDisplayName = (name: string) =>
     `${name.replace(/^Dr\.\s*/i, "").toUpperCase()} (DOCTOR)`;
 
   const appointments = useMemo(() => {
-    void tick;
-    let list = seed;
+    let list = allAppointments.filter((appt) => appt.day === selectedDay);
     if (statusFilter !== "all") {
       list = list.filter((a) => a.status === statusFilter);
     }
@@ -152,7 +339,9 @@ export default function AppointmentBookPage() {
     return list.filter(
       (a) => a.patient.toLowerCase().includes(q) || a.type.toLowerCase().includes(q)
     );
-  }, [search, statusFilter, tick]);
+  }, [allAppointments, search, selectedDay, statusFilter]);
+
+  const movingAppointment = allAppointments.find((appt) => appt.id === movingId) ?? null;
 
   const providerGroups = useMemo(() => {
     return doctors
@@ -172,9 +361,21 @@ export default function AppointmentBookPage() {
   }, [visibleSides, appointments]);
 
   useEffect(() => {
-    if (!selected && !showBook && !showReschedule) return;
+    if (!selected && !showBook && !showReschedule && !menu && !calendarOpen && !moveToDate) return;
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
+        if (menu) {
+          setMenu(null);
+          return;
+        }
+        if (moveToDate) {
+          setMoveToDate(null);
+          return;
+        }
+        if (calendarOpen) {
+          setCalendarOpen(false);
+          return;
+        }
         if (showReschedule) {
           setShowReschedule(false);
           return;
@@ -185,14 +386,107 @@ export default function AppointmentBookPage() {
     };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
-  }, [selected, showBook, showReschedule]);
+  }, [selected, showBook, showReschedule, menu, calendarOpen, moveToDate]);
+
+  useEffect(() => {
+    if (!moveToDate) return;
+    const onDoc = (event: globalThis.MouseEvent) => {
+      if (moveDateRef.current && !moveDateRef.current.contains(event.target as Node)) {
+        setMoveToDate(null);
+      }
+    };
+    document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
+  }, [moveToDate]);
+
+  useEffect(() => {
+    if (!calendarOpen) return;
+    const onDoc = (event: globalThis.MouseEvent) => {
+      if (calendarRef.current && !calendarRef.current.contains(event.target as Node)) {
+        setCalendarOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
+  }, [calendarOpen]);
+
+  useEffect(() => {
+    if (!menu) return;
+    const close = () => setMenu(null);
+    window.addEventListener("mousedown", close);
+    window.addEventListener("scroll", close, true);
+    return () => {
+      window.removeEventListener("mousedown", close);
+      window.removeEventListener("scroll", close, true);
+    };
+  }, [menu]);
 
   const handleRefresh = () => {
     setRefreshing(true);
-    setTimeout(() => {
-      setTick((t) => t + 1);
-      setRefreshing(false);
-    }, 400);
+    setTimeout(() => setRefreshing(false), 400);
+  };
+
+  const slotTaken = (sideId: string, time: string, ignoreId?: string) =>
+    allAppointments.some(
+      (appt) => appt.id !== ignoreId && appt.day === selectedDay && appt.sideId === sideId && appt.start === time
+    );
+
+  const moveAppointment = (id: string, sideId: string, start: string) => {
+    const current = allAppointments.find((appt) => appt.id === id);
+    if (!current || current.status === "blocked") return;
+    if (current.sideId === sideId && current.start === start && current.day === selectedDay) {
+      setMovingId(null);
+      setMenu(null);
+      return;
+    }
+    if (slotTaken(sideId, start, id)) {
+      setMenu(null);
+      setNotice("That slot is already booked.");
+      return;
+    }
+    const end = addMinutes(start, slotLength(current));
+    const next = { ...current, day: selectedDay, sideId, start, end };
+    setAllAppointments((list) => list.map((appt) => (appt.id === id ? next : appt)));
+    setSelected((open) => (open?.id === id ? next : open));
+    setMovingId(null);
+    setDraggingId(null);
+    setDropKey(null);
+    setMenu(null);
+    const side = sides.find((item) => item.id === sideId);
+    setNotice(`Moved ${current.patient} to ${side?.label ?? "slot"} at ${formatTime12(start)} on ${bookDateLabel}.`);
+  };
+
+  const cancelAppointment = (appt: Appointment) => {
+    setAllAppointments((list) => list.filter((item) => item.id !== appt.id));
+    setSelected((open) => (open?.id === appt.id ? null : open));
+    setMovingId((current) => (current === appt.id ? null : current));
+    setShowReschedule(false);
+    setMenu(null);
+    setNotice(`Cancelled ${appt.patient}'s appointment.`);
+  };
+
+  const openReschedule = (appt: Appointment) => {
+    setSelected(appt);
+    setOtherType([]);
+    setRemarks("");
+    setCollect("");
+    setRescheduleNotice(null);
+    setShowReschedule(true);
+    setMenu(null);
+  };
+
+  const openApptMenu = (event: MouseEvent, appt: Appointment) => {
+    if (appt.status === "blocked") return;
+    event.preventDefault();
+    event.stopPropagation();
+    setMenu({ kind: "appt", ...menuPoint(event), appt });
+  };
+
+  const openSlotMenu = (event: MouseEvent, slot: SlotTarget) => {
+    if (!movingAppointment) return;
+    event.preventDefault();
+    event.stopPropagation();
+    setMenu({ kind: "slot", ...menuPoint(event), slot });
   };
 
   const dateLabel = date.toLocaleDateString("en-US", {
@@ -203,9 +497,24 @@ export default function AppointmentBookPage() {
   });
 
   const shiftDay = (delta: number) => {
-    const next = new Date(date);
-    next.setDate(next.getDate() + delta);
+    const next = new Date(date.getFullYear(), date.getMonth(), date.getDate() + delta);
     setDate(next);
+  };
+
+  const chooseDate = (next: Date) => {
+    setDate(new Date(next.getFullYear(), next.getMonth(), next.getDate()));
+    setCalendarOpen(false);
+  };
+
+  const moveAppointmentToDate = (appt: Appointment, nextDate: Date) => {
+    const target = new Date(nextDate.getFullYear(), nextDate.getMonth(), nextDate.getDate());
+    setMovingId(appt.id);
+    setView("grid");
+    setNotice(null);
+    setDate(target);
+    setMoveToDate(null);
+    setMenu(null);
+    setCalendarOpen(false);
   };
 
   const findSlot = (sideId: string, time: string) =>
@@ -220,16 +529,26 @@ export default function AppointmentBookPage() {
             {bookedPatient.name} (#{bookedPatient.id})
           </span>
         )}
-        <div className="flex items-center gap-1 border border-border rounded-[3px] overflow-hidden">
-          <button type="button" className="btn rounded-none border-0 h-7" onClick={() => shiftDay(-1)}>
-            <ChevronLeft className="w-3.5 h-3.5" />
-          </button>
-          <button type="button" className="btn rounded-none border-0 h-7 min-w-[150px]" onClick={() => setDate(new Date())}>
-            {dateLabel}
-          </button>
-          <button type="button" className="btn rounded-none border-0 h-7" onClick={() => shiftDay(1)}>
-            <ChevronRight className="w-3.5 h-3.5" />
-          </button>
+        <div className="relative" ref={calendarRef}>
+          <div className="flex items-center gap-1 border border-border rounded-[3px] overflow-hidden">
+            <button type="button" className="btn rounded-none border-0 h-7" aria-label="Previous day" onClick={() => shiftDay(-1)}>
+              <ChevronLeft className="w-3.5 h-3.5" />
+            </button>
+            <button
+              type="button"
+              className="btn rounded-none border-0 h-7 min-w-[150px]"
+              aria-label="Open calendar"
+              aria-expanded={calendarOpen}
+              onClick={() => setCalendarOpen((open) => !open)}
+            >
+              <CalendarDays className="w-3.5 h-3.5" />
+              {dateLabel}
+            </button>
+            <button type="button" className="btn rounded-none border-0 h-7" aria-label="Next day" onClick={() => shiftDay(1)}>
+              <ChevronRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+          {calendarOpen ? <BookCalendar key={selectedDay} value={date} onSelect={chooseDate} /> : null}
         </div>
       </div>
 
@@ -280,6 +599,24 @@ export default function AppointmentBookPage() {
           </>
         }
       />
+
+      {movingAppointment ? (
+        <div className="panel px-3 py-2 text-[12px] flex items-center justify-between gap-2">
+          <span>
+            Moving <strong>{movingAppointment.patient}</strong>. Right-click an open slot and choose <strong>Move Here</strong>.
+          </span>
+          <button type="button" className="btn" onClick={() => setMovingId(null)}>
+            Clear
+          </button>
+        </div>
+      ) : notice ? (
+        <div className="panel px-3 py-2 text-[12px] flex items-center justify-between gap-2">
+          <span>{notice}</span>
+          <button type="button" className="btn" onClick={() => setNotice(null)}>
+            Close
+          </button>
+        </div>
+      ) : null}
 
       <div className="flex-1 min-h-0">
         <div className="panel flex flex-col min-h-0 h-full overflow-hidden">
@@ -358,12 +695,58 @@ export default function AppointmentBookPage() {
                           </td>
                           {group.sides.map((s) => {
                             const appt = findSlot(s.id, t);
+                            const key = `${s.id}|${t}`;
                             return (
-                              <td key={s.id} className="p-1 align-top h-[44px]">
+                              <td
+                                key={s.id}
+                                className={`p-1 align-top h-[44px] ${dropKey === key ? "bg-primary/10" : ""}`}
+                                onDragOver={(event) => {
+                                  const id = draggingRef.current;
+                                  if (!id || slotTaken(s.id, t, id)) return;
+                                  event.preventDefault();
+                                  setDropKey(key);
+                                }}
+                                onDragLeave={() => setDropKey((current) => (current === key ? null : current))}
+                                onDrop={(event) => {
+                                  event.preventDefault();
+                                  const id = event.dataTransfer.getData("text/plain") || draggingRef.current;
+                                  if (id) moveAppointment(id, s.id, t);
+                                  draggingRef.current = null;
+                                  setDraggingId(null);
+                                  setDropKey(null);
+                                }}
+                              >
                                 {appt ? (
                                   <button
-                                    onClick={() => setSelected(appt)}
-                                    className={`w-full text-left px-1.5 py-1 rounded-[2px] border-none cursor-pointer ${statusClass(appt.status)}`}
+                                    draggable={appt.status !== "blocked"}
+                                    onDragStart={(event) => {
+                                      if (appt.status === "blocked") return;
+                                      event.dataTransfer.setData("text/plain", appt.id);
+                                      event.dataTransfer.effectAllowed = "move";
+                                      draggingRef.current = appt.id;
+                                      skipClickRef.current = true;
+                                      setDraggingId(appt.id);
+                                      setMenu(null);
+                                    }}
+                                    onDragEnd={() => {
+                                      draggingRef.current = null;
+                                      setDraggingId(null);
+                                      setDropKey(null);
+                                      window.setTimeout(() => {
+                                        skipClickRef.current = false;
+                                      }, 50);
+                                    }}
+                                    onClick={() => {
+                                      if (skipClickRef.current) return;
+                                      setSelected(appt);
+                                    }}
+                                    onContextMenu={(event) => openApptMenu(event, appt)}
+                                    title={appt.status === "blocked" ? appt.type : "Drag to another slot, or right-click for options"}
+                                    className={`w-full text-left px-1.5 py-1 rounded-[2px] border-none ${
+                                      appt.status === "blocked" ? "cursor-default" : "cursor-grab active:cursor-grabbing"
+                                    } ${statusClass(appt.status)} ${
+                                      draggingId === appt.id ? "opacity-50" : ""
+                                    } ${movingId === appt.id ? "ring-2 ring-primary" : ""}`}
                                   >
                                     <div className="text-[10px] font-bold truncate">{appt.patient}</div>
                                     <div className="text-[9px] text-muted-foreground truncate">
@@ -373,8 +756,9 @@ export default function AppointmentBookPage() {
                                 ) : (
                                   <button
                                     onClick={() => setShowBook(true)}
+                                    onContextMenu={(event) => openSlotMenu(event, { sideId: s.id, time: t })}
                                     className="w-full h-full min-h-[36px] border border-dashed border-transparent hover:border-border hover:bg-secondary/60 rounded-[2px] cursor-pointer bg-transparent"
-                                    title="Book slot"
+                                    title={movingAppointment ? "Right-click to move the appointment here" : "Book slot"}
                                   />
                                 )}
                               </td>
@@ -404,7 +788,12 @@ export default function AppointmentBookPage() {
                   {appointments
                     .filter((a) => a.status !== "blocked")
                     .map((a) => (
-                      <tr key={a.id} className="cursor-pointer" onClick={() => setSelected(a)}>
+                      <tr
+                        key={a.id}
+                        className="cursor-pointer"
+                        onClick={() => setSelected(a)}
+                        onContextMenu={(event) => openApptMenu(event, a)}
+                      >
                         <td className="font-semibold">
                           {formatTime12(a.start)}–{formatTime12(a.end)}
                         </td>
@@ -423,6 +812,66 @@ export default function AppointmentBookPage() {
           )}
         </div>
       </div>
+
+      {menu && (
+        <div
+          className="fixed z-[2200] min-w-[168px] bg-card border border-border rounded-[4px] shadow-lg py-1"
+          style={{ left: menu.x, top: menu.y }}
+          onMouseDown={(event) => event.stopPropagation()}
+        >
+          {menu.kind === "appt" ? (
+            <>
+              <MenuButton label="Details" onClick={() => { setSelected(menu.appt); setMenu(null); }} />
+              <MenuButton
+                label="Move"
+                hint="Click Move, go to other date and time,then right-click an open slot and choose Move Here. You can also drag the appointment onto an open slot on same date."
+                onClick={() => {
+                  setMovingId(menu.appt.id);
+                  setNotice(null);
+                  setView("grid");
+                  setMenu(null);
+                }}
+              />
+              <MenuButton
+                label="Move to Date"
+                onClick={() => {
+                  setMoveToDate({
+                    appt: menu.appt,
+                    x: Math.min(menu.x, window.innerWidth - 264),
+                    y: Math.min(menu.y, window.innerHeight - 320),
+                  });
+                  setMenu(null);
+                }}
+              />
+              <MenuButton label="Reschedule" onClick={() => openReschedule(menu.appt)} />
+              <MenuButton label="Cancel" danger onClick={() => cancelAppointment(menu.appt)} />
+            </>
+          ) : (
+            <MenuButton
+              label="Move Here"
+              onClick={() => {
+                if (movingId) moveAppointment(movingId, menu.slot.sideId, menu.slot.time);
+              }}
+            />
+          )}
+        </div>
+      )}
+
+      {moveToDate ? (
+        <div
+          ref={moveDateRef}
+          className="fixed z-[2300]"
+          style={{ left: moveToDate.x, top: moveToDate.y }}
+          onMouseDown={(event) => event.stopPropagation()}
+        >
+          <BookCalendar
+            floating={false}
+            title={`Move ${moveToDate.appt.patient}`}
+            value={parseDay(moveToDate.appt.day)}
+            onSelect={(next) => moveAppointmentToDate(moveToDate.appt, next)}
+          />
+        </div>
+      ) : null}
 
       {selected && (
         <div className="fixed inset-0 bg-black/50 z-[2000] flex items-center justify-center p-4" onClick={() => setSelected(null)}>

@@ -769,7 +769,7 @@ export default function DoctorScreenPage() {
                                 key={action.id}
                                 type="button"
                                 title={action.label}
-                                className="w-7 h-7 rounded-full border border-sky-300 bg-sky-50 text-sky-700 hover:bg-sky-100 cursor-pointer inline-flex items-center justify-center"
+                                className="w-7 h-7 rounded-full border border-primary/40 bg-primary/10 text-primary hover:bg-primary/20 cursor-pointer inline-flex items-center justify-center"
                                 onClick={() => setActiveTool(`row-action:${action.id}`)}
                               >
                                 <Icon className="w-3.5 h-3.5" />
